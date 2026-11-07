@@ -42,7 +42,8 @@ PARAGRAPHS = [
 
 
 def write_txt(path: Path) -> None:
-    path.write_text("\n\n".join([BANNER, *PARAGRAPHS]) + "\n", encoding="utf-8")
+    # newline="\n": stop Windows translating to CRLF, so the file matches the repo copy.
+    path.write_text("\n\n".join([BANNER, *PARAGRAPHS]) + "\n", encoding="utf-8", newline="\n")
 
 
 def write_docx(path: Path) -> None:
