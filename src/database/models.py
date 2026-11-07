@@ -106,13 +106,17 @@ class Analysis(Base):
 
     document: Mapped[Document] = relationship(back_populates="analyses")
     indicators: Mapped[list[Indicator]] = relationship(
-        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="Indicator.id")
     entities: Mapped[list[EntityRecord]] = relationship(
-        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="EntityRecord.id")
     categories: Mapped[list[ThreatCategoryRecord]] = relationship(
-        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="ThreatCategoryRecord.id")
     mappings: Mapped[list[TechniqueMappingRecord]] = relationship(
-        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="TechniqueMappingRecord.id")
     risk_components: Mapped[list[RiskComponentRecord]] = relationship(
         back_populates="analysis", cascade="all, delete-orphan", passive_deletes=True,
         order_by="RiskComponentRecord.position")
@@ -142,7 +146,8 @@ class Indicator(Base):
 
     analysis: Mapped[Analysis] = relationship(back_populates="indicators")
     occurrences: Mapped[list[IndicatorOccurrence]] = relationship(
-        back_populates="indicator", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="indicator", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="IndicatorOccurrence.id")
 
     __table_args__ = (UniqueConstraint("analysis_id", "ioc_type", "value",
                                        name="uq_indicator_per_analysis"),)
@@ -155,6 +160,8 @@ class IndicatorOccurrence(Base):
     indicator_id: Mapped[int] = mapped_column(ForeignKey("indicators.id", ondelete="CASCADE"),
                                               index=True)
     raw: Mapped[str] = mapped_column(String(2048))
+    defanged: Mapped[bool] = mapped_column(Boolean, default=False)
+    sentence_index: Mapped[int | None] = mapped_column(Integer, default=None)
     page_number: Mapped[int]
     char_start: Mapped[int]
     char_end: Mapped[int]
@@ -180,7 +187,8 @@ class EntityRecord(Base):
 
     analysis: Mapped[Analysis] = relationship(back_populates="entities")
     mentions: Mapped[list[EntityMentionRecord]] = relationship(
-        back_populates="entity", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="entity", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="EntityMentionRecord.id")
 
     __table_args__ = (UniqueConstraint("analysis_id", "entity_type", "name",
                                        name="uq_entity_per_analysis"),)
@@ -193,6 +201,7 @@ class EntityMentionRecord(Base):
     entity_id: Mapped[int] = mapped_column(ForeignKey("entities.id", ondelete="CASCADE"),
                                            index=True)
     text: Mapped[str] = mapped_column(String(512))
+    sentence_index: Mapped[int]
     page_number: Mapped[int]
     char_start: Mapped[int]
     char_end: Mapped[int]
@@ -215,7 +224,8 @@ class ThreatCategoryRecord(Base):
 
     analysis: Mapped[Analysis] = relationship(back_populates="categories")
     evidence: Mapped[list[CategoryEvidenceRecord]] = relationship(
-        back_populates="category", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="category", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="CategoryEvidenceRecord.id")
 
     __table_args__ = (UniqueConstraint("analysis_id", "category",
                                        name="uq_category_per_analysis"),)
@@ -227,6 +237,7 @@ class CategoryEvidenceRecord(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     category_id: Mapped[int] = mapped_column(
         ForeignKey("threat_categories.id", ondelete="CASCADE"), index=True)
+    sentence_index: Mapped[int]
     page_number: Mapped[int]
     source: Mapped[str] = mapped_column(String(16))
     status: Mapped[AssertionStatus] = mapped_column(_enum(AssertionStatus, "assertion_status"))
@@ -258,7 +269,8 @@ class TechniqueMappingRecord(Base):
 
     analysis: Mapped[Analysis] = relationship(back_populates="mappings")
     evidence: Mapped[list[TechniqueEvidenceRecord]] = relationship(
-        back_populates="mapping", cascade="all, delete-orphan", passive_deletes=True)
+        back_populates="mapping", cascade="all, delete-orphan", passive_deletes=True,
+        order_by="TechniqueEvidenceRecord.id")
 
     __table_args__ = (
         UniqueConstraint("analysis_id", "technique_id", name="uq_mapping_per_analysis"),
@@ -272,6 +284,7 @@ class TechniqueEvidenceRecord(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     mapping_id: Mapped[int] = mapped_column(
         ForeignKey("technique_mappings.id", ondelete="CASCADE"), index=True)
+    sentence_index: Mapped[int]
     page_number: Mapped[int]
     method: Mapped[str] = mapped_column(String(16))
     status: Mapped[AssertionStatus] = mapped_column(_enum(AssertionStatus, "assertion_status"))

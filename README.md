@@ -59,6 +59,11 @@ an evidence trail for every finding: document, page and character position.
 * **Explainable risk score**: R = 0.30V + 0.25M + 0.25A + 0.20E, with a reasoned breakdown for
   each component. It uses the CISA KEV catalogue, guards against inflation and double
   counting, and reports a separate confidence level ([methodology](docs/methodology.md#10-risk-scoring-phase-3)).
+* **Persistence and analyst verification**: SQLite + SQLAlchemy store every analysis.
+  * Documents are de-duplicated by SHA-256, and re-analyses are kept as history.
+  * Analysts can mark IOCs (malicious / benign / false positive) and ATT&CK mappings
+    (confirmed / rejected) with notes. Every change goes into an append-only audit log.
+  * Only findings and their evidence sentences are stored; the full text is opt-in.
 * **Evidence views**: findings for each sentence, and CVE IDs merged with named
   vulnerabilities (Log4Shell ↔ CVE-2021-44228).
 * **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
@@ -187,6 +192,9 @@ with environment variables:
 | `CYBERSLEUTH_LOG_LEVEL` | INFO |
 | `CYBERSLEUTH_SPACY_MODEL` | en_core_web_sm |
 | `CYBERSLEUTH_SPACY_BATCH_SIZE` | 64 |
+| `CYBERSLEUTH_DB_URL` | `sqlite:///data/cybersleuth.db` |
+| `CYBERSLEUTH_STORE_FULL_TEXT` | 0 (store evidence sentences only) |
+| `CYBERSLEUTH_ANALYST` | analyst (name recorded in the audit log) |
 
 ## Testing
 
@@ -219,7 +227,8 @@ src/intelligence/       Analysis orchestrator, evidence views (MITRE mapping, ri
 src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
 src/ml/                 Threat-category dataset, rule baseline, classifier, evaluation
 src/visualization/      Table builders for the UI
-src/database/           SQLAlchemy models (planned)
+src/ui/                 Streamlit pages (Analysis, History, Dashboard) and tab renderers
+src/database/           SQLAlchemy schema, repository, hydration of stored analyses
 src/reporting/          PDF/JSON/CSV export (planned)
 data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated lists, rules
 data/evaluation/        Annotation guidelines and the annotated dev/test documents

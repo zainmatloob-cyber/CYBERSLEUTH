@@ -177,7 +177,9 @@ class AnalysisRepository:
                 ioc_type=i.ioc_type, value=i.value, flags=sorted(f.value for f in i.flags),
                 defanged=i.defanged, occurrence_count=i.count, source=i.source,
                 verification=i.verification,
-                occurrences=[IndicatorOccurrence(raw=o.raw, page_number=o.page_number,
+                occurrences=[IndicatorOccurrence(raw=o.raw, defanged=o.defanged,
+                                                 sentence_index=o.sentence_index,
+                                                 page_number=o.page_number,
                                                  char_start=o.char_start, char_end=o.char_end,
                                                  context=o.context) for o in i.occurrences]))
         for e in result.entities:
@@ -185,14 +187,16 @@ class AnalysisRepository:
                 entity_type=e.entity_type, name=e.name, source=e.source.value, kb_id=e.kb_id,
                 attributes=dict(e.attributes), alternatives=list(e.alternatives),
                 mention_count=e.count,
-                mentions=[EntityMentionRecord(text=m.text, page_number=m.page_number,
+                mentions=[EntityMentionRecord(text=m.text, sentence_index=m.sentence_index,
+                                              page_number=m.page_number,
                                               char_start=m.char_start, char_end=m.char_end,
                                               context=m.context) for m in e.mentions]))
         for c in result.categories:
             analysis.categories.append(ThreatCategoryRecord(
                 category=c.category, status=c.status, sources=c.sources,
                 sentence_count=c.sentence_count, max_score=c.max_score,
-                evidence=[CategoryEvidenceRecord(page_number=e.page_number, source=e.source,
+                evidence=[CategoryEvidenceRecord(sentence_index=e.sentence_index,
+                                                 page_number=e.page_number, source=e.source,
                                                  status=e.status, score=e.score,
                                                  terms=list(e.terms), context=e.context)
                           for e in c.evidence]))
@@ -202,7 +206,8 @@ class AnalysisRepository:
                 status=m.status, methods=m.methods, explicit=m.explicit,
                 max_score=m.max_score, verdict=m.verdict,
                 evidence=[TechniqueEvidenceRecord(
-                    page_number=e.page_number, method=e.method.value, status=e.status,
+                    sentence_index=e.sentence_index, page_number=e.page_number,
+                    method=e.method.value, status=e.status,
                     matched_text=e.matched_text, score=e.score,
                     alternatives=[list(a) for a in e.alternatives], context=e.context)
                     for e in m.evidence]))
@@ -221,6 +226,8 @@ class AnalysisRepository:
             if item is None:
                 raise DatabaseError(f"{target.value} {item_id} not found.")
             old = getattr(item, field)
+            if old == new_value and (item.analyst_note or None) == (note or None):
+                return  # unchanged: no update, no audit event
             setattr(item, field, new_value)
             item.analyst_note = note
             item.verified_at = utcnow()

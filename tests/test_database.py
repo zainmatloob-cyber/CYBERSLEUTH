@@ -133,6 +133,18 @@ def test_indicator_verdict_with_audit_trail(repo, result):
     assert events[0].note == "Seen in our proxy logs"
 
 
+def test_unchanged_verdict_records_no_event(repo, result):
+    analysis_id = repo.save(result).analysis_id
+    indicator_id = repo.get_analysis(analysis_id).indicators[0].id
+    repo.set_indicator_verdict(indicator_id, "unverified")  # same value, no note
+    repo.set_indicator_verdict(indicator_id, "benign", note="n")
+    repo.set_indicator_verdict(indicator_id, "benign", note="n")  # repeated save
+    assert [(e.old_value, e.new_value) for e in repo.verification_events()] == [
+        ("unverified", "benign")]
+    repo.set_indicator_verdict(indicator_id, "benign", note="changed note")
+    assert len(repo.verification_events()) == 2  # a note change is recorded
+
+
 def test_mapping_verdict(repo, result):
     analysis_id = repo.save(result).analysis_id
     mapping = next(m for m in repo.get_analysis(analysis_id).mappings

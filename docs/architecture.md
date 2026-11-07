@@ -138,3 +138,27 @@ Uploaded documents are treated as hostile input.
 | `src/intelligence/mitre_mapper.py` | Explicit matcher, LinearSVC technique model with abstention, aggregation |
 | `src/intelligence/threat_assessment.py` | Report-level categories from sentence evidence |
 | `src/intelligence/risk_scorer.py` | Explainable, configurable risk model; CISA KEV |
+
+## Phase 4: persistence and UI
+
+```mermaid
+flowchart LR
+    U[Upload] --> A[Analyzer.analyze] --> R[(AnalysisRepository.save)]
+    R -->|analysis id| G[get_analysis] --> H[hydrate → StoredAnalysis] --> V[Tab renderers]
+    HP[History page] --> G
+    V -->|verdict form| W[set_indicator_verdict / set_mapping_verdict] --> R
+```
+
+* **One rendering path.** Fresh and reopened analyses are both rendered from a
+  `StoredAnalysis`, rebuilt from the database (`src/database/views.py`). A round-trip test
+  proves that save → load → hydrate reproduces every finding exactly.
+* **Session-only views** (Evidence, Text, Sentences) need the full text, which is not stored
+  by default, so they appear only for the current upload.
+* **Pages** (`src/ui/pages.py`) receive the analyzer and repository as arguments. If the
+  database cannot be opened, analysis still works without saving or verification.
+* **Integrity**:
+  * foreign keys with `ON DELETE CASCADE` (SQLite pragma set on every connection);
+  * unique findings per analysis;
+  * CHECK constraints on enums and ranges;
+  * schema version in `PRAGMA user_version`;
+  * unchanged verdict saves write no audit event.
