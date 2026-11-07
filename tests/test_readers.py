@@ -190,8 +190,8 @@ def test_read_docx_paragraphs(docx_bytes):
 
 
 def test_read_docx_tables_in_document_order():
-    lines = read_docx(validate_upload(_docx_with_table(), "r.docx")).pages[0].text.splitlines()
-    assert lines == [
+    blocks = read_docx(validate_upload(_docx_with_table(), "r.docx")).pages[0].text.split("\n\n")
+    assert blocks == [
         "Intro paragraph.",
         "Indicator | Type",
         "198.51.100.7 | IPv4",

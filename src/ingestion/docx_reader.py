@@ -73,7 +73,9 @@ def read_docx(file: ValidatedFile) -> ExtractedDocument:
     props = document.core_properties
     metadata = clean_metadata({f: getattr(props, f, None) for f in _CORE_PROPERTY_FIELDS})
 
-    text = "\n".join(lines)
+    # Blank line between blocks: each DOCX paragraph and table row is a real
+    # structural unit, so the sentence splitter must never merge them.
+    text = "\n\n".join(line for line in lines if line.strip())
     logger.info("Read DOCX %s (%d blocks, %d chars)", file.filename, len(lines), len(text))
     return ExtractedDocument.from_validated(
         file, pages=[PageText(page_number=1, text=text)], metadata=metadata
