@@ -6,10 +6,11 @@ CyberSleuth turns unstructured cybersecurity reports (PDF, DOCX, TXT) into
 structured, explainable, evidence-backed threat intelligence. It runs entirely
 locally with free and open-source tools and needs no paid API.
 
-> **Status: Phase 3 complete, v0.3.0.** Ingestion, IOC extraction, entity recognition,
-> threat classification (TF-IDF + Logistic Regression), MITRE ATT&CK technique mapping and
-> explainable risk scoring work and are tested. The database, dashboard and report exports
-> (Phase 4) are **not yet implemented**. See the [Roadmap](#roadmap).
+> **Status: Phase 4 complete, v0.4.0.** Ingestion, IOC extraction, entity recognition,
+> threat classification (TF-IDF + Logistic Regression), MITRE ATT&CK technique mapping,
+> explainable risk scoring, SQLite persistence with analyst verification, a dashboard with
+> cross-document explorers, and PDF/JSON/CSV reports work and are tested. Phase 5 (evaluation
+> on real reports, hardening, deployment) is next. See the [Roadmap](#roadmap).
 
 ## Problem
 
@@ -69,6 +70,12 @@ an evidence trail for every finding: document, page and character position.
   * An **IOC Explorer** showing which reports share an indicator, an **Entity Explorer**, and an
     **ATT&CK Explorer** with verification coverage and a tactic × document heatmap.
   * Counts use documents, not mentions, and only the latest analysis per document.
+* **Reports** ([docs/reports.md](docs/reports.md)):
+  * **PDF** for analysts, **JSON** (complete, versioned schema) and **CSV** tables (ZIP).
+  * They include evidence sentences, analyst verdicts and notes, the verification history and
+    the limitations.
+  * Indicators and evidence are defanged, CSV formula injection is neutralised, and the full
+    document text is never exported.
 * **Evidence views**: findings for each sentence, and CVE IDs merged with named
   vulnerabilities (Log4Shell ↔ CVE-2021-44228).
 * **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
@@ -115,7 +122,7 @@ Sentence-level results on ATT&CK-style text. Expect lower performance on real re
 
 ```text
 Upload → Validation → Extraction → Cleaning → Sentences → IOCs & Entities → Evidence
-       → Threat Classification → MITRE ATT&CK → Risk Scoring → [Database → Reports]   (bracketed: planned)
+       → Threat Classification → MITRE ATT&CK → Risk Scoring → Database → Dashboard / Reports
 ```
 
 Details: [docs/architecture.md](docs/architecture.md) · Methodology and
@@ -123,14 +130,15 @@ limitations: [docs/methodology.md](docs/methodology.md)
 
 ## Technology stack
 
-| Area | Phase 1 | Planned |
-|---|---|---|
-| Language | Python 3.12 | |
-| UI | Streamlit, Plotly | |
-| Documents | PyMuPDF, python-docx | |
-| Data | pandas | NumPy, SQLite + SQLAlchemy |
-| NLP / ML | spaCy 3.8 (`en_core_web_sm`), regex extraction, MITRE ATT&CK KB | TF-IDF, scikit-learn |
-| Quality | pytest, pytest-cov, ruff | |
+| Area | Tools |
+|---|---|
+| Language | Python 3.12 |
+| UI | Streamlit (multipage), Plotly |
+| Documents | PyMuPDF, python-docx |
+| Data | pandas, SQLite + SQLAlchemy 2.0 |
+| NLP / ML | spaCy 3.8 (`en_core_web_sm`), regex extraction, MITRE ATT&CK v20.1 KB, scikit-learn (TF-IDF, Logistic Regression, LinearSVC) |
+| Reports | fpdf2 (PDF), json, csv |
+| Quality | pytest, pytest-cov, ruff |
 
 ## Installation (Windows)
 
@@ -217,6 +225,9 @@ The suite covers:
 * IOC false-positive traps and defanging variants;
 * entity disambiguation and knowledge-base integrity;
 * the evaluation metrics;
+* persistence, hydration round-trips and the verification audit trail;
+* dashboard aggregations (document counting, negation, re-analysis);
+* report safety (defanging, formula injection, no full text, link restrictions);
 * end-to-end analysis, and the UI through Streamlit's `AppTest`.
 
 Model-dependent tests are skipped automatically if `en_core_web_sm` is not installed.
@@ -228,13 +239,13 @@ app.py                  Streamlit entry point
 config/settings.py      Limits and paths (environment overrides)
 src/ingestion/          Validation, readers, cleaning, pipeline, data models
 src/nlp/                Sentence segmentation, IOC extraction, entity recognition, KB loader
-src/intelligence/       Analysis orchestrator, evidence views (MITRE mapping, risk: planned)
+src/intelligence/       Analysis orchestrator, ATT&CK mapping, threat assessment, risk, evidence
 src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
 src/ml/                 Threat-category dataset, rule baseline, classifier, evaluation
 src/visualization/      Table builders, cross-document aggregations, Plotly figures
 src/ui/                 Streamlit pages (Analysis, History, Dashboard, IOC/Entity/ATT&CK explorers)
 src/database/           SQLAlchemy schema, repository, hydration of stored analyses
-src/reporting/          PDF/JSON/CSV export (planned)
+src/reporting/          PDF/JSON/CSV report exports
 data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated lists, rules
 data/evaluation/        Annotation guidelines and the annotated dev/test documents
 scripts/                Sample generator, ATT&CK KB builder, evaluation runner
@@ -247,7 +258,7 @@ docs/                   Architecture, methodology, evaluation reports
 - [x] **Phase 1:** Foundation and document ingestion
 - [x] **Phase 2:** IOC extraction, cybersecurity named-entity recognition, evidence views, evaluation
 - [x] **Phase 3:** Threat classification (rule baseline + TF-IDF/Logistic Regression), MITRE ATT&CK mapping, explainable risk scoring
-- [ ] **Phase 4:** SQLite persistence, dashboard, explorers, PDF/JSON/CSV reports
+- [x] **Phase 4:** SQLite persistence and analyst verification, dashboard, explorers, PDF/JSON/CSV reports
 - [ ] **Phase 5:** Evaluation on a manually verified dataset, hardening, deployment
 
 ## Known limitations

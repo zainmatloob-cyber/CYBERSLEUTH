@@ -77,7 +77,8 @@ def test_result_views_render(analysis_app):
     assert metrics["ATT&CK techniques"] == "2"  # T1558.003 observed, T1566 negated
     assert metrics["Risk"].split(" · ")[1] in {"Low", "Moderate", "High", "Critical"}
     assert analysis_app.success  # no warnings → success banner
-    assert [t.label for t in analysis_app.tabs][-1] == "ℹ️ Metadata"
+    assert [t.label for t in analysis_app.tabs][-2:] == ["ℹ️ Metadata",
+                                                       "📤 Export"]
     assert "🔤 Sentences" in [t.label for t in analysis_app.tabs]  # session text available
 
 

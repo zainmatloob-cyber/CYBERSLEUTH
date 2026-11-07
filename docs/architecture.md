@@ -20,11 +20,10 @@ flowchart TD
 
     classDef done fill:#0b3d2e,stroke:#00c2a8,color:#e6edf3
     classDef todo fill:#161b22,stroke:#6e7681,color:#8b949e
-    class V,X,C,S,I,T,M,R done
-    class D,UI todo
+    class V,X,C,S,I,T,M,R,D,UI done
 ```
 
-Green stages are implemented (Phases 1–3). Grey stages come in later phases.
+All stages are implemented (Phases 1–4).
 
 ## Phase 2: intelligence extraction
 
@@ -109,6 +108,9 @@ Uploaded documents are treated as hostile input.
 | Markdown/link injection in the UI | Document text shown only in plain-text widgets; filenames, warnings and errors escaped before Markdown rendering |
 | Accidental contact with attacker infrastructure | Nothing ever resolves or fetches extracted URLs or IPs |
 | Information leakage | Unexpected exceptions are logged; users see a generic message |
+| Clickable attacker infrastructure in reports | Network IOCs and evidence sentences defanged in PDF/CSV; only ATT&CK links are clickable ([reports](reports.md)) |
+| CSV formula injection | Cells starting with `= + - @` (or tab/CR) are prefixed with `'` |
+| Document leakage through exports | Reports never include the full text, even when it is stored |
 
 ## Extension points
 
@@ -175,3 +177,17 @@ validator:
 * heatmaps use a single-hue sequential ramp, with zero receding into the dark surface;
 * risk bands are **not** colour-coded with status hues, because warning and serious fail the
   normal-vision separation floor (ΔE 13.6 < 15). Severity is carried by the label and icon.
+
+### Report exports
+
+```mermaid
+flowchart LR
+    V[StoredAnalysis + audit events] --> J[json_report.build_report]
+    J --> JS[JSON]
+    J --> C[csv_report → ZIP of CSVs]
+    J --> P[pdf_report → PDF]
+```
+
+One dictionary feeds all three formats, so they cannot disagree. Defanging, formula
+neutralisation and filename sanitising live in `src/reporting/common.py`. The formats,
+schema and safety rules are documented in [reports.md](reports.md).

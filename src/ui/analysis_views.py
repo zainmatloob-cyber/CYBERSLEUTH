@@ -19,6 +19,8 @@ from src.intelligence.analyzer import AnalysisResult
 from src.intelligence.mitre_mapper import AnalystVerdict
 from src.nlp.entity_models import EntityType
 from src.nlp.ioc_models import IOCType, VerificationStatus
+from src.reporting import csv_report, json_report, pdf_report
+from src.reporting.common import report_stem
 from src.ui.common import BAND_ICON, md_escape
 from src.visualization import tables
 
@@ -276,7 +278,8 @@ def render_metadata(view: StoredAnalysis, repo: AnalysisRepository | None) -> No
     st.dataframe(pd.DataFrame(provenance, columns=["Field", "Value"]), hide_index=True,
                  width="stretch")
     st.write("**Verification history**")
-    events = repo.verification_events(view.analysis_id) if repo and view.analysis_id else []
+    events = (repo.verification_events(view.analysis_id)
+                      if repo and view.analysis_id else [])
     if events:
         st.dataframe(pd.DataFrame([
             {"When (UTC)": e.created_at.strftime("%Y-%m-%d %H:%M:%S"),
@@ -285,6 +288,40 @@ def render_metadata(view: StoredAnalysis, repo: AnalysisRepository | None) -> No
             for e in events]), hide_index=True, width="stretch")
     else:
         st.caption("No analyst verdicts recorded yet.")
+
+
+REPORTS = (
+    ("PDF report", "pdf", "application/pdf", pdf_report.to_pdf,
+     "Analyst-facing report: summary, risk, findings with evidence, verification, limitations."),
+    ("JSON (complete)", "json", "application/json", json_report.to_json,
+     "Every finding and evidence sentence, versioned schema. Includes canonical IOC values."),
+    ("CSV tables (ZIP)", "zip", "application/zip", csv_report.to_csv_zip,
+     "One CSV per finding type, defanged, safe to open in a spreadsheet."),
+)
+
+
+def render_export(view: StoredAnalysis, repo: AnalysisRepository | None) -> None:
+    st.caption("Reports contain findings and their evidence sentences, never the full "
+               "document text. Network indicators are defanged in the PDF and CSV; verdicts "
+               "are exported as currently recorded.")
+    if not view.analysis_id:
+        st.info("This analysis is not saved, so reports carry no analyst verdicts.")
+    stem = report_stem(view)
+
+    def builder(export: Callable) -> Callable[[], bytes]:
+        def build() -> bytes:  # runs on click, so verdicts saved since are included
+            events = (repo.verification_events(view.analysis_id)
+                      if repo and view.analysis_id else [])
+            return export(view, events)
+        return build
+
+    for column, (label, ext, mime, export, help_text) in zip(
+            st.columns(len(REPORTS)), REPORTS, strict=True):
+        with column:
+            st.download_button(f"⬇️ {label}", data=builder(export), file_name=f"{stem}.{ext}",
+                               mime=mime, on_click="ignore", key=f"export_{ext}",
+                               width="stretch")
+            st.caption(help_text)
 
 
 # --- session-only tabs (need the document text) -----------------------------------
@@ -337,6 +374,7 @@ def render_analysis(view: StoredAnalysis, repo: AnalysisRepository | None,
                   ("📄 Text", lambda: render_text(result.document)),
                   ("🔤 Sentences", lambda: render_sentences(result.document))]
     views.append(("ℹ️ Metadata", lambda: render_metadata(view, repo)))
+    views.append(("📤 Export", lambda: render_export(view, repo)))
     for tab, (_, render) in zip(st.tabs([name for name, _ in views]), views, strict=True):
         with tab:
             render()
