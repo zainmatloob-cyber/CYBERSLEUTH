@@ -1,0 +1,36 @@
+{
+ "version": "2026-11-07",
+ "description": "Manually reviewed disambiguation rules for knowledge-base entity names. Forms listed in context_required_forms (and every form of 3 characters or fewer) are accepted only if the same sentence contains a context keyword for the entity's type. blocked_forms are never matched.",
+ "blocked_forms": ["at", "route", "meek"],
+ "context_required_forms": [
+  "Agenda", "Anchor", "Apostle", "Armageddon", "Aurora", "Avenger", "Axiom", "Bazar", "Bumblebee",
+  "Cannon", "Carbon", "Chaos", "Chimera", "Cicada", "Cleaver", "Covenant", "Crimson", "Crutch",
+  "Cuba", "Denis", "Disco", "Donut", "Dragonfly", "Elise", "Embargo", "Emissary", "Empire", "Epic",
+  "Equation", "Expand", "Explosive", "Ferocious", "Flame", "Gadolinium", "Gazer", "Havoc",
+  "Helminth", "Inception", "James", "Karma", "Kevin", "Kido", "Krypton", "Leviathan", "Lucifer",
+  "Lurid", "Machete", "Mafalda", "Mango", "Mantis", "Matryoshka", "Maze", "Meteor", "Milan",
+  "Mirage", "Mori", "Mosquito", "Mythic", "Ninja", "Octopus", "Page", "Pandora", "Patchwork",
+  "Peppy", "Phosphorus", "Ping", "Play", "Pony", "Prestige", "Proton", "Rattlesnake", "Reaper",
+  "Reaver", "Responder", "Rover", "Royal", "Ruler", "Samurai", "Scorpion", "Shark", "Sidewinder",
+  "Silence", "Sliver", "Snake", "Soldier", "Solar", "Spark", "Spica", "Strider", "Systeminfo",
+  "Tasklist", "Tick", "Trinity", "Wiper",
+  "BACKSPACE", "BISCUIT", "BITTER", "CALENDAR", "CANOPY", "CHROMIUM", "CRASHPAD", "DEADWOOD",
+  "DRIFTWOOD", "DUSTPAN", "ELMER", "FIREANT", "GRIFFON", "HAYMAKER", "LOWBALL", "MEDUSA",
+  "MERCURY", "MONSOON", "NICKEL", "PACEMAKER", "PHOTO", "PITSTOP", "PLATINUM", "REPTILE",
+  "RIPTIDE", "SHOTPUT", "SILICON", "SKID", "SUPERNOVA", "UPPERCUT", "VERMIN", "VIPER", "ZINC",
+  "ZIPLINE",
+  "Cherry Picker", "Cloud Atlas", "Deputy Dog", "Line Dancer", "Line Runner", "Poison Ivy",
+  "Rising Sun", "Sea Turtle", "Skeleton Key", "Small Sieve"
+ ],
+ "context_keywords": {
+  "malware": ["malware", "ransomware", "trojan", "backdoor", "loader", "dropper", "downloader",
+              "botnet", "rat", "implant", "payload", "stealer", "infostealer", "wiper", "worm",
+              "variant", "sample", "family", "strain", "spyware", "rootkit", "keylogger",
+              "encryptor", "locker", "beacon", "webshell", "web shell"],
+  "threat_actor": ["group", "actor", "actors", "apt", "operators", "gang", "crew", "adversary",
+                   "adversaries", "attributed", "nation-state", "state-sponsored", "cluster",
+                   "intrusion set", "affiliate", "affiliates", "hackers"],
+  "tool": ["tool", "tools", "utility", "command", "binary", "executed", "execute", "framework",
+           "c2", "lolbin", "toolkit", "script", "invoked", "ran"]
+ }
+}

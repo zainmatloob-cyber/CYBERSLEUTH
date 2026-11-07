@@ -33,3 +33,15 @@ class EncryptedDocumentError(IngestionError):
 
 class EmptyDocumentError(IngestionError):
     """Document parsed successfully but contains no extractable text."""
+
+
+class NLPError(CyberSleuthError):
+    """Base class for NLP component failures."""
+
+
+class ModelNotAvailableError(NLPError):
+    """A required NLP model is not installed."""
+
+
+class KnowledgeBaseError(NLPError):
+    """A bundled knowledge-base file is missing or malformed."""

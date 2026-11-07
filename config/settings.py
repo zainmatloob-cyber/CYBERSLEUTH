@@ -44,6 +44,14 @@ class IngestionSettings:
 
 
 @dataclass(frozen=True)
+class NlpSettings:
+    """NLP model configuration."""
+
+    spacy_model: str = os.getenv("CYBERSLEUTH_SPACY_MODEL", "en_core_web_sm")
+    spacy_batch_size: int = _env_int("SPACY_BATCH_SIZE", 64)
+
+
+@dataclass(frozen=True)
 class Settings:
     """Top-level application settings."""
 
@@ -54,6 +62,7 @@ class Settings:
     processed_dir: Path = PROJECT_ROOT / "data" / "processed"
     knowledge_base_dir: Path = PROJECT_ROOT / "data" / "knowledge_base"
     ingestion: IngestionSettings = field(default_factory=IngestionSettings)
+    nlp: NlpSettings = field(default_factory=NlpSettings)
 
 
 settings = Settings()

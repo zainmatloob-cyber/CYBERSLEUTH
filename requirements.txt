@@ -1,6 +1,12 @@
-# CyberSleuth runtime dependencies — Phase 1 (ingestion + UI)
-# Later phases add: spacy, scikit-learn, numpy, SQLAlchemy, plotly, fpdf2/reportlab
+# CyberSleuth runtime dependencies
+# Later phases add: scikit-learn, numpy, SQLAlchemy, plotly, fpdf2/reportlab
+
+# Phase 1: ingestion + UI
 streamlit>=1.38,<2.0
 PyMuPDF>=1.24,<2.0
 python-docx>=1.1,<2.0
 pandas>=2.2,<3.0
+
+# Phase 2: NLP
+spacy>=3.8,<3.9
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
