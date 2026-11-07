@@ -52,6 +52,17 @@ class NlpSettings:
 
 
 @dataclass(frozen=True)
+class DatabaseSettings:
+    """Persistence configuration."""
+
+    url: str = os.getenv("CYBERSLEUTH_DB_URL",
+                         f"sqlite:///{(PROJECT_ROOT / 'data' / 'cybersleuth.db').as_posix()}")
+    # Privacy default: keep only evidence sentences that support findings, not the full text.
+    store_full_text: bool = os.getenv("CYBERSLEUTH_STORE_FULL_TEXT", "0") == "1"
+    analyst_name: str = os.getenv("CYBERSLEUTH_ANALYST", "analyst")
+
+
+@dataclass(frozen=True)
 class Settings:
     """Top-level application settings."""
 
@@ -63,6 +74,7 @@ class Settings:
     knowledge_base_dir: Path = PROJECT_ROOT / "data" / "knowledge_base"
     ingestion: IngestionSettings = field(default_factory=IngestionSettings)
     nlp: NlpSettings = field(default_factory=NlpSettings)
+    database: DatabaseSettings = field(default_factory=DatabaseSettings)
 
 
 settings = Settings()
