@@ -1,0 +1,8 @@
+# Store text with LF line endings in the repository on every OS
+* text=auto eol=lf
+
+# Never touch binary documents
+*.pdf  binary
+*.docx binary
+*.png  binary
+*.jpg  binary
