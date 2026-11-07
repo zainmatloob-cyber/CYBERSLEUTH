@@ -40,8 +40,10 @@ def test_micro_and_macro():
     per_type = {"x": Counts(tp=9, fp=1, fn=0), "y": Counts(tp=0, fp=0, fn=1)}
     total = micro(per_type.values())
     assert (total.tp, total.fp, total.fn) == (9, 1, 1)
-    # "y" has support but no predictions → F1 undefined → excluded from the mean.
-    assert macro_f1(per_type) == pytest.approx(per_type["x"].f1)
+    # "y" has gold support but no predictions: recall 0 → F1 counts as 0 (not skipped).
+    assert macro_f1(per_type) == pytest.approx(per_type["x"].f1 / 2)
+    # A type with no gold items is not part of the macro average.
+    assert macro_f1({**per_type, "z": Counts(fp=3)}) == pytest.approx(per_type["x"].f1 / 2)
     assert macro_f1({}) is None
 
 

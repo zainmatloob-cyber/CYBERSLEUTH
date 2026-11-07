@@ -62,6 +62,10 @@ def micro(counts: Iterable[Counts]) -> Counts:
 
 
 def macro_f1(per_type: dict[str, Counts]) -> float | None:
-    """Unweighted mean F1 over types that have gold support (rare types count equally)."""
-    values = [c.f1 for c in per_type.values() if c.support and c.f1 is not None]
+    """Unweighted mean F1 over types that have gold support (rare types count equally).
+
+    A type with gold items but no predictions has recall 0, so its F1 counts as 0.
+    Skipping it (because precision is undefined) would inflate the average.
+    """
+    values = [c.f1 if c.f1 is not None else 0.0 for c in per_type.values() if c.support]
     return sum(values) / len(values) if values else None
