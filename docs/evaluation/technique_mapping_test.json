@@ -1,0 +1,55 @@
+{
+ "date": "2026-11-07 16:07 UTC",
+ "revision": "53c514b",
+ "selected_C": 2.0,
+ "threshold": -0.6465533983345989,
+ "target_precision": 0.8,
+ "val": {
+  "selective_precision": 0.8052407932011332,
+  "coverage": 0.9697802197802198
+ },
+ "classes": 196,
+ "test": {
+  "n": 2149,
+  "top1": 0.8161935784085621,
+  "top3": 0.9283387622149837,
+  "top5": 0.95067473243369,
+  "coverage": 0.9716147045137273,
+  "selective_precision": 0.8280651340996169,
+  "sentences_with_gold_technique_unseen_in_train": 1,
+  "ci95": {
+   "top1": [
+    0.7969161010348281,
+    0.8339995969745033
+   ],
+   "top3": [
+    0.9165896598944364,
+    0.9391434617309896
+   ],
+   "top5": [
+    0.938990438817506,
+    0.9615757573190566
+   ],
+   "selective_precision": [
+    0.8100201640726089,
+    0.8449458265947786
+   ],
+   "coverage": [
+    0.9625942539888463,
+    0.9794982029604836
+   ]
+  },
+  "explicit": {
+   "coverage": 0.09632387156817124,
+   "precision": 0.6331877729257642,
+   "predicted": 229,
+   "correct": 145
+  },
+  "assertion_status": {
+   "observed": 1404,
+   "capability": 705,
+   "possible": 33,
+   "negated": 7
+  }
+ }
+}

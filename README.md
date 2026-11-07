@@ -80,6 +80,16 @@ Category labels are derived from technique labels. Results are on a test split o
 | Rule baseline | 0.64 (0.59–0.69) |
 | Majority baseline | 0.00 |
 
+### ATT&CK technique mapping (Phase 3, in progress)
+Explicit matching (technique IDs, ATT&CK names, curated terms) plus a LinearSVC suggesting one
+of 196 parent techniques. Each mapping gets an assertion status (observed / capability /
+possible / negated) and starts unverified ([model card](docs/models/technique_mapper.md)):
+
+| Test split (2,149 sentences, unseen actors) | Value (95% CI) |
+|---|---|
+| Model top-1 / top-5 accuracy | **0.82** (0.80–0.83) / 0.95 |
+| Explicit matcher precision (lower bound) | 0.63 |
+
 Sentence-level results on ATT&CK-style text. Expect lower performance on real reports.
 
 ## Architecture

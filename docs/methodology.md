@@ -200,3 +200,21 @@ deterministic).
 **Distinction to keep in mind.** The rules detect *mentions*, while the labels describe
 *behaviour*. This is the same mention-vs-evidence problem the ATT&CK mapping stage
 must handle.
+
+## 8. ATT&CK technique mapping (Phase 3)
+
+`src/intelligence/mitre_mapper.py` combines **explicit** mappings and **model** mappings:
+* Explicit (deterministic) mappings come from technique IDs (revoked IDs translated through
+  `attack_techniques.json`), multi-word ATT&CK names, and curated terms with verified IDs.
+* Model mappings come from a LinearSVC over 196 parent techniques, with an abstention
+  threshold chosen on val.
+
+Each piece of evidence carries an assertion status
+(`observed`/`capability`/`possible`/`negated`, from `src/intelligence/assertion.py`), and
+each mapping starts `unverified`. This is the **mention vs. evidence** distinction: "Phishing
+was not involved" yields a *negated* T1566 mapping, not evidence of phishing.
+
+Test results (scored once): model top-1 0.82 (95% CI 0.80–0.83) and top-5 0.95. The explicit
+matcher's precision of 0.63 is a lower bound because the gold labels are single-label.
+Abstention cannot be evaluated properly, because the data has no "no technique" sentences.
+Details, error analysis and open fixes are in the [model card](models/technique_mapper.md).
