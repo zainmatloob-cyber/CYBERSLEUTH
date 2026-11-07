@@ -1,0 +1,88 @@
+{
+ "version": "2026-11-07b",
+ "description": "Explainable risk model R = sum(weight_c * component_c), components on 0-100. All values are configurable initial heuristics chosen by the project author, not cybersecurity standards.",
+ "weights": {
+  "vulnerability": 0.3,
+  "malware": 0.25,
+  "attack_behaviour": 0.25,
+  "evidence": 0.2
+ },
+ "bands": [
+  {
+   "name": "Low",
+   "min": 0
+  },
+  {
+   "name": "Moderate",
+   "min": 30
+  },
+  {
+   "name": "High",
+   "min": 50
+  },
+  {
+   "name": "Critical",
+   "min": 75
+  }
+ ],
+ "vulnerability": {
+  "mentioned_cve": 50,
+  "named_vulnerability": 70,
+  "known_exploited": 90,
+  "known_exploited_ransomware": 100,
+  "breadth_bonus_per_extra_cve": 5,
+  "breadth_bonus_cap": 10
+ },
+ "malware": {
+  "malware_mentioned": 50,
+  "known_malware_family": 60,
+  "ransomware_evidence": 85,
+  "file_hash_bonus": 10
+ },
+ "attack_behaviour": {
+  "tactic_severity": {
+   "impact": 100,
+   "exfiltration": 90,
+   "credential-access": 80,
+   "lateral-movement": 75,
+   "privilege-escalation": 70,
+   "command-and-control": 65,
+   "initial-access": 60,
+   "persistence": 60,
+   "collection": 60,
+   "execution": 55,
+   "stealth": 55,
+   "discovery": 35,
+   "reconnaissance": 25,
+   "resource-development": 20,
+   "defense-impairment": 60
+  },
+  "status_factor": {
+   "observed": 1.0,
+   "capability": 0.5,
+   "possible": 0.25,
+   "negated": 0.0
+  },
+  "method_factor": {
+   "explicit": 1.0,
+   "model": 0.5
+  },
+  "breadth_bonus_per_extra_tactic": 3,
+  "breadth_bonus_cap": 15,
+  "breadth_counts": "explicit or multi-sentence techniques only"
+ },
+ "evidence": {
+  "corroborated_share_points": 40,
+  "evidence_sentences_points": 30,
+  "evidence_sentences_full_at": 10,
+  "ioc_type_diversity_points": 30,
+  "ioc_type_diversity_full_at": 4
+ },
+ "confidence": {
+  "min_sentences": 5,
+  "model_only_share_warning": 0.7
+ },
+ "changelog": [
+  "2026-11-07b: defense-evasion replaced by defense-impairment (ATT&CK v20.1 split it into stealth and defense-impairment); model-suggestion factor 0.8 -> 0.5 and breadth bonus restricted to explicit/corroborated techniques, because model suggestions showed false positives on non-technique sentences (headings, acknowledgements) and their false-positive rate on real reports is unmeasured."
+ ]
+}

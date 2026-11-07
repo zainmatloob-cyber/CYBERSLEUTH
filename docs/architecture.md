@@ -20,11 +20,11 @@ flowchart TD
 
     classDef done fill:#0b3d2e,stroke:#00c2a8,color:#e6edf3
     classDef todo fill:#161b22,stroke:#6e7681,color:#8b949e
-    class V,X,C,S,I done
-    class T,M,R,D,UI todo
+    class V,X,C,S,I,T,M,R done
+    class D,UI todo
 ```
 
-Green stages are implemented (Phases 1–2). Grey stages come in later phases.
+Green stages are implemented (Phases 1–3). Grey stages come in later phases.
 
 ## Phase 2: intelligence extraction
 
@@ -118,3 +118,23 @@ Uploaded documents are treated as hostile input.
   rule-based one.
 * **New formats**: add a reader that returns `ExtractedDocument`, a `FileType`
   member, a magic-byte rule in the validator, and a `case` in `pipeline._read`.
+
+## Phase 3: threat intelligence
+
+`Analyzer.analyze()` continues after entity recognition with:
+* `ThreatAssessor.assess()`: classifier and rules per sentence, aggregated into report categories;
+* `TechniqueMapper.map()`: explicit and model ATT&CK mappings, each with an assertion status;
+* `RiskScorer.score()`: R = 0.30V + 0.25M + 0.25A + 0.20E, with explanations and a separate
+  confidence level.
+
+`AnalysisResult.components` records which mode each stage ran in (model or fallback).
+
+| Module | Responsibility |
+|---|---|
+| `src/ml/dataset.py` | Pinned HF dataset, technique-to-category labels, leakage-safe grouped split |
+| `src/ml/rule_classifier.py`, `threat_classifier.py`, `evaluation.py` | Rule baseline; TF-IDF + LR; multi-label metrics with bootstrap CIs |
+| `src/intelligence/attack_kb.py` | ATT&CK v20.1 techniques; resolving revoked IDs |
+| `src/intelligence/assertion.py` | observed / capability / possible / negated |
+| `src/intelligence/mitre_mapper.py` | Explicit matcher, LinearSVC technique model with abstention, aggregation |
+| `src/intelligence/threat_assessment.py` | Report-level categories from sentence evidence |
+| `src/intelligence/risk_scorer.py` | Explainable, configurable risk model; CISA KEV |

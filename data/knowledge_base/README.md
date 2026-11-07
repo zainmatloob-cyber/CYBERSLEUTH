@@ -7,6 +7,9 @@ Versioned reference data bundled with CyberSleuth. Nothing here is fetched at ru
 | `iana_tlds.txt` | https://data.iana.org/TLD/tlds-alpha-by-domain.txt | see first line (`# Version ...`) | IANA public data |
 | `attack_entities.json` | Derived from MITRE ATT&CK Enterprise STIX ([attack-stix-data](https://github.com/mitre-attack/attack-stix-data)) by `scripts/build_attack_kb.py` | `attack_version` field (v20.1) | [ATT&CK Terms of Use](https://attack.mitre.org/resources/legal-and-branding/terms-of-use/) |
 | `curated_entities.json` | Hand-curated: abused admin tools, named vulnerabilities → CVE, attack-technique terms | `version` field | Project (MIT) |
+| `attack_techniques.json` | Derived from MITRE ATT&CK Enterprise v20.1 by `scripts/build_attack_kb.py`: 706 techniques plus a revoked-ID → replacement map | `attack_version` field | ATT&CK Terms of Use |
+| `technique_category_map.json` | Hand-written ATT&CK technique → threat category map, with a rationale per category | `version` field | Project (MIT) |
+| `cisa_kev.json` | CISA Known Exploited Vulnerabilities catalogue, reduced by `scripts/build_kev_snapshot.py` | `catalog_version` field (2026.11.06) | U.S. Government work |
 | `entity_rules.json` | Hand-reviewed disambiguation rules for ambiguous ATT&CK names | `version` field | Project (MIT) |
 
 MITRE ATT&CK® is a registered trademark of The MITRE Corporation.

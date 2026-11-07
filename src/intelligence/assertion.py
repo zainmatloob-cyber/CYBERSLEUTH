@@ -30,7 +30,7 @@ STATUS_RANK = {AssertionStatus.OBSERVED: 0, AssertionStatus.CAPABILITY: 1,
 
 _NEGATION = re.compile(
     # "without" is deliberately absent: "executed without user interaction" is not a negation.
-    r"\b(?:not|never|no evidence|no indication|no sign|none of|neither|nor"
+    r"\b(?:not|never|no|none of|neither|nor"
     r"|did not|does not|do not|was not|were not|is not|are not|has not|have not"
     r"|didn't|doesn't|wasn't|weren't|isn't|aren't|hasn't|haven't|ruled out|unrelated)\b",
     re.IGNORECASE,

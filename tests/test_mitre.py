@@ -84,6 +84,7 @@ def test_curated_term_ids_are_active(kb):
         ("The malware has the ability to capture keystrokes.", AssertionStatus.CAPABILITY),
         ("Phishing was not involved in this intrusion.", AssertionStatus.NEGATED),
         ("There is no evidence of lateral movement.", AssertionStatus.NEGATED),
+        ("No DDoS attack was observed.", AssertionStatus.NEGATED),
         ("The actor may have used PowerShell.", AssertionStatus.POSSIBLE),
         ("Defenders should block DNS tunneling.", AssertionStatus.POSSIBLE),
         ("The payload executed without user interaction.", AssertionStatus.OBSERVED),

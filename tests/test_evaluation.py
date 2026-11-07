@@ -10,7 +10,6 @@ import pytest
 from src.evaluation.metrics import Counts, macro_f1, micro, score
 from src.evaluation.runner import GoldFileError, evaluate_split, load_gold, normalise
 from src.intelligence.analyzer import Analyzer
-from src.nlp.entity_extractor import EntityExtractor
 
 EVAL_DIR = Path(__file__).resolve().parent.parent / "data" / "evaluation"
 
@@ -100,7 +99,7 @@ def test_gold_with_missing_document_rejected(tmp_path):
 
 def test_empty_split_rejected(tmp_path):
     with pytest.raises(GoldFileError):
-        evaluate_split(tmp_path, Analyzer(entity_extractor=EntityExtractor(model=None)), "x")
+        evaluate_split(tmp_path, Analyzer(use_models=False), "x")
 
 
 # --- runner -------------------------------------------------------------------
@@ -112,7 +111,7 @@ def test_runner_scores_and_lists_errors(tmp_path):
         "entities": [{"type": "threat_actor", "value": "APT28"},
                      {"type": "malware", "value": "Emotet"}],  # not in text → FN
     })
-    analyzer = Analyzer(entity_extractor=EntityExtractor(model=None))
+    analyzer = Analyzer(use_models=False)
     report = evaluate_split(tmp_path, analyzer, "rules-only")
     assert report.overall("iocs").f1 == 1.0
     entities = report.overall("entities")

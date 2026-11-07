@@ -34,11 +34,12 @@ _MODULES = [
     ("Document Analysis", "Available"),
     ("IOC Extraction", "Available"),
     ("Entity Recognition", "Available"),
-    ("Threat Classification", "Phase 3"),
-    ("MITRE ATT&CK Mapping", "Phase 3"),
-    ("Risk Analysis", "Phase 3"),
+    ("Threat Classification", "Available"),
+    ("MITRE ATT&CK Mapping", "Available"),
+    ("Risk Analysis", "Available"),
     ("Dashboard & Reports", "Phase 4"),
 ]
+_BAND_ICON = {"Low": "🟢", "Moderate": "🟡", "High": "🟠", "Critical": "🔴"}
 
 _MARKDOWN_SPECIAL = re.compile(r"([\\`*_{}\[\]()<>#+\-.!|~$:])")
 
@@ -98,13 +99,15 @@ def _run_analysis(
 
 def _render_summary(result: AnalysisResult) -> None:
     doc = result.document
-    cols = st.columns(6)
-    cols[0].metric("Format", doc.file_type.value.upper())
-    cols[1].metric("Pages", doc.page_count)
-    cols[2].metric("Sentences", f"{len(doc.sentences):,}")
+    risk = result.risk
+    cols = st.columns(7)
+    cols[0].metric("Risk", f"{risk.score:.0f} · {risk.band}")
+    cols[1].metric("Confidence", risk.confidence.level.title())
+    cols[2].metric("Pages", doc.page_count)
     cols[3].metric("Unique IOCs", len(result.indicators))
     cols[4].metric("Entities", len(result.entities))
-    cols[5].metric("Analysis time", f"{result.timings_ms.get('total', 0) / 1000:.1f} s")
+    cols[5].metric("ATT&CK techniques", len(result.mappings))
+    cols[6].metric("Analysis time", f"{result.timings_ms.get('total', 0) / 1000:.1f} s")
     for warning in [*result.warnings, *doc.warnings]:
         st.warning(md_escape(warning))
     if not (result.warnings or doc.warnings):
@@ -166,7 +169,7 @@ def _render_metadata_tab(result: AnalysisResult) -> None:
         st.caption("No embedded metadata.")
     st.write("**Analysis provenance**")
     provenance = [
-        ("NER model", result.model_name or "none (rules only)"),
+        *((f"Component: {k}", v) for k, v in result.components.items()),
         *((f"Knowledge base: {k}", v) for k, v in result.kb_versions.items()),
         *((f"Time: {k}", f"{v:,.0f} ms") for k, v in result.timings_ms.items()),
     ]
@@ -269,6 +272,78 @@ def _render_entities_tab(result: AnalysisResult) -> None:
         st.caption("No vulnerabilities mentioned.")
 
 
+def _render_risk_tab(result: AnalysisResult) -> None:
+    risk = result.risk
+    st.subheader(f"{_BAND_ICON.get(risk.band, '')} {risk.score:.1f} / 100 · {risk.band}")
+    weights = {c.key: c.weight for c in risk.components}
+    st.caption(
+        f"R = {weights['vulnerability']:.2f}·V + {weights['malware']:.2f}·M + "
+        f"{weights['attack_behaviour']:.2f}·A + {weights['evidence']:.2f}·E · risk model "
+        f"{risk.config_version}. Severity and confidence are reported separately."
+    )
+    for component in risk.components:
+        st.write(f"**{component.label}**: {component.value:.0f}/100 × {component.weight:.2f} "
+                 f"= {component.contribution:.1f}")
+        st.progress(component.value / 100)
+        for line in component.explanation:
+            st.text(f"  • {line}")
+    st.write(f"**Confidence: {risk.confidence.level}**")
+    for reason in risk.confidence.reasons:
+        st.text(f"  • {reason}")
+    with st.expander("Limitations of this score"):
+        for limitation in risk.limitations:
+            st.text(f"• {limitation}")
+    st.dataframe(tables.risk_components_frame(risk), hide_index=True, width="stretch")
+
+
+def _render_threats_tab(result: AnalysisResult) -> None:
+    findings = result.categories
+    if not findings:
+        st.info("No threat categories were detected.")
+        return
+    st.caption(
+        "Categories are aggregated from sentences. **model** = TF-IDF classifier (score, not a "
+        "probability); **rules** = keyword evidence, which also fires on mere mentions. A "
+        "category whose only evidence is negated is shown as `negated`. Report-level "
+        "aggregation is not validated against labelled reports."
+    )
+    st.dataframe(tables.categories_frame(findings), hide_index=True, width="stretch")
+    labels = [f"{f.category} ({f.status.value})" for f in findings]
+    selected = st.selectbox("Evidence for category", range(len(findings)),
+                            format_func=labels.__getitem__, key="category_detail")
+    st.dataframe(tables.category_evidence_frame(findings[selected]), hide_index=True,
+                 width="stretch")
+
+
+def _render_attack_tab(result: AnalysisResult) -> None:
+    mappings = result.mappings
+    if not mappings:
+        st.info("No ATT&CK techniques were mapped.")
+        return
+    st.caption(
+        "**explicit-*** mappings come from the text naming the technique; **model** mappings "
+        "are suggestions (score = SVM margin, not a probability). Status: observed / "
+        "capability / possible / negated. Every mapping is **unverified** until an analyst "
+        "reviews it."
+    )
+    left, right = st.columns(2)
+    explicit_only = left.checkbox("Explicit mappings only", key="attack_explicit_only")
+    hide_negated = right.checkbox("Hide negated", value=True, key="attack_hide_negated")
+    visible = [m for m in mappings if (not explicit_only or m.explicit)
+               and (not hide_negated or m.status.value != "negated")]
+    st.caption(f"{len(visible)} of {len(mappings)} techniques")
+    st.dataframe(
+        tables.mappings_frame(visible), hide_index=True, width="stretch",
+        column_config={"ATT&CK": st.column_config.LinkColumn("ATT&CK", display_text="ATT&CK ↗")},
+    )
+    if visible:
+        labels = [f"{m.technique_id} · {m.name}" for m in visible]
+        selected = st.selectbox("Evidence for technique", range(len(visible)),
+                                format_func=labels.__getitem__, key="attack_detail")
+        st.dataframe(tables.mapping_evidence_frame(visible[selected]), hide_index=True,
+                     width="stretch")
+
+
 def _render_evidence_tab(result: AnalysisResult) -> None:
     only_findings = st.checkbox("Only sentences with findings", value=True, key="ev_only")
     frame = tables.evidence_frame(result.evidence, only_findings=only_findings)
@@ -284,7 +359,8 @@ def main() -> None:
     _render_sidebar()
 
     st.header("Document Analysis")
-    st.caption("Ingestion, IOC extraction and cybersecurity entity recognition.")
+    st.caption("Ingestion, IOC and entity extraction, threat classification, ATT&CK mapping and "
+               "explainable risk scoring.")
 
     uploaded = st.file_uploader(
         "Upload a threat report", type=["pdf", "docx", "txt"], accept_multiple_files=False
@@ -310,20 +386,20 @@ def main() -> None:
 
     st.subheader(md_escape(result.document.filename))
     _render_summary(result)
-    tabs = st.tabs(["🎯 IOCs", "🧬 Entities", "🔎 Evidence", "📄 Text", "🔤 Sentences",
-                    "ℹ️ Metadata"])
-    with tabs[0]:
-        _render_iocs_tab(result)
-    with tabs[1]:
-        _render_entities_tab(result)
-    with tabs[2]:
-        _render_evidence_tab(result)
-    with tabs[3]:
-        _render_text_tab(result.document)
-    with tabs[4]:
-        _render_sentences_tab(result.document)
-    with tabs[5]:
-        _render_metadata_tab(result)
+    views = [
+        ("⚠️ Risk", lambda: _render_risk_tab(result)),
+        ("🧭 Threats", lambda: _render_threats_tab(result)),
+        ("🗺️ ATT&CK", lambda: _render_attack_tab(result)),
+        ("🎯 IOCs", lambda: _render_iocs_tab(result)),
+        ("🧬 Entities", lambda: _render_entities_tab(result)),
+        ("🔎 Evidence", lambda: _render_evidence_tab(result)),
+        ("📄 Text", lambda: _render_text_tab(result.document)),
+        ("🔤 Sentences", lambda: _render_sentences_tab(result.document)),
+        ("ℹ️ Metadata", lambda: _render_metadata_tab(result)),
+    ]
+    for tab, (_, render) in zip(st.tabs([name for name, _ in views]), views, strict=True):
+        with tab:
+            render()
 
 
 if __name__ == "__main__":

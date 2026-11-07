@@ -130,3 +130,73 @@ def evidence_frame(evidence: list[SentenceEvidence], only_findings: bool = True)
             ),
         })
     return pd.DataFrame(rows, columns=["Page", "Sentence", "Indicators", "Entities"])
+
+
+# --- Phase 3: threat categories, ATT&CK mappings, risk ----------------------------------
+
+
+def categories_frame(findings: list) -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "Category": f.category.replace("_", " ").title(),
+                "Status": f.status.value,
+                "Sources": ", ".join(f.sources),
+                "Sentences": f.sentence_count,
+                "Max model score": None if f.max_score is None else round(f.max_score, 2),
+                "Example": f.evidence[0].context,
+            }
+            for f in findings
+        ],
+        columns=["Category", "Status", "Sources", "Sentences", "Max model score", "Example"],
+    )
+
+
+def category_evidence_frame(finding) -> pd.DataFrame:
+    return pd.DataFrame(
+        [{"Page": e.page_number, "Source": e.source, "Status": e.status.value,
+          "Score / terms": (f"{e.score:.2f}" if e.score is not None else ", ".join(e.terms)),
+          "Sentence": e.context} for e in finding.evidence],
+        columns=["Page", "Source", "Status", "Score / terms", "Sentence"],
+    )
+
+
+def mappings_frame(mappings: list) -> pd.DataFrame:
+    return pd.DataFrame(
+        [
+            {
+                "Technique": m.technique_id,
+                "Name": m.name,
+                "Tactics": ", ".join(m.tactics),
+                "Status": m.status.value,
+                "Method": ", ".join(m.methods),
+                "Evidence": len(m.evidence),
+                "Max model score": None if m.max_score is None else round(m.max_score, 2),
+                "Verification": m.verdict.value,
+                "ATT&CK": m.url,
+            }
+            for m in mappings
+        ],
+        columns=["Technique", "Name", "Tactics", "Status", "Method", "Evidence",
+                 "Max model score", "Verification", "ATT&CK"],
+    )
+
+
+def mapping_evidence_frame(mapping) -> pd.DataFrame:
+    return pd.DataFrame(
+        [{"Page": e.page_number, "Method": e.method.value, "Status": e.status.value,
+          "Matched": e.matched_text or "",
+          "Score": None if e.score is None else round(e.score, 2),
+          "Alternatives": ", ".join(f"{t} ({s:.2f})" for t, s in e.alternatives),
+          "Sentence": e.context} for e in mapping.evidence],
+        columns=["Page", "Method", "Status", "Matched", "Score", "Alternatives", "Sentence"],
+    )
+
+
+def risk_components_frame(risk) -> pd.DataFrame:
+    return pd.DataFrame(
+        [{"Component": c.label, "Weight": c.weight, "Value (0-100)": c.value,
+          "Contribution": round(c.contribution, 1), "Why": " ".join(c.explanation)}
+         for c in risk.components],
+        columns=["Component", "Weight", "Value (0-100)", "Contribution", "Why"],
+    )

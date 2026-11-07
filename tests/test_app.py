@@ -26,16 +26,19 @@ def _render_results_script() -> None:
 
     import app
     from src.intelligence.analyzer import Analyzer
-    from src.nlp.entity_extractor import EntityExtractor
 
     pdf = pymupdf.open()
     pdf.new_page().insert_text((72, 72), "APT28 used Mimikatz. Then 198.51.100.7 was seen.")
     pdf.new_page().insert_text((72, 72), "Log4Shell (CVE-2021-44228) was exploited.")
+    pdf.new_page().insert_text((72, 72), "They used Kerberoasting. No phishing was observed.")
     if "result" not in st.session_state:
-        analyzer = Analyzer(entity_extractor=EntityExtractor(model=None))
+        analyzer = Analyzer(use_models=False)
         st.session_state["result"] = analyzer.analyze(pdf.tobytes(), "[x](http://evil).pdf")
     result = st.session_state["result"]
     app._render_summary(result)
+    app._render_risk_tab(result)
+    app._render_threats_tab(result)
+    app._render_attack_tab(result)
     app._render_iocs_tab(result)
     app._render_entities_tab(result)
     app._render_evidence_tab(result)
@@ -54,10 +57,26 @@ def results_app() -> AppTest:
 def test_result_views_render(results_app):
     at = results_app
     metrics = {m.label: m.value for m in at.metric}
-    assert metrics["Format"] == "PDF" and metrics["Pages"] == "2"
+    assert metrics["Pages"] == "3"
     assert metrics["Unique IOCs"] == "2"  # IP + CVE
-    assert metrics["Entities"] == "3"  # APT28, Mimikatz, Log4Shell
+    # APT28, Mimikatz, Log4Shell, Kerberoasting, Phishing (the last is a negated mention)
+    assert metrics["Entities"] == "5"
+    assert metrics["ATT&CK techniques"] == "2"  # T1558.003 observed, T1566 negated
+    assert metrics["Risk"].split(" · ")[1] in {"Low", "Moderate", "High", "Critical"}
     assert at.success  # no warnings → success banner
+
+
+def test_attack_tab_hides_negated_by_default(results_app):
+    at = results_app
+    assert any("1 of 2 techniques" in c.value for c in at.caption)
+    at.checkbox(key="attack_hide_negated").uncheck().run()
+    assert any("2 of 2 techniques" in c.value for c in at.caption)
+
+
+def test_risk_tab_explains_components(results_app):
+    texts = " ".join(t.value for t in results_app.text)
+    assert "CVE-2021-44228" in texts  # vulnerability explanation names the CVE
+    assert "types, not counts" in texts
 
 
 def test_ioc_filters(results_app):
@@ -72,7 +91,7 @@ def test_ioc_filters(results_app):
 def test_entity_filter_and_evidence_toggle(results_app):
     at = results_app
     at.text_input(key="entity_query").set_value("mimi").run()
-    assert any("1 of 3 entities" in c.value for c in at.caption)
+    assert any("1 of 5 entities" in c.value for c in at.caption)
     at.checkbox(key="ev_only").uncheck().run()
     assert not at.exception
 
@@ -82,9 +101,8 @@ def _error_script() -> None:
 
     import app
     from src.intelligence.analyzer import Analyzer
-    from src.nlp.entity_extractor import EntityExtractor
 
-    analyzer = Analyzer(entity_extractor=EntityExtractor(model=None))
+    analyzer = Analyzer(use_models=False)
     result, error = app._run_analysis(analyzer, b"MZ\x90\x00" * 64, "evil.pdf")
     st.write(f"result={result is None} error={error}")
 

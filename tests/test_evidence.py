@@ -10,7 +10,6 @@ from src.ingestion.pipeline import Stage
 from src.intelligence import analyzer as analyzer_module
 from src.intelligence.analyzer import AnalysisStage, Analyzer
 from src.intelligence.evidence_manager import link_vulnerabilities
-from src.nlp.entity_extractor import EntityExtractor
 from src.nlp.entity_models import EntityType
 from src.nlp.ioc_models import IOCType
 from src.utils.exceptions import ModelNotAvailableError, UnsupportedFileTypeError
@@ -27,7 +26,7 @@ REPORT = (
 
 @pytest.fixture(scope="module")
 def analyzer() -> Analyzer:
-    return Analyzer(entity_extractor=EntityExtractor(model=None))
+    return Analyzer(use_models=False)
 
 
 @pytest.fixture(scope="module")
@@ -52,7 +51,11 @@ def test_analysis_combines_all_stages(result):
         (EntityType.ATTACK_TECHNIQUE, "Spearphishing"),
     }
     assert result.model_name is None and result.kb_versions["attack"] == "20.1"
-    assert set(result.timings_ms) == {"ingestion", "iocs", "entities", "total"}
+    assert result.components == {"entities": "rules-only", "threat_classification": "rules-only",
+                                 "technique_mapping": "explicit-only"}
+    assert result.warnings == []  # rules-only chosen on purpose: no degradation warnings
+    assert set(result.timings_ms) == {"ingestion", "iocs", "entities", "classification",
+                                     "mapping", "risk", "total"}
 
 
 def test_progress_reports_every_stage_once_in_order(analyzer):

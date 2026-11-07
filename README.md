@@ -6,10 +6,10 @@ CyberSleuth turns unstructured cybersecurity reports (PDF, DOCX, TXT) into
 structured, explainable, evidence-backed threat intelligence. It runs entirely
 locally with free and open-source tools and needs no paid API.
 
-> **Status: Phase 2 complete, v0.2.0.** Document ingestion, IOC extraction and
-> cybersecurity entity recognition work, are tested, and are evaluated on an
-> annotated set. Threat classification, MITRE ATT&CK technique mapping and risk
-> scoring are planned and **not yet implemented**. See the [Roadmap](#roadmap).
+> **Status: Phase 3 complete, v0.3.0.** Ingestion, IOC extraction, entity recognition,
+> threat classification (TF-IDF + Logistic Regression), MITRE ATT&CK technique mapping and
+> explainable risk scoring work and are tested. The database, dashboard and report exports
+> (Phase 4) are **not yet implemented**. See the [Roadmap](#roadmap).
 
 ## Problem
 
@@ -50,6 +50,15 @@ an evidence trail for every finding: document, page and character position.
     curated lists, actor naming patterns and spaCy.
   * Resolves ambiguous names from context (`Cuba` ransomware vs. the country).
   * Records the source of every entity, and invents no confidence scores.
+* **Threat classification**: report categories from a TF-IDF + Logistic Regression model
+  (trained on Hugging Face ATT&CK procedure data) plus a keyword rule baseline, with evidence
+  sentences and negation handling.
+* **MITRE ATT&CK mapping** (v20.1): explicit matches (IDs, technique names, curated terms) and
+  model suggestions, each with an assertion status (observed / capability / possible /
+  negated). Every mapping starts unverified.
+* **Explainable risk score**: R = 0.30V + 0.25M + 0.25A + 0.20E, with a reasoned breakdown for
+  each component. It uses the CISA KEV catalogue, guards against inflation and double
+  counting, and reports a separate confidence level ([methodology](docs/methodology.md#10-risk-scoring-phase-3)).
 * **Evidence views**: findings for each sentence, and CVE IDs merged with named
   vulnerabilities (Log4Shell ↔ CVE-2021-44228).
 * **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
@@ -68,7 +77,7 @@ with the code frozen ([details and every error](docs/evaluation/README.md)):
 
 This is a small, self-made set. The numbers are **not** a real-world accuracy claim.
 
-### Threat-category classifier (Phase 3, in progress)
+### Threat-category classifier
 TF-IDF + Logistic Regression, trained on 10,313 ATT&CK procedure sentences from the Hugging
 Face dataset [`sarahwei/cyber_MITRE_technique_CTI_dataset_v16`](https://huggingface.co/datasets/sarahwei/cyber_MITRE_technique_CTI_dataset_v16).
 Category labels are derived from technique labels. Results are on a test split of
@@ -80,7 +89,7 @@ Category labels are derived from technique labels. Results are on a test split o
 | Rule baseline | 0.64 (0.59–0.69) |
 | Majority baseline | 0.00 |
 
-### ATT&CK technique mapping (Phase 3, in progress)
+### ATT&CK technique mapping
 Explicit matching (technique IDs, ATT&CK names, curated terms) plus a LinearSVC suggesting one
 of 196 parent techniques. Each mapping gets an assertion status (observed / capability /
 possible / negated) and starts unverified ([model card](docs/models/technique_mapper.md)):
@@ -96,7 +105,7 @@ Sentence-level results on ATT&CK-style text. Expect lower performance on real re
 
 ```text
 Upload → Validation → Extraction → Cleaning → Sentences → IOCs & Entities → Evidence
-       → [Classification → MITRE ATT&CK → Risk Scoring → Database → Reports]   (bracketed: planned)
+       → Threat Classification → MITRE ATT&CK → Risk Scoring → [Database → Reports]   (bracketed: planned)
 ```
 
 Details: [docs/architecture.md](docs/architecture.md) · Methodology and
@@ -126,6 +135,19 @@ pip install -r requirements-dev.txt
 
 On macOS/Linux, use `python3.12 -m venv .venv` and `source .venv/bin/activate`.
 `requirements.lock.txt` pins the exact versions the tests last passed with.
+
+## Train the models (once, about 2 minutes)
+
+The trained models are not committed (they are git-ignored and rebuilt deterministically):
+
+```powershell
+python scripts/prepare_threat_dataset.py   # downloads the pinned Hugging Face dataset, verifies SHA-256
+python scripts/train_threat_classifier.py --final
+python scripts/train_technique_model.py --final
+```
+
+Without them the app still runs. Threat categories then come from rules only, ATT&CK mapping
+from explicit matches only, and the analysis shows a warning and lowers its confidence.
 
 ## Usage
 
@@ -210,7 +232,7 @@ docs/                   Architecture, methodology, evaluation reports
 
 - [x] **Phase 1:** Foundation and document ingestion
 - [x] **Phase 2:** IOC extraction, cybersecurity named-entity recognition, evidence views, evaluation
-- [ ] **Phase 3:** Threat classification (rule-based baseline + TF-IDF/Logistic Regression), MITRE ATT&CK mapping, risk scoring
+- [x] **Phase 3:** Threat classification (rule baseline + TF-IDF/Logistic Regression), MITRE ATT&CK mapping, explainable risk scoring
 - [ ] **Phase 4:** SQLite persistence, dashboard, explorers, PDF/JSON/CSV reports
 - [ ] **Phase 5:** Evaluation on a manually verified dataset, hardening, deployment
 

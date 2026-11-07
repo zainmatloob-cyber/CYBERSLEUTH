@@ -218,3 +218,63 @@ Test results (scored once): model top-1 0.82 (95% CI 0.80–0.83) and top-5 0.95
 matcher's precision of 0.63 is a lower bound because the gold labels are single-label.
 Abstention cannot be evaluated properly, because the data has no "no technique" sentences.
 Details, error analysis and open fixes are in the [model card](models/technique_mapper.md).
+
+## 9. Report-level threat categories (Phase 3)
+
+`src/intelligence/threat_assessment.py` runs the classifier and the rule baseline on every
+sentence. A category is reported when any sentence supports it. Each piece of evidence keeps
+its source (model score or rule terms) and the sentence's assertion status. A category whose
+only evidence is negated is shown as `negated`. This aggregation is **not validated**: no
+report-level labels exist.
+
+## 10. Risk scoring (Phase 3)
+
+`R = 0.30·V + 0.25·M + 0.25·A + 0.20·E`, with each component on 0–100. All parameters are in
+the versioned [`config/risk_model.json`](../config/risk_model.json), which is validated on
+load (the weights must sum to 1; the bands must start at 0 and increase). The parameters are
+**author-chosen heuristics, not a standard**.
+
+| Component | How it is computed | Guard against inflation / double counting |
+|---|---|---|
+| V | Per merged CVE: mentioned 50 · named 70 · in CISA KEV 90 · KEV with known ransomware use 100 (bundled KEV snapshot, catalogue 2026.11.06) | Max CVE + 5 per extra CVE, capped at +10. CVE IDs and names are already merged per CVE |
+| M | Malware named 50 (ATT&CK-known 60) · ransomware behaviour in a non-negated sentence 85 · +10 if file hashes are present | Hashes alone contribute nothing to M; their count is irrelevant |
+| A | Per technique: max tactic severity × status factor (observed 1 · capability 0.5 · possible 0.25 · negated 0) × method factor (explicit 1 · model 0.5) | Max + 3 per extra tactic, capped at +15. Breadth counts only explicit or multi-sentence techniques |
+| E | 40 × share of techniques that are observed and corroborated · 30 × evidence sentences (full at 10) · 30 × IOC **type** diversity (full at 4) | Types, never counts. IOCs alone give at most 0.20 × 30 = 6 points |
+
+* **Missing evidence**: the component is 0 with the explanation "no evidence". Weights are
+  not redistributed.
+* **Confidence** (high / medium / low) is separate from severity. It is lowered by model
+  fallbacks, scanned pages, very short text, mostly model-only techniques, or no
+  substantive evidence at all.
+* **Validation**: there is no ground-truth risk label, so the score itself cannot be shown to
+  be "correct". Its *properties* are tested instead (`tests/test_risk.py`):
+  * volume invariance (250 IPs score the same as 1);
+  * capped bonuses;
+  * negated evidence counts as zero;
+  * confidence is independent of severity;
+  * contributions sum to the score;
+  * every ATT&CK v20.1 tactic has a severity.
+
+**Revision 2026-11-07b**, after running the full pipeline on the sample and evaluation
+documents:
+* The kill-chain breadth bonus was saturating A at 95–100 for every report, because of
+  unverified model suggestions spread over many tactics. The model-suggestion factor was
+  lowered from 0.8 to 0.5, and breadth now counts only explicit or corroborated techniques.
+* `defense-evasion` was replaced by `defense-impairment`. ATT&CK v20.1 split the old tactic
+  into `stealth` and `defense-impairment`, so the table had silently scored the new tactic as 0.
+
+Example outputs on the synthetic documents (full pipeline, illustrative only):
+
+| Document | R | Band | V | M | A | E | Confidence |
+|---|---:|---|---:|---:|---:|---:|---|
+| synthetic_advisory.pdf | 91.0 | Critical | 100 | 95 | 100 | 61 | high |
+| test_03_lockbit.txt | 85.9 | Critical | 100 | 95 | 80 | 61 | medium |
+| dev_02_espionage.txt | 84.6 | Critical | 100 | 70 | 85 | 79 | high |
+| dev_04_edge_devices.txt | 70.2 | High | 100 | 0 | 100 | 76 | high |
+| dev_01_ransomware.txt | 64.8 | High | 0 | 95 | 92 | 90 | high |
+| test_04_cryptomining.txt | 48.4 | Moderate | 0 | 70 | 80 | 54 | medium |
+| test_02_credential_phishing.txt | 35.6 | Moderate | 0 | 0 | 86 | 70 | high |
+
+Observed model false positives on non-technique sentences (e.g. a document banner mapped to
+T1059, an acknowledgement sentence mapped to T1102) confirm that model technique mappings are
+suggestions and must be verified.
