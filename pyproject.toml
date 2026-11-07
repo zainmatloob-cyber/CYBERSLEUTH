@@ -1,0 +1,18 @@
+[project]
+name = "cybersleuth"
+version = "0.1.0"
+description = "AI-Powered Cyber Threat Intelligence Extraction and Analysis Platform"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM"]
