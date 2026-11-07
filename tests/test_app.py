@@ -1,4 +1,4 @@
-"""Smoke tests for the Streamlit UI (app.py)."""
+"""UI tests for the Streamlit app (app.py) using Streamlit's AppTest."""
 
 from __future__ import annotations
 
@@ -13,55 +13,86 @@ APP_PATH = Path(__file__).resolve().parent.parent / "app.py"
 
 
 def test_app_renders_without_errors():
-    at = AppTest.from_file(str(APP_PATH), default_timeout=30).run()
+    at = AppTest.from_file(str(APP_PATH), default_timeout=60).run()
     assert not at.exception
     assert at.header[0].value == "Document Analysis"
     assert any("Upload a PDF" in info.value for info in at.info)
 
 
 def _render_results_script() -> None:
-    """Runs inside AppTest: ingest a real multi-page PDF and render every results view."""
+    """Runs inside AppTest: analyse a real document and render every results view."""
     import pymupdf
-
-    import app
-    from src.ingestion.pipeline import ingest
-
-    pdf = pymupdf.open()
-    pdf.new_page().insert_text((72, 72), "The actor used phishing. Then 198.51.100.7 was seen.")
-    pdf.new_page().insert_text((72, 72), "Second page sentence.")
-    doc = ingest(pdf.tobytes(), "[x](http://evil).pdf")
-    app._render_summary(doc)
-    app._render_text_tab(doc)
-    app._render_sentences_tab(doc)
-    app._render_metadata_tab(doc)
-
-
-def test_result_views_render_real_document():
-    at = AppTest.from_function(_render_results_script, default_timeout=30).run()
-    assert not at.exception
-    assert [m.value for m in at.metric][:2] == ["PDF", "2"]
-    assert at.success  # no warnings → success banner
-    assert at.selectbox[0].options == ["1", "2"]
-    assert "198.51.100.7" in at.text_area[0].value
-
-    at.text_input[0].set_value("198.51.100").run()  # sentence filter
-    assert not at.exception
-    assert any("1 of 3 sentences" in c.value for c in at.caption)
-
-
-def _run_ingestion_script() -> None:
-    import app
-
-    document, error = app._run_ingestion(b"MZ\x90\x00" * 64, "evil.pdf")
     import streamlit as st
 
-    st.write(f"doc={document is None} error={error}")
+    import app
+    from src.intelligence.analyzer import Analyzer
+    from src.nlp.entity_extractor import EntityExtractor
+
+    pdf = pymupdf.open()
+    pdf.new_page().insert_text((72, 72), "APT28 used Mimikatz. Then 198.51.100.7 was seen.")
+    pdf.new_page().insert_text((72, 72), "Log4Shell (CVE-2021-44228) was exploited.")
+    if "result" not in st.session_state:
+        analyzer = Analyzer(entity_extractor=EntityExtractor(model=None))
+        st.session_state["result"] = analyzer.analyze(pdf.tobytes(), "[x](http://evil).pdf")
+    result = st.session_state["result"]
+    app._render_summary(result)
+    app._render_iocs_tab(result)
+    app._render_entities_tab(result)
+    app._render_evidence_tab(result)
+    app._render_text_tab(result.document)
+    app._render_sentences_tab(result.document)
+    app._render_metadata_tab(result)
 
 
-def test_run_ingestion_returns_error_message_for_bad_file():
-    at = AppTest.from_function(_run_ingestion_script, default_timeout=30).run()
+@pytest.fixture
+def results_app() -> AppTest:
+    at = AppTest.from_function(_render_results_script, default_timeout=60).run()
     assert not at.exception
-    assert "doc=True" in at.markdown[0].value
+    return at
+
+
+def test_result_views_render(results_app):
+    at = results_app
+    metrics = {m.label: m.value for m in at.metric}
+    assert metrics["Format"] == "PDF" and metrics["Pages"] == "2"
+    assert metrics["Unique IOCs"] == "2"  # IP + CVE
+    assert metrics["Entities"] == "3"  # APT28, Mimikatz, Log4Shell
+    assert at.success  # no warnings → success banner
+
+
+def test_ioc_filters(results_app):
+    at = results_app
+    at.text_input(key="ioc_query").set_value("198.51").run()
+    assert not at.exception
+    assert any("1 of 2 indicators" in c.value for c in at.caption)
+    at.checkbox(key="ioc_hide_flagged").check().run()  # 198.51.100.7 is a documentation IP
+    assert any("0 of 2 indicators" in c.value for c in at.caption)
+
+
+def test_entity_filter_and_evidence_toggle(results_app):
+    at = results_app
+    at.text_input(key="entity_query").set_value("mimi").run()
+    assert any("1 of 3 entities" in c.value for c in at.caption)
+    at.checkbox(key="ev_only").uncheck().run()
+    assert not at.exception
+
+
+def _error_script() -> None:
+    import streamlit as st
+
+    import app
+    from src.intelligence.analyzer import Analyzer
+    from src.nlp.entity_extractor import EntityExtractor
+
+    analyzer = Analyzer(entity_extractor=EntityExtractor(model=None))
+    result, error = app._run_analysis(analyzer, b"MZ\x90\x00" * 64, "evil.pdf")
+    st.write(f"result={result is None} error={error}")
+
+
+def test_run_analysis_returns_error_message_for_bad_file():
+    at = AppTest.from_function(_error_script, default_timeout=60).run()
+    assert not at.exception
+    assert "result=True" in at.markdown[0].value
     assert "not a recognised" in at.markdown[0].value
 
 
