@@ -29,3 +29,8 @@ logs/
 .idea/
 Thumbs.db
 .DS_Store
+
+# Downloaded datasets (rebuilt by scripts/prepare_threat_dataset.py)
+data/raw/
+data/processed/*.jsonl
+models/*.joblib

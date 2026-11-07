@@ -1,0 +1,34 @@
+{
+ "version": "2026-11-07",
+ "attack_version_checked": "20.1",
+ "description": "Maps ATT&CK technique IDs to CyberSleuth threat categories, used to derive training labels from technique-labelled CTI sentences. Sub-techniques inherit their parent (T1566.001 -> T1566). A technique may map to several categories. Sentences whose techniques map to no category are labelled 'other'. Mappings are heuristics chosen by the project author, with the rationale recorded here; they are not part of ATT&CK.",
+ "categories": {
+  "phishing": {
+   "techniques": ["T1566", "T1598"],
+   "rationale": "Phishing (initial access) and Phishing for Information (reconnaissance)."
+  },
+  "ransomware": {
+   "techniques": ["T1486", "T1490"],
+   "rationale": "Data Encrypted for Impact is the defining ransomware behaviour. Inhibit System Recovery (shadow-copy deletion, etc.) is a strong ransomware precursor but also occurs in wipers, so this category can include some destructive non-ransomware activity."
+  },
+  "vulnerability_exploitation": {
+   "techniques": ["T1190", "T1203", "T1068", "T1210", "T1211", "T1212"],
+   "rationale": "Every ATT&CK technique whose definition is exploitation of a software vulnerability, across tactics."
+  },
+  "credential_theft": {
+   "techniques": ["T1003", "T1110", "T1555", "T1552", "T1056", "T1558", "T1539", "T1528", "T1111", "T1212"],
+   "rationale": "Core Credential Access techniques that obtain secrets. T1212 (Exploitation for Credential Access) maps to both this category and vulnerability_exploitation."
+  },
+  "data_breach": {
+   "techniques": ["T1011", "T1020", "T1029", "T1030", "T1041", "T1048", "T1052", "T1537", "T1567", "T1700"],
+   "rationale": "All techniques of the ATT&CK Exfiltration tactic (TA0010) in v20.1: data leaving the victim environment."
+  },
+  "ddos": {
+   "techniques": ["T1498", "T1499"],
+   "rationale": "Network and Endpoint Denial of Service. Too rare in procedure examples to train a model on (see dataset card); handled by the rule baseline."
+  }
+ },
+ "not_derivable": {
+  "malware": "Almost every ATT&CK procedure example describes malware or actor behaviour, so 'malware' cannot be derived from a sentence's technique label. Handled by the rule baseline at report level."
+ }
+}
