@@ -7,6 +7,9 @@ PyMuPDF>=1.24,<2.0
 python-docx>=1.1,<2.0
 pandas>=2.2,<3.0
 
+# Phase 3: machine learning
+scikit-learn>=1.5,<2.0
+
 # Phase 2: NLP
 spacy>=3.8,<3.9
 en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
