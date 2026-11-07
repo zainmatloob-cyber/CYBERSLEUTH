@@ -68,6 +68,20 @@ with the code frozen ([details and every error](docs/evaluation/README.md)):
 
 This is a small, self-made set. The numbers are **not** a real-world accuracy claim.
 
+### Threat-category classifier (Phase 3, in progress)
+TF-IDF + Logistic Regression, trained on 10,313 ATT&CK procedure sentences from the Hugging
+Face dataset [`sarahwei/cyber_MITRE_technique_CTI_dataset_v16`](https://huggingface.co/datasets/sarahwei/cyber_MITRE_technique_CTI_dataset_v16).
+Category labels are derived from technique labels. Results are on a test split of
+**unseen actors**, scored once ([model card](docs/models/threat_classifier.md)):
+
+| Test split (2,149 sentences) | Macro F1 (95% CI) |
+|---|---|
+| TF-IDF + Logistic Regression | **0.83** (0.73–0.88) |
+| Rule baseline | 0.64 (0.59–0.69) |
+| Majority baseline | 0.00 |
+
+Sentence-level results on ATT&CK-style text. Expect lower performance on real reports.
+
 ## Architecture
 
 ```text
@@ -171,6 +185,7 @@ src/ingestion/          Validation, readers, cleaning, pipeline, data models
 src/nlp/                Sentence segmentation, IOC extraction, entity recognition, KB loader
 src/intelligence/       Analysis orchestrator, evidence views (MITRE mapping, risk: planned)
 src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
+src/ml/                 Threat-category dataset, rule baseline, classifier, evaluation
 src/visualization/      Table builders for the UI
 src/database/           SQLAlchemy models (planned)
 src/reporting/          PDF/JSON/CSV export (planned)

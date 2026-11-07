@@ -1,0 +1,723 @@
+{
+ "date": "2026-11-07 15:51 UTC",
+ "revision": "daf5fca",
+ "dataset_revision": "9e52a7fb9400097cfe09756ce09256279dfa8d82",
+ "dataset_sha256": "bcac09a30da335f59957ac9e7581749f4040d9857d057a70390baac4371c8855",
+ "selected_C": 16.0,
+ "thresholds": {
+  "credential_theft": 0.35,
+  "data_breach": 0.75,
+  "phishing": 0.85,
+  "ransomware": 0.8,
+  "vulnerability_exploitation": 0.4
+ },
+ "learned_categories": [
+  "credential_theft",
+  "data_breach",
+  "phishing",
+  "ransomware",
+  "vulnerability_exploitation"
+ ],
+ "validation": {
+  "model": {
+   "n": 1456,
+   "per_category": {
+    "credential_theft": {
+     "tp": 49,
+     "fp": 10,
+     "fn": 10,
+     "support": 59,
+     "precision": 0.8305084745762712,
+     "recall": 0.8305084745762712,
+     "f1": 0.8305084745762712
+    },
+    "data_breach": {
+     "tp": 30,
+     "fp": 3,
+     "fn": 4,
+     "support": 34,
+     "precision": 0.9090909090909091,
+     "recall": 0.8823529411764706,
+     "f1": 0.8955223880597014
+    },
+    "phishing": {
+     "tp": 15,
+     "fp": 0,
+     "fn": 2,
+     "support": 17,
+     "precision": 1.0,
+     "recall": 0.8823529411764706,
+     "f1": 0.9375
+    },
+    "ransomware": {
+     "tp": 11,
+     "fp": 0,
+     "fn": 3,
+     "support": 14,
+     "precision": 1.0,
+     "recall": 0.7857142857142857,
+     "f1": 0.88
+    },
+    "vulnerability_exploitation": {
+     "tp": 16,
+     "fp": 3,
+     "fn": 0,
+     "support": 16,
+     "precision": 0.8421052631578947,
+     "recall": 1.0,
+     "f1": 0.9142857142857143
+    }
+   },
+   "macro_f1": 0.8915633153843373,
+   "exact_match": 0.9759615384615384,
+   "confusion": {
+    "labels": [
+     "credential_theft",
+     "data_breach",
+     "phishing",
+     "ransomware",
+     "vulnerability_exploitation",
+     "other"
+    ],
+    "matrix": [
+     [
+      49,
+      0,
+      0,
+      0,
+      0,
+      10
+     ],
+     [
+      0,
+      30,
+      0,
+      0,
+      0,
+      4
+     ],
+     [
+      0,
+      0,
+      15,
+      0,
+      0,
+      2
+     ],
+     [
+      0,
+      0,
+      0,
+      11,
+      0,
+      3
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      16,
+      0
+     ],
+     [
+      10,
+      3,
+      0,
+      0,
+      3,
+      1300
+     ]
+    ]
+   },
+   "ci95": {
+    "credential_theft": [
+     0.745445632798574,
+     0.9203714485328365
+    ],
+    "data_breach": [
+     0.8107786357786357,
+     0.9629629629629629
+    ],
+    "phishing": [
+     0.8181818181818181,
+     1.0
+    ],
+    "ransomware": [
+     0.6666666666666666,
+     1.0
+    ],
+    "vulnerability_exploitation": [
+     0.8235294117647058,
+     1.0
+    ],
+    "macro_f1": [
+     0.8331768686131084,
+     0.9345860215053763
+    ]
+   }
+  },
+  "rules": {
+   "n": 1456,
+   "per_category": {
+    "credential_theft": {
+     "tp": 39,
+     "fp": 32,
+     "fn": 20,
+     "support": 59,
+     "precision": 0.5492957746478874,
+     "recall": 0.6610169491525424,
+     "f1": 0.6
+    },
+    "data_breach": {
+     "tp": 21,
+     "fp": 19,
+     "fn": 13,
+     "support": 34,
+     "precision": 0.525,
+     "recall": 0.6176470588235294,
+     "f1": 0.5675675675675677
+    },
+    "phishing": {
+     "tp": 15,
+     "fp": 12,
+     "fn": 2,
+     "support": 17,
+     "precision": 0.5555555555555556,
+     "recall": 0.8823529411764706,
+     "f1": 0.6818181818181819
+    },
+    "ransomware": {
+     "tp": 7,
+     "fp": 32,
+     "fn": 7,
+     "support": 14,
+     "precision": 0.1794871794871795,
+     "recall": 0.5,
+     "f1": 0.2641509433962264
+    },
+    "vulnerability_exploitation": {
+     "tp": 15,
+     "fp": 7,
+     "fn": 1,
+     "support": 16,
+     "precision": 0.6818181818181818,
+     "recall": 0.9375,
+     "f1": 0.7894736842105263
+    }
+   },
+   "macro_f1": 0.5806020753985004,
+   "exact_match": 0.8365384615384616,
+   "confusion": {
+    "labels": [
+     "credential_theft",
+     "data_breach",
+     "phishing",
+     "ransomware",
+     "vulnerability_exploitation",
+     "other"
+    ],
+    "matrix": [
+     [
+      39,
+      0,
+      0,
+      0,
+      0,
+      20
+     ],
+     [
+      1,
+      20,
+      0,
+      0,
+      0,
+      13
+     ],
+     [
+      2,
+      0,
+      13,
+      0,
+      0,
+      2
+     ],
+     [
+      0,
+      0,
+      0,
+      7,
+      0,
+      7
+     ],
+     [
+      0,
+      0,
+      0,
+      1,
+      14,
+      1
+     ],
+     [
+      29,
+      19,
+      12,
+      27,
+      6,
+      1223
+     ]
+    ]
+   },
+   "ci95": {
+    "credential_theft": [
+     0.48676533676533673,
+     0.716698717948718
+    ],
+    "data_breach": [
+     0.44699346405228757,
+     0.6808752417794971
+    ],
+    "phishing": [
+     0.4761904761904762,
+     0.7999999999999999
+    ],
+    "ransomware": [
+     0.1111111111111111,
+     0.5714285714285713
+    ],
+    "vulnerability_exploitation": [
+     0.6521739130434783,
+     1.0
+    ],
+    "macro_f1": [
+     0.5259857528764363,
+     0.6624016784789521
+    ]
+   }
+  }
+ },
+ "test": {
+  "model": {
+   "n": 2149,
+   "per_category": {
+    "credential_theft": {
+     "tp": 95,
+     "fp": 13,
+     "fn": 9,
+     "support": 104,
+     "precision": 0.8796296296296297,
+     "recall": 0.9134615384615384,
+     "f1": 0.8962264150943395
+    },
+    "data_breach": {
+     "tp": 42,
+     "fp": 9,
+     "fn": 8,
+     "support": 50,
+     "precision": 0.8235294117647058,
+     "recall": 0.84,
+     "f1": 0.8316831683168315
+    },
+    "phishing": {
+     "tp": 30,
+     "fp": 3,
+     "fn": 6,
+     "support": 36,
+     "precision": 0.9090909090909091,
+     "recall": 0.8333333333333334,
+     "f1": 0.8695652173913043
+    },
+    "ransomware": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 7,
+     "support": 14,
+     "precision": 1.0,
+     "recall": 0.5,
+     "f1": 0.6666666666666666
+    },
+    "vulnerability_exploitation": {
+     "tp": 29,
+     "fp": 6,
+     "fn": 1,
+     "support": 30,
+     "precision": 0.8285714285714286,
+     "recall": 0.9666666666666667,
+     "f1": 0.8923076923076922
+    }
+   },
+   "macro_f1": 0.8312898319553668,
+   "exact_match": 0.9706840390879479,
+   "confusion": {
+    "labels": [
+     "credential_theft",
+     "data_breach",
+     "phishing",
+     "ransomware",
+     "vulnerability_exploitation",
+     "other"
+    ],
+    "matrix": [
+     [
+      95,
+      0,
+      0,
+      0,
+      0,
+      9
+     ],
+     [
+      0,
+      42,
+      0,
+      0,
+      0,
+      8
+     ],
+     [
+      0,
+      0,
+      30,
+      0,
+      0,
+      6
+     ],
+     [
+      0,
+      0,
+      0,
+      7,
+      0,
+      7
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      29,
+      1
+     ],
+     [
+      13,
+      9,
+      3,
+      0,
+      6,
+      1884
+     ]
+    ]
+   },
+   "ci95": {
+    "credential_theft": [
+     0.8461428571428571,
+     0.9395082107790592
+    ],
+    "data_breach": [
+     0.7441711389385808,
+     0.9032258064516129
+    ],
+    "phishing": [
+     0.7791847041847042,
+     0.9523809523809523
+    ],
+    "ransomware": [
+     0.18143939393939396,
+     0.875125
+    ],
+    "vulnerability_exploitation": [
+     0.7843137254901961,
+     0.9638766832034018
+    ],
+    "macro_f1": [
+     0.7251928902866861,
+     0.8821516735337283
+    ]
+   }
+  },
+  "rules": {
+   "n": 2149,
+   "per_category": {
+    "credential_theft": {
+     "tp": 85,
+     "fp": 49,
+     "fn": 19,
+     "support": 104,
+     "precision": 0.6343283582089553,
+     "recall": 0.8173076923076923,
+     "f1": 0.7142857142857144
+    },
+    "data_breach": {
+     "tp": 37,
+     "fp": 51,
+     "fn": 13,
+     "support": 50,
+     "precision": 0.42045454545454547,
+     "recall": 0.74,
+     "f1": 0.5362318840579711
+    },
+    "phishing": {
+     "tp": 27,
+     "fp": 31,
+     "fn": 9,
+     "support": 36,
+     "precision": 0.46551724137931033,
+     "recall": 0.75,
+     "f1": 0.574468085106383
+    },
+    "ransomware": {
+     "tp": 12,
+     "fp": 7,
+     "fn": 2,
+     "support": 14,
+     "precision": 0.631578947368421,
+     "recall": 0.8571428571428571,
+     "f1": 0.7272727272727273
+    },
+    "vulnerability_exploitation": {
+     "tp": 29,
+     "fp": 28,
+     "fn": 1,
+     "support": 30,
+     "precision": 0.5087719298245614,
+     "recall": 0.9666666666666667,
+     "f1": 0.6666666666666667
+    }
+   },
+   "macro_f1": 0.6437850154778925,
+   "exact_match": 0.8366682177757097,
+   "confusion": {
+    "labels": [
+     "credential_theft",
+     "data_breach",
+     "phishing",
+     "ransomware",
+     "vulnerability_exploitation",
+     "other"
+    ],
+    "matrix": [
+     [
+      85,
+      2,
+      0,
+      0,
+      0,
+      17
+     ],
+     [
+      0,
+      37,
+      0,
+      0,
+      0,
+      13
+     ],
+     [
+      2,
+      0,
+      25,
+      0,
+      1,
+      8
+     ],
+     [
+      0,
+      0,
+      0,
+      12,
+      0,
+      2
+     ],
+     [
+      1,
+      0,
+      0,
+      0,
+      28,
+      1
+     ],
+     [
+      46,
+      46,
+      29,
+      5,
+      25,
+      1764
+     ]
+    ]
+   },
+   "ci95": {
+    "credential_theft": [
+     0.6347751124437782,
+     0.7836859491998237
+    ],
+    "data_breach": [
+     0.4193255131964809,
+     0.6383068120865367
+    ],
+    "phishing": [
+     0.47614138438880704,
+     0.6666666666666665
+    ],
+    "ransomware": [
+     0.5454545454545454,
+     0.8573051948051947
+    ],
+    "vulnerability_exploitation": [
+     0.5305653295801078,
+     0.7837970323264442
+    ],
+    "macro_f1": [
+     0.5904143551631232,
+     0.6894265409493285
+    ]
+   }
+  },
+  "rules_only": {
+   "n": 2149,
+   "per_category": {
+    "ddos": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 0,
+     "support": 1,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    }
+   },
+   "macro_f1": 1.0,
+   "exact_match": 0.8366682177757097,
+   "confusion": {
+    "labels": [
+     "ddos",
+     "other"
+    ],
+    "matrix": [
+     [
+      1,
+      0
+     ],
+     [
+      0,
+      2148
+     ]
+    ]
+   },
+   "ci95": {}
+  },
+  "majority": {
+   "n": 2149,
+   "per_category": {
+    "credential_theft": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 104,
+     "support": 104,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "data_breach": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 50,
+     "support": 50,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "phishing": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 36,
+     "support": 36,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "ransomware": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 14,
+     "support": 14,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    },
+    "vulnerability_exploitation": {
+     "tp": 0,
+     "fp": 0,
+     "fn": 30,
+     "support": 30,
+     "precision": null,
+     "recall": 0.0,
+     "f1": null
+    }
+   },
+   "macro_f1": 0.0,
+   "exact_match": 0.8906468124709167,
+   "confusion": {
+    "labels": [
+     "credential_theft",
+     "data_breach",
+     "phishing",
+     "ransomware",
+     "vulnerability_exploitation",
+     "other"
+    ],
+    "matrix": [
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      104
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      50
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      36
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      14
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      30
+     ],
+     [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1915
+     ]
+    ]
+   },
+   "ci95": {}
+  }
+ }
+}

@@ -172,3 +172,31 @@ These numbers describe a small, self-made set, not real-world accuracy.
 | `data/knowledge_base/curated_entities.json`, `entity_rules.json` | Hand-curated and reviewed | Curated entities, disambiguation |
 
 No real incident data or real live indicators are used anywhere in the project.
+
+## 7. Threat classification (Phase 3)
+
+**Data.** Hugging Face `sarahwei/cyber_MITRE_technique_CTI_dataset_v16` @ `9e52a7f`
+(SHA-256 verified). It contains ATT&CK v16 procedure sentences labelled with techniques.
+Categories are **derived** with the versioned `technique_category_map.json`; Data Breach
+is defined as the ATT&CK Exfiltration tactic. The split is grouped by actor/software
+through the ATT&CK knowledge base (no group in more than one split). See the
+[dataset card](datasets/threat_categories.md).
+
+**Models.**
+* A keyword rule baseline with evidence terms for every category. It is the only source
+  for `ddos` and `malware`.
+* TF-IDF (word + char n-grams) with one-vs-rest balanced Logistic Regression. C and the
+  per-category thresholds are chosen on val; the test split is scored once.
+
+**Results (test).** Macro F1 0.83 (95% CI 0.73–0.88) vs. 0.64 for the rules. The model wins
+on 4 of 5 categories; the rules win on ransomware, where model recall is 0.50 with a very
+wide CI. Details and confusion matrices are in the [model card](models/threat_classifier.md).
+
+**Reporting corrections.** The first version of the report averaged the rules' macro F1
+over a different category set: it included `ddos`, which has one test sentence. It was
+corrected to the comparable value, and the model was unchanged (retraining is
+deterministic).
+
+**Distinction to keep in mind.** The rules detect *mentions*, while the labels describe
+*behaviour*. This is the same mention-vs-evidence problem the ATT&CK mapping stage
+must handle.
