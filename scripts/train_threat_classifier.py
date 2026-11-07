@@ -112,7 +112,11 @@ def main() -> None:
     print(f"Selected C = {best_c}; learned categories: {categories}")
     print("Thresholds:", model.thresholds)
 
-    rule_categories = [*categories, "ddos"]
+    # Rules are compared on the model's categories, so the macro F1 values are comparable.
+    # Rule-only categories (ddos) are reported separately: one DDoS test sentence scored
+    # 1.00 would otherwise inflate the rules' macro F1.
+    rule_categories = categories
+    rule_only = ["ddos"]
     val_model = evaluate(val_y, model.predict(val_x), val_g, categories, 1000)
     val_rules = evaluate(val_y, rules.predict(val_x), val_g, rule_categories, 1000)
     val_majority = evaluate(val_y, [frozenset({OTHER})] * len(val_y), val_g, categories, 0)
@@ -128,7 +132,14 @@ def main() -> None:
     # --- final, one-time test evaluation ----------------------------------------
     test_x, test_y, test_g = load("test")
     test_model = evaluate(test_y, model.predict(test_x), test_g, categories, 1000)
-    test_rules = evaluate(test_y, rules.predict(test_x), test_g, rule_categories, 1000)
+    test_rule_predictions = rules.predict(test_x)
+    test_rules = evaluate(test_y, test_rule_predictions, test_g, rule_categories, 1000)
+    test_rules_only = evaluate(test_y, test_rule_predictions, test_g, rule_only, 0)
+    rule_only_lines = [
+        f"* `{c}` (rules only): support {m['support']}, TP {m['tp']}, FP {m['fp']}, "
+        f"FN {m['fn']}. Too few examples for a meaningful score."
+        for c, m in test_rules_only["per_category"].items()
+    ]
     test_majority = evaluate(test_y, [frozenset({OTHER})] * len(test_y), test_g, categories, 0)
 
     meta = {"date": datetime.now(UTC).strftime("%Y-%m-%d %H:%M UTC"), "revision": revision(),
@@ -148,8 +159,12 @@ def main() -> None:
         "texts are ATT&CK procedure examples. Expect lower performance on real reports.",
         "* 95% CIs: percentile bootstrap over actor/software groups (1,000 resamples).", "",
         table("TF-IDF + Logistic Regression", test_model, categories),
-        table("Rule baseline", test_rules, rule_categories),
+        table("Rule baseline (same categories as the model)", test_rules, rule_categories),
+        "Rule-only categories:", "", *rule_only_lines, "",
         f"Majority baseline (always `other`): macro F1 = {fmt(test_majority['macro_f1'])}", "",
+        "_Report revision note: the first version of this report computed the rules' macro F1 "
+        "including `ddos` (1 test example), giving 0.70 instead of the comparable 0.64. The "
+        "model is unchanged (retraining is deterministic)._", "",
         "### Confusion matrix (model, primary label)", "", confusion_table(test_model), "",
         "### Confusion matrix (rules, primary label)", "", confusion_table(test_rules), "",
     ])
@@ -158,7 +173,8 @@ def main() -> None:
                                                           newline="\n")
     (REPORT_DIR / "threat_classifier_test.json").write_text(json.dumps({
         **meta, "validation": {"model": val_model, "rules": val_rules},
-        "test": {"model": test_model, "rules": test_rules, "majority": test_majority},
+        "test": {"model": test_model, "rules": test_rules, "rules_only": test_rules_only,
+                 "majority": test_majority},
     }, indent=1) + "\n", encoding="utf-8", newline="\n")
     print(markdown)
     print(f"Saved model to {MODEL_PATH} and reports to {REPORT_DIR}")
