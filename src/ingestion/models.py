@@ -26,6 +26,25 @@ EXTENSION_TO_TYPE: dict[str, FileType] = {
 }
 
 
+_MAX_METADATA_VALUE_LENGTH = 500
+
+
+def clean_metadata(raw: dict[str, object]) -> dict[str, str]:
+    """Keep non-empty metadata values as bounded strings.
+
+    Document metadata is attacker-controlled, so values are length-limited and
+    always stored as plain strings.
+    """
+    cleaned: dict[str, str] = {}
+    for key, value in raw.items():
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            cleaned[str(key)] = text[:_MAX_METADATA_VALUE_LENGTH]
+    return cleaned
+
+
 @dataclass(frozen=True)
 class ValidatedFile:
     """An upload that has passed every validation check and may be parsed."""
@@ -77,6 +96,20 @@ class ExtractedDocument:
     warnings: list[str] = field(default_factory=list)
     needs_ocr: bool = False
     sentences: list[Sentence] = field(default_factory=list)
+
+    @classmethod
+    def from_validated(
+        cls, file: ValidatedFile, pages: list[PageText], **kwargs
+    ) -> ExtractedDocument:
+        """Create a document carrying the identity fields of a validated upload."""
+        return cls(
+            filename=file.filename,
+            file_type=file.file_type,
+            sha256=file.sha256,
+            size_bytes=file.size_bytes,
+            pages=pages,
+            **kwargs,
+        )
 
     @property
     def page_count(self) -> int:
