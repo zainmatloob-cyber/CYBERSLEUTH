@@ -27,7 +27,8 @@ def per_category_counts(
 ) -> dict[str, Counts]:
     result = {}
     for category in categories:
-        tp = sum(1 for t, p in zip(truth, predicted, strict=True) if category in t and category in p)
+        tp = sum(1 for t, p in zip(truth, predicted, strict=True)
+                 if category in t and category in p)
         fp = sum(1 for t, p in zip(truth, predicted, strict=True)
                  if category not in t and category in p)
         fn = sum(1 for t, p in zip(truth, predicted, strict=True)

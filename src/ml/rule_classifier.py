@@ -36,7 +36,8 @@ RULES: dict[str, tuple[str, ...]] = {
     ),
     "data_breach": (
         r"exfiltrat\w*", r"data leak\w*", r"leak site", r"stolen data", r"data theft",
-        r"(?:upload|transferr?)(?:s|ed|ing)? (?:the )?(?:stolen|collected|harvested) (?:data|files)",
+        r"(?:upload|transferr?)(?:s|ed|ing)? (?:the )?(?:stolen|collected|harvested)"
+        r" (?:data|files)",
     ),
     "ddos": (
         r"d?dos attacks?", r"ddos", r"denial[- ]of[- ]service", r"(?:syn|udp|http) flood\w*",
