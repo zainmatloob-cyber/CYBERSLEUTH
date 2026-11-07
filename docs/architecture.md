@@ -20,11 +20,28 @@ flowchart TD
 
     classDef done fill:#0b3d2e,stroke:#00c2a8,color:#e6edf3
     classDef todo fill:#161b22,stroke:#6e7681,color:#8b949e
-    class V,X,C,S done
-    class I,T,M,R,D,UI todo
+    class V,X,C,S,I done
+    class T,M,R,D,UI todo
 ```
 
-Green stages are implemented (Phase 1). Grey stages come in later phases.
+Green stages are implemented (Phases 1–2). Grey stages come in later phases.
+
+## Phase 2: intelligence extraction
+
+`src/intelligence/analyzer.py::Analyzer.analyze()` runs ingestion, then
+`IOCExtractor.extract()`, then `EntityExtractor.extract()`, and returns an
+`AnalysisResult`. Its derived views (`evidence`, `vulnerabilities`) come from
+`evidence_manager.py`. The `Analyzer` holds the spaCy model and phrase matchers, so it
+is created once (the app caches it with `st.cache_resource`). If the model is missing,
+entity recognition falls back to the rules only.
+
+| Module | Responsibility |
+|---|---|
+| `src/nlp/ioc_models.py`, `ioc_extractor.py` | IOC types and flags; defang-aware matching, validation, de-duplication, evidence |
+| `src/nlp/entity_models.py`, `entity_kb.py`, `entity_extractor.py` | Entity types and sources; KB loading and validation; KB + pattern + spaCy recognition |
+| `src/intelligence/evidence_manager.py` | Findings per sentence; merging CVE IDs with named vulnerabilities |
+| `src/visualization/tables.py` | Plain table builders; validated ATT&CK/NVD links |
+| `src/evaluation/` | Metrics and the gold-file evaluation runner |
 
 ## Phase 1: ingestion
 

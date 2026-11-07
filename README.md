@@ -6,9 +6,10 @@ CyberSleuth turns unstructured cybersecurity reports (PDF, DOCX, TXT) into
 structured, explainable, evidence-backed threat intelligence. It runs entirely
 locally with free and open-source tools and needs no paid API.
 
-> **Status: Phase 1 complete, v0.1.0.** Document ingestion works and is tested.
-> IOC extraction, entity recognition, classification, MITRE ATT&CK mapping and
-> risk scoring are planned and **not yet implemented**. See the [Roadmap](#roadmap).
+> **Status: Phase 2 complete, v0.2.0.** Document ingestion, IOC extraction and
+> cybersecurity entity recognition work, are tested, and are evaluated on an
+> annotated set. Threat classification, MITRE ATT&CK technique mapping and risk
+> scoring are planned and **not yet implemented**. See the [Roadmap](#roadmap).
 
 ## Problem
 
@@ -35,15 +36,43 @@ an evidence trail for every finding: document, page and character position.
 * **Text cleaning that leaves indicators unchanged**: Unicode normalisation that
   keeps `hxxp://`, `evil[.]com`, `10[.]0[.]0[.]5`, hashes and CVE IDs exactly as written.
 * **Sentence segmentation with exact source positions**, the base for
-  evidence-backed findings in later phases.
-* **Streamlit interface** with a dark theme, upload progress, warnings, a
-  per-page text view, a searchable sentence table and metadata.
+  evidence-backed findings.
+* **IOC extraction** of IPv4, domains, URLs, emails, MD5/SHA-1/SHA-256 and CVE IDs.
+  * Handles defanged forms (`hxxp`, `[.]`, `[at]`).
+  * Validated against an IANA TLD snapshot and Python's IP parser.
+  * Guards against filenames, version strings and .NET namespaces.
+  * De-duplicated, with page, position and sentence for every occurrence.
+  * Flags such as private IP or documentation range. Indicators are **never** treated
+    as malicious by default.
+* **Cybersecurity entity recognition** of malware, threat actors, tools, named
+  vulnerabilities, attack techniques, organisations and locations.
+  * Uses a MITRE ATT&CK v20.1 knowledge base with aliases (`Fancy Bear` → APT28, G0007),
+    curated lists, actor naming patterns and spaCy.
+  * Resolves ambiguous names from context (`Cuba` ransomware vs. the country).
+  * Records the source of every entity, and invents no confidence scores.
+* **Evidence views**: findings for each sentence, and CVE IDs merged with named
+  vulnerabilities (Log4Shell ↔ CVE-2021-44228).
+* **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
+  and ATT&CK/NVD reference links. Document text, sentence and metadata views.
+
+## Evaluation
+
+8 synthetic, author-annotated documents, split dev/test. The test split was scored once,
+with the code frozen ([details and every error](docs/evaluation/README.md)):
+
+| Test split | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| IOC extraction | 1.00 | 1.00 | 1.00 |
+| Entity recognition (rules + spaCy) | 0.87 | 0.83 | 0.85 |
+| Entity recognition (rules only) | 1.00 | 0.55 | 0.71 |
+
+This is a small, self-made set. The numbers are **not** a real-world accuracy claim.
 
 ## Architecture
 
 ```text
-Upload → Validation → Extraction → Cleaning → Sentences → [IOCs & Entities → Classification
-       → MITRE ATT&CK → Risk Scoring → Database → Dashboard & Reports]   (bracketed: planned)
+Upload → Validation → Extraction → Cleaning → Sentences → IOCs & Entities → Evidence
+       → [Classification → MITRE ATT&CK → Risk Scoring → Database → Reports]   (bracketed: planned)
 ```
 
 Details: [docs/architecture.md](docs/architecture.md) · Methodology and
@@ -57,7 +86,7 @@ limitations: [docs/methodology.md](docs/methodology.md)
 | UI | Streamlit | Plotly |
 | Documents | PyMuPDF, python-docx | |
 | Data | pandas | NumPy, SQLite + SQLAlchemy |
-| NLP / ML | Rule-based cleaning and segmentation | spaCy, TF-IDF, scikit-learn |
+| NLP / ML | spaCy 3.8 (`en_core_web_sm`), regex extraction, MITRE ATT&CK KB | TF-IDF, scikit-learn |
 | Quality | pytest, pytest-cov, ruff | |
 
 ## Installation (Windows)
@@ -86,13 +115,16 @@ Open http://localhost:8501 and upload a report. Synthetic demo documents are in
 Programmatic use:
 
 ```python
-from src.ingestion.pipeline import ingest
+from src.intelligence.analyzer import Analyzer
 
-doc = ingest(open("report.pdf", "rb").read(), "report.pdf")
-print(doc.page_count, len(doc.sentences), doc.warnings)
-for s in doc.sentences[:3]:
-    print(s.page_number, s.char_start, s.text)
+result = Analyzer().analyze(open("report.pdf", "rb").read(), "report.pdf")
+for indicator in result.indicators:
+    print(indicator.ioc_type, indicator.value, indicator.count, sorted(indicator.flags))
+for entity in result.entities:
+    print(entity.entity_type, entity.name, entity.kb_id, entity.source)
 ```
+
+Evaluate extraction quality: `python scripts/evaluate_extraction.py --split dev`.
 
 ## Configuration
 
@@ -107,6 +139,8 @@ with environment variables:
 | `CYBERSLEUTH_MAX_DOCX_ZIP_ENTRIES` | 2000 |
 | `CYBERSLEUTH_MIN_CHARS_PER_TEXT_PAGE` | 20 |
 | `CYBERSLEUTH_LOG_LEVEL` | INFO |
+| `CYBERSLEUTH_SPACY_MODEL` | en_core_web_sm |
+| `CYBERSLEUTH_SPACY_BATCH_SIZE` | 64 |
 
 ## Testing
 
@@ -116,10 +150,17 @@ pytest --cov=src --cov=app --cov-report=term-missing
 ruff check .
 ```
 
-The suite covers validation and attack cases (disguised executables, zip bombs,
-path traversal, Markdown injection), every reader's edge cases, cleaning that
-leaves IOCs intact, the sentence-position invariant, end-to-end ingestion, and
-the UI through Streamlit's `AppTest`.
+The suite covers:
+* validation and attack cases (disguised executables, zip bombs, path traversal,
+  Markdown injection);
+* every reader's edge cases;
+* cleaning that leaves IOCs intact, and the sentence-position invariant;
+* IOC false-positive traps and defanging variants;
+* entity disambiguation and knowledge-base integrity;
+* the evaluation metrics;
+* end-to-end analysis, and the UI through Streamlit's `AppTest`.
+
+Model-dependent tests are skipped automatically if `en_core_web_sm` is not installed.
 
 ## Project structure
 
@@ -127,19 +168,23 @@ the UI through Streamlit's `AppTest`.
 app.py                  Streamlit entry point
 config/settings.py      Limits and paths (environment overrides)
 src/ingestion/          Validation, readers, cleaning, pipeline, data models
-src/nlp/                Sentence segmentation (IOC/NER/classification: planned)
-src/intelligence/       MITRE mapping, risk scoring (planned)
+src/nlp/                Sentence segmentation, IOC extraction, entity recognition, KB loader
+src/intelligence/       Analysis orchestrator, evidence views (MITRE mapping, risk: planned)
+src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
+src/visualization/      Table builders for the UI
 src/database/           SQLAlchemy models (planned)
 src/reporting/          PDF/JSON/CSV export (planned)
-scripts/make_samples.py Synthetic demo-document generator
+data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated lists, rules
+data/evaluation/        Annotation guidelines and the annotated dev/test documents
+scripts/                Sample generator, ATT&CK KB builder, evaluation runner
 tests/                  pytest suite
-docs/                   Architecture and methodology
+docs/                   Architecture, methodology, evaluation reports
 ```
 
 ## Roadmap
 
 - [x] **Phase 1:** Foundation and document ingestion
-- [ ] **Phase 2:** IOC extraction and cybersecurity named-entity recognition
+- [x] **Phase 2:** IOC extraction, cybersecurity named-entity recognition, evidence views, evaluation
 - [ ] **Phase 3:** Threat classification (rule-based baseline + TF-IDF/Logistic Regression), MITRE ATT&CK mapping, risk scoring
 - [ ] **Phase 4:** SQLite persistence, dashboard, explorers, PDF/JSON/CSV reports
 - [ ] **Phase 5:** Evaluation on a manually verified dataset, hardening, deployment

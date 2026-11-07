@@ -1,0 +1,236 @@
+{
+ "date": "2026-11-07 15:10 UTC",
+ "revision": "a0c4cb4",
+ "attack_version": "20.1",
+ "split": "dev",
+ "mode": "rules+en_core_web_sm",
+ "documents": [
+  "dev_01_ransomware.txt",
+  "dev_02_espionage.txt",
+  "dev_03_banking.txt",
+  "dev_04_edge_devices.txt"
+ ],
+ "tasks": {
+  "iocs": {
+   "micro": {
+    "tp": 29,
+    "fp": 0,
+    "fn": 0,
+    "support": 29,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+   },
+   "macro_f1": 1.0,
+   "per_type": {
+    "cve": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 0,
+     "support": 3,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "domain": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "support": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "email": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 0,
+     "support": 3,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "ipv4": {
+     "tp": 8,
+     "fp": 0,
+     "fn": 0,
+     "support": 8,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "md5": {
+     "tp": 2,
+     "fp": 0,
+     "fn": 0,
+     "support": 2,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "sha1": {
+     "tp": 2,
+     "fp": 0,
+     "fn": 0,
+     "support": 2,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "sha256": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 0,
+     "support": 3,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "url": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "support": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    }
+   }
+  },
+  "entities": {
+   "micro": {
+    "tp": 53,
+    "fp": 4,
+    "fn": 4,
+    "support": 57,
+    "precision": 0.9298245614035088,
+    "recall": 0.9298245614035088,
+    "f1": 0.9298245614035088
+   },
+   "macro_f1": 0.9446701043797232,
+   "per_type": {
+    "attack_technique": {
+     "tp": 14,
+     "fp": 0,
+     "fn": 1,
+     "support": 15,
+     "precision": 1.0,
+     "recall": 0.9333333333333333,
+     "f1": 0.9655172413793104
+    },
+    "location": {
+     "tp": 9,
+     "fp": 1,
+     "fn": 0,
+     "support": 9,
+     "precision": 0.9,
+     "recall": 1.0,
+     "f1": 0.9473684210526316
+    },
+    "malware": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "support": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "organization": {
+     "tp": 7,
+     "fp": 3,
+     "fn": 2,
+     "support": 9,
+     "precision": 0.7,
+     "recall": 0.7777777777777778,
+     "f1": 0.7368421052631577
+    },
+    "threat_actor": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "support": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "tool": {
+     "tp": 13,
+     "fp": 0,
+     "fn": 1,
+     "support": 14,
+     "precision": 1.0,
+     "recall": 0.9285714285714286,
+     "f1": 0.962962962962963
+    },
+    "vulnerability": {
+     "tp": 2,
+     "fp": 0,
+     "fn": 0,
+     "support": 2,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    }
+   }
+  }
+ },
+ "errors": [
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "CERT"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "Tor"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_negative",
+   "value": "CISA"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_negative",
+   "value": "MEGA"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "tool",
+   "error": "false_negative",
+   "value": "Tor"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "attack_technique",
+   "error": "false_negative",
+   "value": "Data Encryption for Impact"
+  },
+  {
+   "document": "dev_01_ransomware.txt",
+   "task": "entities",
+   "type": "location",
+   "error": "false_positive",
+   "value": "CISA"
+  },
+  {
+   "document": "dev_03_banking.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "Outlook Web Access"
+  }
+ ]
+}

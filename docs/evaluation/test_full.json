@@ -1,0 +1,269 @@
+{
+ "date": "2026-11-07 15:10 UTC",
+ "revision": "a0c4cb4",
+ "attack_version": "20.1",
+ "split": "test",
+ "mode": "rules+en_core_web_sm",
+ "documents": [
+  "test_01_supply_chain.txt",
+  "test_02_credential_phishing.txt",
+  "test_03_lockbit.txt",
+  "test_04_cryptomining.txt"
+ ],
+ "tasks": {
+  "iocs": {
+   "micro": {
+    "tp": 18,
+    "fp": 0,
+    "fn": 0,
+    "support": 18,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0
+   },
+   "macro_f1": 1.0,
+   "per_type": {
+    "domain": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 0,
+     "support": 1,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "email": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 0,
+     "support": 1,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "ipv4": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 0,
+     "support": 5,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "md5": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 0,
+     "support": 3,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "sha1": {
+     "tp": 2,
+     "fp": 0,
+     "fn": 0,
+     "support": 2,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "sha256": {
+     "tp": 2,
+     "fp": 0,
+     "fn": 0,
+     "support": 2,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "url": {
+     "tp": 4,
+     "fp": 0,
+     "fn": 0,
+     "support": 4,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    }
+   }
+  },
+  "entities": {
+   "micro": {
+    "tp": 39,
+    "fp": 6,
+    "fn": 8,
+    "support": 47,
+    "precision": 0.8666666666666667,
+    "recall": 0.8297872340425532,
+    "f1": 0.8478260869565217
+   },
+   "macro_f1": 0.8673469387755102,
+   "per_type": {
+    "attack_technique": {
+     "tp": 14,
+     "fp": 0,
+     "fn": 0,
+     "support": 14,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "location": {
+     "tp": 7,
+     "fp": 0,
+     "fn": 0,
+     "support": 7,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "malware": {
+     "tp": 5,
+     "fp": 0,
+     "fn": 2,
+     "support": 7,
+     "precision": 1.0,
+     "recall": 0.7142857142857143,
+     "f1": 0.8333333333333333
+    },
+    "organization": {
+     "tp": 6,
+     "fp": 6,
+     "fn": 3,
+     "support": 9,
+     "precision": 0.5,
+     "recall": 0.6666666666666666,
+     "f1": 0.5714285714285715
+    },
+    "threat_actor": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 0,
+     "support": 3,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    },
+    "tool": {
+     "tp": 3,
+     "fp": 0,
+     "fn": 3,
+     "support": 6,
+     "precision": 1.0,
+     "recall": 0.5,
+     "f1": 0.6666666666666666
+    },
+    "vulnerability": {
+     "tp": 1,
+     "fp": 0,
+     "fn": 0,
+     "support": 1,
+     "precision": 1.0,
+     "recall": 1.0,
+     "f1": 1.0
+    }
+   }
+  }
+ },
+ "errors": [
+  {
+   "document": "test_01_supply_chain.txt",
+   "task": "entities",
+   "type": "tool",
+   "error": "false_negative",
+   "value": "Net"
+  },
+  {
+   "document": "test_01_supply_chain.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "HTTPS"
+  },
+  {
+   "document": "test_01_supply_chain.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "Software"
+  },
+  {
+   "document": "test_01_supply_chain.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_negative",
+   "value": "NCSC"
+  },
+  {
+   "document": "test_02_credential_phishing.txt",
+   "task": "entities",
+   "type": "malware",
+   "error": "false_negative",
+   "value": "POWERSTAR"
+  },
+  {
+   "document": "test_02_credential_phishing.txt",
+   "task": "entities",
+   "type": "tool",
+   "error": "false_negative",
+   "value": "Evilginx"
+  },
+  {
+   "document": "test_02_credential_phishing.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "MFA"
+  },
+  {
+   "document": "test_03_lockbit.txt",
+   "task": "entities",
+   "type": "malware",
+   "error": "false_negative",
+   "value": "LockBit"
+  },
+  {
+   "document": "test_03_lockbit.txt",
+   "task": "entities",
+   "type": "tool",
+   "error": "false_negative",
+   "value": "wbadmin"
+  },
+  {
+   "document": "test_03_lockbit.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "Group Policy"
+  },
+  {
+   "document": "test_03_lockbit.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "LockBit"
+  },
+  {
+   "document": "test_03_lockbit.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_negative",
+   "value": "ACN"
+  },
+  {
+   "document": "test_04_cryptomining.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_positive",
+   "value": "SSH"
+  },
+  {
+   "document": "test_04_cryptomining.txt",
+   "task": "entities",
+   "type": "organization",
+   "error": "false_negative",
+   "value": "Alibaba Cloud"
+  }
+ ]
+}

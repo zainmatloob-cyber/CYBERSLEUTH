@@ -67,10 +67,90 @@ A rule-based splitter, chosen because it is predictable on IOC-heavy text:
   spaces. This mainly affects unpunctuated IOC lists.
 * Each sentence stores its page number and character positions.
 
-## 2. Known limitations (Phase 1)
+## 2. IOC extraction (Phase 2)
+
+Implemented in `src/nlp/ioc_extractor.py`. It never resolves or contacts any value.
+
+1. **Matching on the original text.** The regexes accept common defanging directly
+   (`[.]`, `(.)`, `{.}`, `[dot]`, `[@]`, `[at]`, `hxxp`, `fxp`, `[:]`, `[://]`), so character
+   positions stay exact. The refanged value is stored separately from the text as written.
+2. **Validation for each type.**
+   * IPv4 is parsed with `ipaddress`, which rejects octets over 255 and leading zeros.
+     Matches preceded by `v`, `ver`, `version` or `build` are rejected.
+   * Domains need a TLD from the bundled IANA snapshot (or an RFC 6761 special-use name).
+   * Hashes must be bounded by non-hex characters and mix digits and letters.
+   * CVE years must be between 1999 and next year.
+3. **False-positive guards, derived from data.**
+   * 11 real TLDs collide with file extensions (`zip py md sh app cab mov one pl rs so`).
+     These are accepted as domains only when written defanged.
+   * Title-case dotted names (`System.Management`) are rejected because `.management`,
+     `.exchange` and `.security` are real TLDs.
+4. **Overlap priority:** URL > email > CVE > IPv4 > domain > hash. A host inside a URL is
+   not counted twice.
+5. **De-duplication** by `(type, value)`. Every occurrence keeps its page, position,
+   sentence index and sentence text.
+
+Flags (`documentation_range`, `private`, `reserved_domain`, …) describe what a value is.
+Every indicator is `unverified`: being extracted is not a verdict.
+
+## 3. Entity recognition (Phase 2)
+
+Implemented in `src/nlp/entity_extractor.py`. When spans overlap, the earlier source wins:
+
+| Priority | Source | Provenance label |
+|---|---|---|
+| 1 | MITRE ATT&CK v20.1 groups, malware and tools with aliases (1,716 names) | `kb:mitre-attack` |
+| 2 | Curated tools, named vulnerabilities (→ CVE), attack-technique terms | `kb:curated` |
+| 3 | Actor naming patterns (APT/FIN/UNC/TA/DEV/Storm/UAC/TAG, vendor animal and weather names) | `rule:actor-pattern` |
+| 4 | spaCy `en_core_web_sm` ORG / GPE / LOC | `model:spacy` |
+
+**Disambiguation.**
+* 132 hand-reviewed ATT&CK names that are ordinary words (`Cuba`, `Royal`, `Silence`), plus
+  every name of 3 characters or fewer, count only when the same sentence contains a keyword
+  for their type.
+* Names shared by several entries (e.g. `Sofacy`: group or malware) are resolved by
+  context. The other candidates are kept in `alternatives`.
+
+**Model output filtering.** Model entities are dropped when they:
+* look like identifiers (domains, CVE IDs, hashes, paths);
+* span a whole sentence (usually a heading);
+* are part of a dotted identifier.
+
+A leading "the" is removed from model entity names.
+
+**Confidence.** None. The rules are deterministic, and `en_core_web_sm` does not expose
+calibrated per-entity probabilities, so no score is invented.
+
+Entities are **mentions**: "Phishing was not involved" still yields Phishing. Deciding
+whether a behaviour actually occurred belongs to the ATT&CK mapping stage (Phase 3).
+
+## 4. Evaluation (Phase 2)
+
+8 synthetic, author-annotated documents, split 4 dev and 4 test. The test split was scored
+once, with the extractor code frozen. Full protocol, per-type results and every error are
+in [evaluation/README.md](evaluation/README.md).
+
+| Task (test split) | Precision | Recall | F1 |
+|---|---:|---:|---:|
+| IOCs | 1.00 | 1.00 | 1.00 |
+| Entities (rules + model) | 0.87 | 0.83 | 0.85 |
+| Entities (rules only) | 1.00 | 0.55 | 0.71 |
+
+These numbers describe a small, self-made set, not real-world accuracy.
+
+## 5. Known limitations
 
 | Area | Limitation | Possible mitigation |
 |---|---|---|
+| IOC | No IPv6, SHA-512, file paths, registry keys or cryptocurrency addresses | More patterns with the same validation approach |
+| IOC | Title-case real domains (`Evil.Com`) are rejected by the namespace guard | Context-aware guard |
+| IOC | `evil.com.zz` (an invalid TLD after a valid one) is rejected as a whole | Fall back to the longest valid suffix |
+| IOC | The part of an email before `@` is lowercased | Keep the original case |
+| NER | Entities absent from ATT&CK and the curated list are missed (test recall: tools 0.50) | Broader curated lists; a trained NER model with labelled data |
+| NER | Ambiguous names without a context keyword in the same sentence are missed (`Tor`, lowercase `net`) | Context window wider than one sentence |
+| NER | The model labels protocols and products as ORG (test ORG precision 0.50) | Stop-list validated on dev; a larger model |
+| NER | About 730 sentences/s; a 20 MB text file takes minutes | Parallel `nlp.pipe`, background jobs |
+| Evaluation | Small, synthetic, self-annotated set | Independently annotated public advisories |
 | OCR | Scanned pages are detected but not read | Optional Tesseract integration |
 | DOCX | Headers, footers, footnotes, comments and text boxes are not extracted | Read the extra document parts |
 | DOCX | Nested tables are flattened into their cell text | Walk tables recursively |
@@ -81,13 +161,14 @@ A rule-based splitter, chosen because it is predictable on IOC-heavy text:
 | Segmentation | The abbreviation list is English-only and fixed | Statistical splitter (Phase 2 evaluation) |
 | TXT | Windows-1252 fallback can mis-decode other single-byte encodings | Statistical charset detection |
 
-## 3. Data used
+## 6. Data used
 
-Phase 1 uses only **synthetic** documents, generated by `scripts/make_samples.py`
-and by test fixtures:
-* IPs from RFC 5737 documentation ranges (`198.51.100.0/24`, `203.0.113.0/24`).
-* Domains under `example.*`.
-* The EICAR test-file MD5.
-* A fictional threat actor.
+| Data | Origin | Purpose |
+|---|---|---|
+| `data/samples/` | Synthetic, generated by `scripts/make_samples.py` (RFC 5737 IPs, `example.*` domains, EICAR MD5, fictional actor) | Demos, end-to-end tests |
+| `data/evaluation/` | Synthetic, author-written and author-annotated | Extraction evaluation (section 4) |
+| `data/knowledge_base/iana_tlds.txt` | IANA TLD list, version 2026110700 | Domain validation |
+| `data/knowledge_base/attack_entities.json` | Derived from MITRE ATT&CK Enterprise v20.1 | Entity knowledge base |
+| `data/knowledge_base/curated_entities.json`, `entity_rules.json` | Hand-curated and reviewed | Curated entities, disambiguation |
 
-No model metrics are reported in Phase 1. Classification and evaluation begin in Phase 3.
+No real incident data or real live indicators are used anywhere in the project.
