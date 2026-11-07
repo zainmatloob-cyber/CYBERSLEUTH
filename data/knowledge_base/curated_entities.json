@@ -1,92 +1,729 @@
 {
- "version": "2026-11-07",
- "description": "Hand-curated entities not covered as ATT&CK software: dual-use/admin tools commonly abused in intrusions, named vulnerabilities with their CVE identifiers, and generic attack-technique terms. Technique terms are mentions only; mapping to ATT&CK techniques happens in Phase 3. Matching is case-insensitive.",
+ "version": "2026-11-07b",
+ "description": "Hand-curated entities not covered as ATT&CK software: dual-use/admin tools commonly abused in intrusions, named vulnerabilities with their CVE identifiers, and generic attack-technique terms. Technique terms are mentions only; mapping to ATT&CK techniques happens in Phase 3. Matching is case-insensitive. Technique terms carry 'attack_ids' (ATT&CK v20.1); terms naming a tactic or concept rather than a technique have none.",
  "tools": [
-  {"name": "PowerShell", "variants": ["PowerShell", "pwsh"]},
-  {"name": "WMI", "variants": ["WMI", "Windows Management Instrumentation", "wmic"]},
-  {"name": "rundll32", "variants": ["rundll32", "rundll32.exe"]},
-  {"name": "regsvr32", "variants": ["regsvr32", "regsvr32.exe"]},
-  {"name": "mshta", "variants": ["mshta", "mshta.exe"]},
-  {"name": "vssadmin", "variants": ["vssadmin", "vssadmin.exe"]},
-  {"name": "bcdedit", "variants": ["bcdedit", "bcdedit.exe"]},
-  {"name": "AnyDesk", "variants": ["AnyDesk"]},
-  {"name": "TeamViewer", "variants": ["TeamViewer"]},
-  {"name": "Atera", "variants": ["Atera"]},
-  {"name": "Splashtop", "variants": ["Splashtop"]},
-  {"name": "Metasploit", "variants": ["Metasploit", "Meterpreter"]},
-  {"name": "Nmap", "variants": ["Nmap"]},
-  {"name": "Advanced IP Scanner", "variants": ["Advanced IP Scanner"]},
-  {"name": "WinSCP", "variants": ["WinSCP"]},
-  {"name": "MEGAsync", "variants": ["MEGAsync"]},
-  {"name": "Process Hacker", "variants": ["Process Hacker"]}
+  {
+   "name": "PowerShell",
+   "variants": [
+    "PowerShell",
+    "pwsh"
+   ]
+  },
+  {
+   "name": "WMI",
+   "variants": [
+    "WMI",
+    "Windows Management Instrumentation",
+    "wmic"
+   ]
+  },
+  {
+   "name": "rundll32",
+   "variants": [
+    "rundll32",
+    "rundll32.exe"
+   ]
+  },
+  {
+   "name": "regsvr32",
+   "variants": [
+    "regsvr32",
+    "regsvr32.exe"
+   ]
+  },
+  {
+   "name": "mshta",
+   "variants": [
+    "mshta",
+    "mshta.exe"
+   ]
+  },
+  {
+   "name": "vssadmin",
+   "variants": [
+    "vssadmin",
+    "vssadmin.exe"
+   ]
+  },
+  {
+   "name": "bcdedit",
+   "variants": [
+    "bcdedit",
+    "bcdedit.exe"
+   ]
+  },
+  {
+   "name": "AnyDesk",
+   "variants": [
+    "AnyDesk"
+   ]
+  },
+  {
+   "name": "TeamViewer",
+   "variants": [
+    "TeamViewer"
+   ]
+  },
+  {
+   "name": "Atera",
+   "variants": [
+    "Atera"
+   ]
+  },
+  {
+   "name": "Splashtop",
+   "variants": [
+    "Splashtop"
+   ]
+  },
+  {
+   "name": "Metasploit",
+   "variants": [
+    "Metasploit",
+    "Meterpreter"
+   ]
+  },
+  {
+   "name": "Nmap",
+   "variants": [
+    "Nmap"
+   ]
+  },
+  {
+   "name": "Advanced IP Scanner",
+   "variants": [
+    "Advanced IP Scanner"
+   ]
+  },
+  {
+   "name": "WinSCP",
+   "variants": [
+    "WinSCP"
+   ]
+  },
+  {
+   "name": "MEGAsync",
+   "variants": [
+    "MEGAsync"
+   ]
+  },
+  {
+   "name": "Process Hacker",
+   "variants": [
+    "Process Hacker"
+   ]
+  }
  ],
  "vulnerabilities": [
-  {"name": "Log4Shell", "variants": ["Log4Shell"], "cve": ["CVE-2021-44228"]},
-  {"name": "EternalBlue", "variants": ["EternalBlue"], "cve": ["CVE-2017-0144"]},
-  {"name": "ProxyLogon", "variants": ["ProxyLogon"], "cve": ["CVE-2021-26855"]},
-  {"name": "ProxyShell", "variants": ["ProxyShell"], "cve": ["CVE-2021-34473", "CVE-2021-34523", "CVE-2021-31207"]},
-  {"name": "ProxyNotShell", "variants": ["ProxyNotShell"], "cve": ["CVE-2022-41040", "CVE-2022-41082"]},
-  {"name": "Heartbleed", "variants": ["Heartbleed"], "cve": ["CVE-2014-0160"]},
-  {"name": "Shellshock", "variants": ["Shellshock"], "cve": ["CVE-2014-6271"]},
-  {"name": "Zerologon", "variants": ["Zerologon"], "cve": ["CVE-2020-1472"]},
-  {"name": "PrintNightmare", "variants": ["PrintNightmare"], "cve": ["CVE-2021-34527"]},
-  {"name": "BlueKeep", "variants": ["BlueKeep"], "cve": ["CVE-2019-0708"]},
-  {"name": "Follina", "variants": ["Follina"], "cve": ["CVE-2022-30190"]},
-  {"name": "Spring4Shell", "variants": ["Spring4Shell"], "cve": ["CVE-2022-22965"]},
-  {"name": "Text4Shell", "variants": ["Text4Shell"], "cve": ["CVE-2022-42889"]},
-  {"name": "Dirty COW", "variants": ["Dirty COW", "DirtyCOW"], "cve": ["CVE-2016-5195"]},
-  {"name": "Dirty Pipe", "variants": ["Dirty Pipe", "DirtyPipe"], "cve": ["CVE-2022-0847"]},
-  {"name": "SMBGhost", "variants": ["SMBGhost"], "cve": ["CVE-2020-0796"]},
-  {"name": "Citrix Bleed", "variants": ["Citrix Bleed", "CitrixBleed"], "cve": ["CVE-2023-4966"]},
-  {"name": "Looney Tunables", "variants": ["Looney Tunables"], "cve": ["CVE-2023-4911"]},
-  {"name": "regreSSHion", "variants": ["regreSSHion"], "cve": ["CVE-2024-6387"]}
+  {
+   "name": "Log4Shell",
+   "variants": [
+    "Log4Shell"
+   ],
+   "cve": [
+    "CVE-2021-44228"
+   ]
+  },
+  {
+   "name": "EternalBlue",
+   "variants": [
+    "EternalBlue"
+   ],
+   "cve": [
+    "CVE-2017-0144"
+   ]
+  },
+  {
+   "name": "ProxyLogon",
+   "variants": [
+    "ProxyLogon"
+   ],
+   "cve": [
+    "CVE-2021-26855"
+   ]
+  },
+  {
+   "name": "ProxyShell",
+   "variants": [
+    "ProxyShell"
+   ],
+   "cve": [
+    "CVE-2021-34473",
+    "CVE-2021-34523",
+    "CVE-2021-31207"
+   ]
+  },
+  {
+   "name": "ProxyNotShell",
+   "variants": [
+    "ProxyNotShell"
+   ],
+   "cve": [
+    "CVE-2022-41040",
+    "CVE-2022-41082"
+   ]
+  },
+  {
+   "name": "Heartbleed",
+   "variants": [
+    "Heartbleed"
+   ],
+   "cve": [
+    "CVE-2014-0160"
+   ]
+  },
+  {
+   "name": "Shellshock",
+   "variants": [
+    "Shellshock"
+   ],
+   "cve": [
+    "CVE-2014-6271"
+   ]
+  },
+  {
+   "name": "Zerologon",
+   "variants": [
+    "Zerologon"
+   ],
+   "cve": [
+    "CVE-2020-1472"
+   ]
+  },
+  {
+   "name": "PrintNightmare",
+   "variants": [
+    "PrintNightmare"
+   ],
+   "cve": [
+    "CVE-2021-34527"
+   ]
+  },
+  {
+   "name": "BlueKeep",
+   "variants": [
+    "BlueKeep"
+   ],
+   "cve": [
+    "CVE-2019-0708"
+   ]
+  },
+  {
+   "name": "Follina",
+   "variants": [
+    "Follina"
+   ],
+   "cve": [
+    "CVE-2022-30190"
+   ]
+  },
+  {
+   "name": "Spring4Shell",
+   "variants": [
+    "Spring4Shell"
+   ],
+   "cve": [
+    "CVE-2022-22965"
+   ]
+  },
+  {
+   "name": "Text4Shell",
+   "variants": [
+    "Text4Shell"
+   ],
+   "cve": [
+    "CVE-2022-42889"
+   ]
+  },
+  {
+   "name": "Dirty COW",
+   "variants": [
+    "Dirty COW",
+    "DirtyCOW"
+   ],
+   "cve": [
+    "CVE-2016-5195"
+   ]
+  },
+  {
+   "name": "Dirty Pipe",
+   "variants": [
+    "Dirty Pipe",
+    "DirtyPipe"
+   ],
+   "cve": [
+    "CVE-2022-0847"
+   ]
+  },
+  {
+   "name": "SMBGhost",
+   "variants": [
+    "SMBGhost"
+   ],
+   "cve": [
+    "CVE-2020-0796"
+   ]
+  },
+  {
+   "name": "Citrix Bleed",
+   "variants": [
+    "Citrix Bleed",
+    "CitrixBleed"
+   ],
+   "cve": [
+    "CVE-2023-4966"
+   ]
+  },
+  {
+   "name": "Looney Tunables",
+   "variants": [
+    "Looney Tunables"
+   ],
+   "cve": [
+    "CVE-2023-4911"
+   ]
+  },
+  {
+   "name": "regreSSHion",
+   "variants": [
+    "regreSSHion"
+   ],
+   "cve": [
+    "CVE-2024-6387"
+   ]
+  }
  ],
  "attack_techniques": [
-  {"name": "Phishing", "variants": ["phishing"]},
-  {"name": "Spearphishing", "variants": ["spearphishing", "spear-phishing", "spear phishing"]},
-  {"name": "Smishing", "variants": ["smishing"]},
-  {"name": "Vishing", "variants": ["vishing"]},
-  {"name": "Business Email Compromise", "variants": ["business email compromise", "BEC"]},
-  {"name": "Watering Hole", "variants": ["watering hole", "watering-hole"]},
-  {"name": "Drive-by Compromise", "variants": ["drive-by compromise", "drive-by download"]},
-  {"name": "Supply Chain Compromise", "variants": ["supply chain attack", "supply chain compromise", "supply-chain attack"]},
-  {"name": "Malvertising", "variants": ["malvertising"]},
-  {"name": "SEO Poisoning", "variants": ["SEO poisoning"]},
-  {"name": "Typosquatting", "variants": ["typosquatting"]},
-  {"name": "SQL Injection", "variants": ["SQL injection", "SQLi"]},
-  {"name": "Cross-site Scripting", "variants": ["cross-site scripting", "XSS"]},
-  {"name": "Command Injection", "variants": ["command injection", "OS command injection"]},
-  {"name": "Remote Code Execution", "variants": ["remote code execution", "RCE"]},
-  {"name": "Web Shell", "variants": ["web shell", "webshell"]},
-  {"name": "Privilege Escalation", "variants": ["privilege escalation"]},
-  {"name": "Lateral Movement", "variants": ["lateral movement", "moved laterally"]},
-  {"name": "Credential Dumping", "variants": ["credential dumping", "dumped credentials", "LSASS dumping"]},
-  {"name": "Credential Harvesting", "variants": ["credential harvesting"]},
-  {"name": "Brute Force", "variants": ["brute force", "brute-force"]},
-  {"name": "Password Spraying", "variants": ["password spraying", "password spray"]},
-  {"name": "Credential Stuffing", "variants": ["credential stuffing"]},
-  {"name": "Pass the Hash", "variants": ["pass-the-hash", "pass the hash"]},
-  {"name": "Pass the Ticket", "variants": ["pass-the-ticket", "pass the ticket"]},
-  {"name": "Kerberoasting", "variants": ["Kerberoasting", "Kerberoast"]},
-  {"name": "Golden Ticket", "variants": ["golden ticket"]},
-  {"name": "DCSync", "variants": ["DCSync"]},
-  {"name": "MFA Fatigue", "variants": ["MFA fatigue", "MFA bombing", "push bombing"]},
-  {"name": "SIM Swapping", "variants": ["SIM swapping", "SIM swap"]},
-  {"name": "DLL Side-Loading", "variants": ["DLL side-loading", "DLL sideloading", "DLL side loading"]},
-  {"name": "DLL Hijacking", "variants": ["DLL hijacking", "DLL search order hijacking"]},
-  {"name": "Process Injection", "variants": ["process injection"]},
-  {"name": "Process Hollowing", "variants": ["process hollowing"]},
-  {"name": "Living off the Land", "variants": ["living off the land", "living-off-the-land", "LOTL"]},
-  {"name": "Data Exfiltration", "variants": ["data exfiltration", "exfiltrated data", "exfiltration"]},
-  {"name": "Command and Control", "variants": ["command and control", "command-and-control"]},
-  {"name": "DNS Tunneling", "variants": ["DNS tunneling", "DNS tunnelling"]},
-  {"name": "Domain Fronting", "variants": ["domain fronting"]},
-  {"name": "Keylogging", "variants": ["keylogging"]},
-  {"name": "Adversary-in-the-Middle", "variants": ["adversary-in-the-middle", "man-in-the-middle", "AiTM", "MitM"]},
-  {"name": "Denial of Service", "variants": ["denial of service", "denial-of-service", "DDoS", "DoS attack"]},
-  {"name": "Zero-day Exploitation", "variants": ["zero-day", "0-day", "zero day exploit"]},
-  {"name": "Data Encryption for Impact", "variants": ["encrypted files", "file encryption", "data encryption"]},
-  {"name": "Double Extortion", "variants": ["double extortion"]},
-  {"name": "Malicious Macro", "variants": ["malicious macro", "malicious macros", "macro-enabled document"]}
+  {
+   "name": "Phishing",
+   "variants": [
+    "phishing"
+   ],
+   "attack_ids": [
+    "T1566"
+   ]
+  },
+  {
+   "name": "Spearphishing",
+   "variants": [
+    "spearphishing",
+    "spear-phishing",
+    "spear phishing"
+   ],
+   "attack_ids": [
+    "T1566"
+   ]
+  },
+  {
+   "name": "Smishing",
+   "variants": [
+    "smishing"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Vishing",
+   "variants": [
+    "vishing"
+   ],
+   "attack_ids": [
+    "T1566.004"
+   ]
+  },
+  {
+   "name": "Business Email Compromise",
+   "variants": [
+    "business email compromise",
+    "BEC"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Watering Hole",
+   "variants": [
+    "watering hole",
+    "watering-hole"
+   ],
+   "attack_ids": [
+    "T1189"
+   ]
+  },
+  {
+   "name": "Drive-by Compromise",
+   "variants": [
+    "drive-by compromise",
+    "drive-by download"
+   ],
+   "attack_ids": [
+    "T1189"
+   ]
+  },
+  {
+   "name": "Supply Chain Compromise",
+   "variants": [
+    "supply chain attack",
+    "supply chain compromise",
+    "supply-chain attack"
+   ],
+   "attack_ids": [
+    "T1195"
+   ]
+  },
+  {
+   "name": "Malvertising",
+   "variants": [
+    "malvertising"
+   ],
+   "attack_ids": [
+    "T1583.008"
+   ]
+  },
+  {
+   "name": "SEO Poisoning",
+   "variants": [
+    "SEO poisoning"
+   ],
+   "attack_ids": [
+    "T1608.006"
+   ]
+  },
+  {
+   "name": "Typosquatting",
+   "variants": [
+    "typosquatting"
+   ],
+   "attack_ids": [
+    "T1583.001"
+   ]
+  },
+  {
+   "name": "SQL Injection",
+   "variants": [
+    "SQL injection",
+    "SQLi"
+   ],
+   "attack_ids": [
+    "T1190"
+   ]
+  },
+  {
+   "name": "Cross-site Scripting",
+   "variants": [
+    "cross-site scripting",
+    "XSS"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Command Injection",
+   "variants": [
+    "command injection",
+    "OS command injection"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Remote Code Execution",
+   "variants": [
+    "remote code execution",
+    "RCE"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Web Shell",
+   "variants": [
+    "web shell",
+    "webshell"
+   ],
+   "attack_ids": [
+    "T1505.003"
+   ]
+  },
+  {
+   "name": "Privilege Escalation",
+   "variants": [
+    "privilege escalation"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Lateral Movement",
+   "variants": [
+    "lateral movement",
+    "moved laterally"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Credential Dumping",
+   "variants": [
+    "credential dumping",
+    "dumped credentials",
+    "LSASS dumping"
+   ],
+   "attack_ids": [
+    "T1003"
+   ]
+  },
+  {
+   "name": "Credential Harvesting",
+   "variants": [
+    "credential harvesting"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Brute Force",
+   "variants": [
+    "brute force",
+    "brute-force"
+   ],
+   "attack_ids": [
+    "T1110"
+   ]
+  },
+  {
+   "name": "Password Spraying",
+   "variants": [
+    "password spraying",
+    "password spray"
+   ],
+   "attack_ids": [
+    "T1110.003"
+   ]
+  },
+  {
+   "name": "Credential Stuffing",
+   "variants": [
+    "credential stuffing"
+   ],
+   "attack_ids": [
+    "T1110.004"
+   ]
+  },
+  {
+   "name": "Pass the Hash",
+   "variants": [
+    "pass-the-hash",
+    "pass the hash"
+   ],
+   "attack_ids": [
+    "T1550.002"
+   ]
+  },
+  {
+   "name": "Pass the Ticket",
+   "variants": [
+    "pass-the-ticket",
+    "pass the ticket"
+   ],
+   "attack_ids": [
+    "T1550.003"
+   ]
+  },
+  {
+   "name": "Kerberoasting",
+   "variants": [
+    "Kerberoasting",
+    "Kerberoast"
+   ],
+   "attack_ids": [
+    "T1558.003"
+   ]
+  },
+  {
+   "name": "Golden Ticket",
+   "variants": [
+    "golden ticket"
+   ],
+   "attack_ids": [
+    "T1558.001"
+   ]
+  },
+  {
+   "name": "DCSync",
+   "variants": [
+    "DCSync"
+   ],
+   "attack_ids": [
+    "T1003.006"
+   ]
+  },
+  {
+   "name": "MFA Fatigue",
+   "variants": [
+    "MFA fatigue",
+    "MFA bombing",
+    "push bombing"
+   ],
+   "attack_ids": [
+    "T1621"
+   ]
+  },
+  {
+   "name": "SIM Swapping",
+   "variants": [
+    "SIM swapping",
+    "SIM swap"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "DLL Side-Loading",
+   "variants": [
+    "DLL side-loading",
+    "DLL sideloading",
+    "DLL side loading"
+   ],
+   "attack_ids": [
+    "T1574.001"
+   ]
+  },
+  {
+   "name": "DLL Hijacking",
+   "variants": [
+    "DLL hijacking",
+    "DLL search order hijacking"
+   ],
+   "attack_ids": [
+    "T1574.001"
+   ]
+  },
+  {
+   "name": "Process Injection",
+   "variants": [
+    "process injection"
+   ],
+   "attack_ids": [
+    "T1055"
+   ]
+  },
+  {
+   "name": "Process Hollowing",
+   "variants": [
+    "process hollowing"
+   ],
+   "attack_ids": [
+    "T1055.012"
+   ]
+  },
+  {
+   "name": "Living off the Land",
+   "variants": [
+    "living off the land",
+    "living-off-the-land",
+    "LOTL"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Data Exfiltration",
+   "variants": [
+    "data exfiltration",
+    "exfiltrated data",
+    "exfiltration"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Command and Control",
+   "variants": [
+    "command and control",
+    "command-and-control"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "DNS Tunneling",
+   "variants": [
+    "DNS tunneling",
+    "DNS tunnelling"
+   ],
+   "attack_ids": [
+    "T1071.004"
+   ]
+  },
+  {
+   "name": "Domain Fronting",
+   "variants": [
+    "domain fronting"
+   ],
+   "attack_ids": [
+    "T1090.004"
+   ]
+  },
+  {
+   "name": "Keylogging",
+   "variants": [
+    "keylogging"
+   ],
+   "attack_ids": [
+    "T1056.001"
+   ]
+  },
+  {
+   "name": "Adversary-in-the-Middle",
+   "variants": [
+    "adversary-in-the-middle",
+    "man-in-the-middle",
+    "AiTM",
+    "MitM"
+   ],
+   "attack_ids": [
+    "T1557"
+   ]
+  },
+  {
+   "name": "Denial of Service",
+   "variants": [
+    "denial of service",
+    "denial-of-service",
+    "DDoS",
+    "DoS attack"
+   ],
+   "attack_ids": [
+    "T1498",
+    "T1499"
+   ]
+  },
+  {
+   "name": "Zero-day Exploitation",
+   "variants": [
+    "zero-day",
+    "0-day",
+    "zero day exploit"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Data Encryption for Impact",
+   "variants": [
+    "encrypted files",
+    "file encryption",
+    "data encryption"
+   ],
+   "attack_ids": [
+    "T1486"
+   ]
+  },
+  {
+   "name": "Double Extortion",
+   "variants": [
+    "double extortion"
+   ],
+   "attack_ids": []
+  },
+  {
+   "name": "Malicious Macro",
+   "variants": [
+    "malicious macro",
+    "malicious macros",
+    "macro-enabled document"
+   ],
+   "attack_ids": [
+    "T1204.002"
+   ]
+  }
  ]
 }

@@ -191,6 +191,22 @@ def build_dataset(
     return merged[["text", "techniques", "categories", "group", "split"]]
 
 
+PROCESSED_PATH = settings.data_dir / "processed" / "threat_categories.jsonl"
+
+
+def load_processed(split: str, path: Path = PROCESSED_PATH) -> list[dict]:
+    """Rows of one split from the processed JSONL (built by prepare_threat_dataset.py)."""
+    if split not in SPLITS:
+        raise DatasetError(f"Unknown split {split!r}")
+    if not path.is_file():
+        raise DatasetError(f"{path} not found. Run: python scripts/prepare_threat_dataset.py")
+    with path.open(encoding="utf-8") as handle:
+        rows = [row for row in map(json.loads, handle) if row["split"] == split]
+    if not rows:
+        raise DatasetError(f"No {split} rows in {path.name}")
+    return rows
+
+
 def dataset_statistics(dataset: pd.DataFrame, categories: Iterable[str]) -> dict:
     """Counts per split and category, plus multi-label and grouping figures."""
     labels = [*categories, OTHER]
