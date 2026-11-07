@@ -36,6 +36,7 @@ numpy==2.5.4
 packaging==26.3
 pandas==2.3.3
 pillow==13.0.0
+plotly==6.9.0
 pluggy==1.7.0
 preshed==3.0.15
 protobuf==7.36.2

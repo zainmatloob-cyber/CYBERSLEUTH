@@ -162,3 +162,16 @@ flowchart LR
   * CHECK constraints on enums and ranges;
   * schema version in `PRAGMA user_version`;
   * unchanged verdict saves write no audit event.
+
+### Dashboard and explorers
+
+`src/visualization/aggregations.py` turns repository records (latest analysis per document)
+into DataFrames, counting **documents, not mentions**. `src/visualization/dashboard.py` turns
+them into Plotly figures, and every chart is paired with a table view.
+
+The colours were validated against the app's dark surface (`#0e1117`) with a palette
+validator:
+* single-series bars use one blue (`#3987e5`, ≥3:1 contrast);
+* heatmaps use a single-hue sequential ramp, with zero receding into the dark surface;
+* risk bands are **not** colour-coded with status hues, because warning and serious fail the
+  normal-vision separation floor (ΔE 13.6 < 15). Severity is carried by the label and icon.

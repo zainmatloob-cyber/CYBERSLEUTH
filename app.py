@@ -42,6 +42,12 @@ def main() -> None:
                 url_path="history"),
         st.Page(lambda: pages.dashboard_page(repo), title="Dashboard", icon="📊",
                 url_path="dashboard"),
+        st.Page(lambda: pages.ioc_explorer_page(repo), title="IOC Explorer", icon="🎯",
+                url_path="iocs"),
+        st.Page(lambda: pages.entity_explorer_page(repo), title="Entity Explorer", icon="🧬",
+                url_path="entities"),
+        st.Page(lambda: pages.attack_explorer_page(repo), title="ATT&CK Explorer", icon="🗺️",
+                url_path="attack"),
     ])
     with st.sidebar:
         st.title(f"🛡️ {settings.app_name}")

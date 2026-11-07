@@ -64,6 +64,11 @@ an evidence trail for every finding: document, page and character position.
   * Analysts can mark IOCs (malicious / benign / false positive) and ATT&CK mappings
     (confirmed / rejected) with notes. Every change goes into an append-only audit log.
   * Only findings and their evidence sentences are stored; the full text is opt-in.
+* **Dashboard and cross-document explorers** (Plotly):
+  * Charts of risk bands, threat categories, ATT&CK tactics and IOC types.
+  * An **IOC Explorer** showing which reports share an indicator, an **Entity Explorer**, and an
+    **ATT&CK Explorer** with verification coverage and a tactic × document heatmap.
+  * Counts use documents, not mentions, and only the latest analysis per document.
 * **Evidence views**: findings for each sentence, and CVE IDs merged with named
   vulnerabilities (Log4Shell ↔ CVE-2021-44228).
 * **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
@@ -121,7 +126,7 @@ limitations: [docs/methodology.md](docs/methodology.md)
 | Area | Phase 1 | Planned |
 |---|---|---|
 | Language | Python 3.12 | |
-| UI | Streamlit | Plotly |
+| UI | Streamlit, Plotly | |
 | Documents | PyMuPDF, python-docx | |
 | Data | pandas | NumPy, SQLite + SQLAlchemy |
 | NLP / ML | spaCy 3.8 (`en_core_web_sm`), regex extraction, MITRE ATT&CK KB | TF-IDF, scikit-learn |
@@ -226,8 +231,8 @@ src/nlp/                Sentence segmentation, IOC extraction, entity recognitio
 src/intelligence/       Analysis orchestrator, evidence views (MITRE mapping, risk: planned)
 src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
 src/ml/                 Threat-category dataset, rule baseline, classifier, evaluation
-src/visualization/      Table builders for the UI
-src/ui/                 Streamlit pages (Analysis, History, Dashboard) and tab renderers
+src/visualization/      Table builders, cross-document aggregations, Plotly figures
+src/ui/                 Streamlit pages (Analysis, History, Dashboard, IOC/Entity/ATT&CK explorers)
 src/database/           SQLAlchemy schema, repository, hydration of stored analyses
 src/reporting/          PDF/JSON/CSV export (planned)
 data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated lists, rules

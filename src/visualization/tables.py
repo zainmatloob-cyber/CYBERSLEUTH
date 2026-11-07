@@ -13,6 +13,7 @@ import pandas as pd
 from src.intelligence.evidence_manager import SentenceEvidence, VulnerabilityRecord
 from src.nlp.entity_models import Entity
 from src.nlp.ioc_models import Indicator
+from src.visualization.aggregations import category_label
 
 _ATTACK_ID_RE = re.compile(r"^([GS])\d{4}$")
 _CVE_RE = re.compile(r"^CVE-\d{4}-\d{4,7}$")
@@ -139,7 +140,7 @@ def categories_frame(findings: list) -> pd.DataFrame:
     return pd.DataFrame(
         [
             {
-                "Category": f.category.replace("_", " ").title(),
+                "Category": category_label(f.category),
                 "Status": f.status.value,
                 "Sources": ", ".join(f.sources),
                 "Sentences": f.sentence_count,

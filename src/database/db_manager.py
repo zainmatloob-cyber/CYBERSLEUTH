@@ -290,6 +290,22 @@ class AnalysisRepository:
         """Subquery: the most recent analysis id per document."""
         return (select(func.max(Analysis.id)).group_by(Analysis.document_id)).scalar_subquery()
 
+    def latest_analyses(self) -> list[Analysis]:
+        """Most recent analysis of every document (with its document), newest first."""
+        with self.session() as session:
+            return list(session.scalars(
+                select(Analysis).where(Analysis.id.in_(self._latest_ids(session)))
+                .options(selectinload(Analysis.document))
+                .order_by(Analysis.created_at.desc(), Analysis.id.desc())))
+
+    def latest_categories(self) -> list[ThreatCategoryRecord]:
+        with self.session() as session:
+            return list(session.scalars(
+                select(ThreatCategoryRecord)
+                .where(ThreatCategoryRecord.analysis_id.in_(self._latest_ids(session)))
+                .options(selectinload(ThreatCategoryRecord.analysis)
+                         .selectinload(Analysis.document))))
+
     def latest_indicators(self) -> list[Indicator]:
         with self.session() as session:
             return list(session.scalars(
@@ -302,7 +318,8 @@ class AnalysisRepository:
             return list(session.scalars(
                 select(EntityRecord)
                 .where(EntityRecord.analysis_id.in_(self._latest_ids(session)))
-                .options(selectinload(EntityRecord.analysis).selectinload(Analysis.document))))
+                .options(selectinload(EntityRecord.mentions),
+                         selectinload(EntityRecord.analysis).selectinload(Analysis.document))))
 
     def latest_mappings(self) -> list[TechniqueMappingRecord]:
         with self.session() as session:
