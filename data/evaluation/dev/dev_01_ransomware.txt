@@ -1,0 +1,15 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional incident written for testing.
+
+Incident Report: Ransomware Intrusion at a Regional Hospital
+
+On 3 March 2026 a hospital in Portugal was hit by Akira ransomware. The intrusion began when an employee opened a malicious macro document delivered by phishing from hr-benefits[@]payroll-notice[.]top. The macro downloaded loader version 3.2.1.4 from hxxps://cdn-sync[.]xyz/upd/setup.msi and executed it with rundll32.
+
+Over the next two days the operators used AdFind and BloodHound for discovery, dumped credentials from LSASS with Mimikatz, and moved laterally using PsExec. Command and control traffic went to 203.0.113.45 and 198.51.100.200 on port 8443, and to the domain beacon-cloud[.]top.
+
+Before encryption the actors exfiltrated data with Rclone to a MEGA account and deleted shadow copies with vssadmin. The ransom note referenced the file readme.txt and a Tor negotiation portal. Investigators also noted the archive invoice.zip and the script stage2.py on the file server.
+
+Hashes:
+setup.msi MD5 ee125efd4164f3fd5666402d1ae9907f
+loader.dll SHA-256 0dfa7b4f4c097350d258d734a3c4cf9197217c0931a4d50df2d6df189d720bfd
+
+The hospital notified CISA and the Portuguese national CERT. Microsoft and Mandiant assisted with recovery.

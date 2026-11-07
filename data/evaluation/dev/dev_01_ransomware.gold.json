@@ -1,0 +1,35 @@
+{
+ "document": "dev_01_ransomware.txt",
+ "iocs": [
+  {"type": "email", "value": "hr-benefits@payroll-notice.top"},
+  {"type": "url", "value": "https://cdn-sync.xyz/upd/setup.msi"},
+  {"type": "ipv4", "value": "203.0.113.45"},
+  {"type": "ipv4", "value": "198.51.100.200"},
+  {"type": "domain", "value": "beacon-cloud.top"},
+  {"type": "md5", "value": "ee125efd4164f3fd5666402d1ae9907f"},
+  {"type": "sha256", "value": "0dfa7b4f4c097350d258d734a3c4cf9197217c0931a4d50df2d6df189d720bfd"}
+ ],
+ "entities": [
+  {"type": "malware", "value": "Akira"},
+  {"type": "tool", "value": "rundll32"},
+  {"type": "tool", "value": "AdFind"},
+  {"type": "tool", "value": "BloodHound"},
+  {"type": "tool", "value": "Mimikatz"},
+  {"type": "tool", "value": "PsExec"},
+  {"type": "tool", "value": "Rclone"},
+  {"type": "tool", "value": "vssadmin"},
+  {"type": "tool", "value": "Tor"},
+  {"type": "attack_technique", "value": "Malicious Macro"},
+  {"type": "attack_technique", "value": "Phishing"},
+  {"type": "attack_technique", "value": "Credential Dumping"},
+  {"type": "attack_technique", "value": "Lateral Movement"},
+  {"type": "attack_technique", "value": "Command and Control"},
+  {"type": "attack_technique", "value": "Data Exfiltration"},
+  {"type": "attack_technique", "value": "Data Encryption for Impact"},
+  {"type": "organization", "value": "MEGA"},
+  {"type": "organization", "value": "CISA"},
+  {"type": "organization", "value": "Microsoft"},
+  {"type": "organization", "value": "Mandiant"},
+  {"type": "location", "value": "Portugal"}
+ ]
+}

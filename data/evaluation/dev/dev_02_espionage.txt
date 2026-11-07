@@ -1,0 +1,17 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional campaign written for testing.
+
+Espionage Campaign Targeting Diplomatic Entities
+
+Researchers attribute a 2026 espionage campaign to APT29, a group also tracked as Midnight Blizzard. The actor sent spear-phishing emails impersonating Norway's Ministry of Foreign Affairs to diplomats in Brussels and Warsaw.
+
+The lure linked to hxxp://docs-viewer[.]example[.]org/view?id=7731 which delivered a ZIP archive. Inside, a shortcut file launched PowerShell to download a second stage from 192.0.2.88. The implant, which shares code with WellMess, used DNS tunneling to reach ns1.telemetry-check[.]net.
+
+The group exploited CVE-2023-42793 in exposed build servers and abused the System.Management.Automation namespace to run scripts in memory. Persistence was achieved through a scheduled task created with schtasks.
+
+Indicators:
+- SHA-1 bc73b9c7175d681c57fca636cfeb6a46eced9939
+- SHA-1 d434badfe2e1114e6c7f363311b3215c96e2b3c9
+- MD5 b155b8693da6f3b225d8c01bdaaea235
+- Email: press.office[at]mfa-portal[.]example[.]net
+
+Analysts at ESET and CERT Polska shared additional findings. A separate cluster, UNC5812, used similar infrastructure but is not assessed to be related.

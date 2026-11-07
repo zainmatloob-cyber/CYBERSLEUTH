@@ -1,0 +1,28 @@
+{
+ "document": "dev_02_espionage.txt",
+ "iocs": [
+  {"type": "url", "value": "http://docs-viewer.example.org/view?id=7731"},
+  {"type": "ipv4", "value": "192.0.2.88"},
+  {"type": "domain", "value": "ns1.telemetry-check.net"},
+  {"type": "cve", "value": "CVE-2023-42793"},
+  {"type": "sha1", "value": "bc73b9c7175d681c57fca636cfeb6a46eced9939"},
+  {"type": "sha1", "value": "d434badfe2e1114e6c7f363311b3215c96e2b3c9"},
+  {"type": "md5", "value": "b155b8693da6f3b225d8c01bdaaea235"},
+  {"type": "email", "value": "press.office@mfa-portal.example.net"}
+ ],
+ "entities": [
+  {"type": "threat_actor", "value": "APT29"},
+  {"type": "threat_actor", "value": "UNC5812"},
+  {"type": "malware", "value": "WellMess"},
+  {"type": "tool", "value": "PowerShell"},
+  {"type": "tool", "value": "schtasks"},
+  {"type": "attack_technique", "value": "Spearphishing"},
+  {"type": "attack_technique", "value": "DNS Tunneling"},
+  {"type": "organization", "value": "Ministry of Foreign Affairs"},
+  {"type": "organization", "value": "ESET"},
+  {"type": "organization", "value": "CERT Polska"},
+  {"type": "location", "value": "Norway"},
+  {"type": "location", "value": "Brussels"},
+  {"type": "location", "value": "Warsaw"}
+ ]
+}

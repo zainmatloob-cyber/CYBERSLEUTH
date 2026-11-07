@@ -1,0 +1,11 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional report written for testing.
+
+Linux Botnet and Cryptomining Campaign
+
+A cryptomining campaign attributed to the Rocke group compromised cloud servers in Singapore and India by exploiting weak SSH passwords through credential stuffing. After access, a shell script downloaded a miner from hxxp://198.51.100.33/x86/kworker and added a cron job for persistence.
+
+The same infrastructure served Kinsing payloads and used the domain pool-stats[.]example[.]net for mining pool communication. The operators removed competing malware such as Xbash and disabled monitoring agents from Alibaba Cloud.
+
+A related sample (SHA-1 d434badfe2e1114e6c7f363311b3215c96e2b3c9) was first uploaded from Hong Kong. Another file, kworker.so, was found in /tmp. Version strings like v2.0.1.7 appeared in the binary.
+
+Responders from Trend Micro shared the findings. The campaign did not involve ransomware or DDoS activity.

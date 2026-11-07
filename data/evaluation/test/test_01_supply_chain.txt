@@ -1,0 +1,16 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional incident written for testing.
+
+Case Study: Supply Chain Compromise of a Software Vendor
+
+In late 2025 attackers breached the build pipeline of a Dutch software company and inserted a backdoor into a signed update. The activity overlaps with Lazarus Group tradecraft, and some researchers use the name Diamond Sleet for the same cluster.
+
+Customers who installed version 7.1.0.3 of the update received a loader that reached out to hxxps://telemetry[.]softupd[.]example[.]com/api/v2 and to 198.51.100.61. A secondary payload, identified as a variant of FALLCHILL, beaconed to 203.0.113.18:4444.
+
+The intruders used living-off-the-land techniques: they ran certutil to decode payloads, created accounts with net user, and used WMI for remote execution. Credentials were obtained through Kerberoasting. They staged data in C:\ProgramData\cache\out.rar before exfiltration over HTTPS.
+
+File hashes:
+MD5 b52b00e50c862581ab39c2968ee06d89
+SHA-1 1a4ea786cf48d35a6ee7ab94e062d4583bbd5117
+SHA-256 52b2b0672f2d29d173ad4c7c7819a5002ed51ec1ef5d0b81eef7345dddc47159
+
+Reports were shared with the Netherlands' NCSC and with Kaspersky. Phishing was not involved in this intrusion.

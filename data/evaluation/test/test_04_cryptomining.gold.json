@@ -1,0 +1,20 @@
+{
+ "document": "test_04_cryptomining.txt",
+ "iocs": [
+  {"type": "url", "value": "http://198.51.100.33/x86/kworker"},
+  {"type": "domain", "value": "pool-stats.example.net"},
+  {"type": "sha1", "value": "d434badfe2e1114e6c7f363311b3215c96e2b3c9"}
+ ],
+ "entities": [
+  {"type": "threat_actor", "value": "Rocke"},
+  {"type": "malware", "value": "Kinsing"},
+  {"type": "malware", "value": "Xbash"},
+  {"type": "attack_technique", "value": "Credential Stuffing"},
+  {"type": "attack_technique", "value": "Denial of Service"},
+  {"type": "organization", "value": "Alibaba Cloud"},
+  {"type": "organization", "value": "Trend Micro"},
+  {"type": "location", "value": "Singapore"},
+  {"type": "location", "value": "India"},
+  {"type": "location", "value": "Hong Kong"}
+ ]
+}

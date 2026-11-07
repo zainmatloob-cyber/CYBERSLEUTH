@@ -1,0 +1,26 @@
+{
+ "document": "test_01_supply_chain.txt",
+ "iocs": [
+  {"type": "url", "value": "https://telemetry.softupd.example.com/api/v2"},
+  {"type": "ipv4", "value": "198.51.100.61"},
+  {"type": "ipv4", "value": "203.0.113.18"},
+  {"type": "md5", "value": "b52b00e50c862581ab39c2968ee06d89"},
+  {"type": "sha1", "value": "1a4ea786cf48d35a6ee7ab94e062d4583bbd5117"},
+  {"type": "sha256", "value": "52b2b0672f2d29d173ad4c7c7819a5002ed51ec1ef5d0b81eef7345dddc47159"}
+ ],
+ "entities": [
+  {"type": "threat_actor", "value": "Lazarus Group"},
+  {"type": "malware", "value": "FALLCHILL"},
+  {"type": "tool", "value": "certutil"},
+  {"type": "tool", "value": "Net"},
+  {"type": "tool", "value": "WMI"},
+  {"type": "attack_technique", "value": "Supply Chain Compromise"},
+  {"type": "attack_technique", "value": "Living off the Land"},
+  {"type": "attack_technique", "value": "Kerberoasting"},
+  {"type": "attack_technique", "value": "Data Exfiltration"},
+  {"type": "attack_technique", "value": "Phishing"},
+  {"type": "organization", "value": "NCSC"},
+  {"type": "organization", "value": "Kaspersky"},
+  {"type": "location", "value": "Netherlands"}
+ ]
+}

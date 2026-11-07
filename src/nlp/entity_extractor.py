@@ -64,6 +64,7 @@ _IOC_LIKE_RE = re.compile(
     re.IGNORECASE,
 )
 _TRAILING_PUNCTUATION = ".:;!?"
+_LEADING_ARTICLE = re.compile(r"^the\s+", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -193,8 +194,16 @@ class EntityExtractor:
             if entity_type is None:
                 continue
             start, end = ent.start_char, ent.end_char
+            # Part of a dotted identifier ("System" in System.Management.Automation).
+            if re.match(r"\.\w", doc.text[end : end + 2]) or (
+                start >= 2 and re.match(r"\w\.", doc.text[start - 2 : start])
+            ):
+                continue
             if doc.text[start:end].endswith("'s"):  # possessive is not part of the name
                 end -= 2
+            article = _LEADING_ARTICLE.match(doc.text[start:end])
+            if article:  # "the NCSC" and "NCSC" are the same organisation
+                start += article.end()
             text = " ".join(doc.text[start:end].split())
             if (
                 len(text) < 2

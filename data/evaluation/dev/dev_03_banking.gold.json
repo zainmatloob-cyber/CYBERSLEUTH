@@ -1,0 +1,25 @@
+{
+ "document": "dev_03_banking.txt",
+ "iocs": [
+  {"type": "url", "value": "https://receita-download.example.com/setup"},
+  {"type": "ipv4", "value": "198.51.100.14"},
+  {"type": "ipv4", "value": "10.20.30.40"},
+  {"type": "url", "value": "http://203.0.113.9:8080/gate.php"},
+  {"type": "domain", "value": "kqzv-update.top"},
+  {"type": "sha256", "value": "43906815bf6d140644c16ed48199f1e0d5a01177edc95be6b3699a72a7ba350a"},
+  {"type": "sha256", "value": "986cd6284e2f23d036553026b6bb23fcdd43a0916f706443988a5f54243ed325"}
+ ],
+ "entities": [
+  {"type": "threat_actor", "value": "FIN7"},
+  {"type": "malware", "value": "Grandoreiro"},
+  {"type": "malware", "value": "Cobalt Strike"},
+  {"type": "tool", "value": "AnyDesk"},
+  {"type": "attack_technique", "value": "Malvertising"},
+  {"type": "attack_technique", "value": "SEO Poisoning"},
+  {"type": "attack_technique", "value": "Password Spraying"},
+  {"type": "organization", "value": "Banco Exemplo"},
+  {"type": "location", "value": "Latin America"},
+  {"type": "location", "value": "Brazil"},
+  {"type": "location", "value": "Mexico"}
+ ]
+}

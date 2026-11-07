@@ -30,7 +30,7 @@
   "threat_actor": ["group", "actor", "actors", "apt", "operators", "gang", "crew", "adversary",
                    "adversaries", "attributed", "nation-state", "state-sponsored", "cluster",
                    "intrusion set", "affiliate", "affiliates", "hackers"],
-  "tool": ["tool", "tools", "utility", "command", "binary", "executed", "execute", "framework",
+  "tool": ["tool", "tools", "tooling", "utility", "command", "binary", "executed", "execute", "framework",
            "c2", "lolbin", "toolkit", "script", "invoked", "ran"]
  }
 }

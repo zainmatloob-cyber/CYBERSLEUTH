@@ -1,0 +1,14 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional incident written for testing.
+
+LockBit Affiliate Attack on a Manufacturing Firm
+
+A manufacturer in Italy suffered a LockBit 3.0 intrusion in April 2026. Initial access came from a brute force attack against an exposed RDP service at 10.1.1.25, which was reachable through a misconfigured firewall rule. The affiliate then exploited Zerologon to gain domain administrator rights.
+
+The attackers disabled defenses, used Process Hacker to terminate security tools, and spread the encryptor with Group Policy. A double extortion leak post appeared at hxxp://lb3leaks[.]example[.]com/post/8812 two days later.
+
+Payload: SHA-256 9f30214852fbcdfa59f7b8643c65e08417f374b7518a4c8076323b17885530fb
+Dropper: MD5 f5ae7a37ed552a50de0a220aa42c90ec
+
+Negotiations took place over Tox. The company engaged Sophos and informed the Italian authority ACN. Investigators found references to Conti code in the encryptor, consistent with public reporting.
+
+Backups were deleted with wbadmin, and the ransom note was named Restore-My-Files.txt.

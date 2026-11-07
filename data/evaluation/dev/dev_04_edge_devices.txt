@@ -1,0 +1,11 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional advisory written for testing.
+
+Advisory: Exploitation of Edge Devices and Concurrent DDoS Activity
+
+Threat actors are exploiting Citrix Bleed (CVE-2023-4966) and CVE-2024-3400 against VPN appliances. Successful exploitation allows session hijacking and remote code execution. Several organisations in Canada reported web shell uploads within hours of disclosure.
+
+Separately, a hacktivist group calling itself Quartzite Typhoon claimed DDoS attacks against government portals in Estonia, using a botnet of compromised routers. Attack traffic originated from addresses including 203.0.113.250 and 198.51.100.77.
+
+Observed post-exploitation tooling included Impacket, Sliver, and the open-source scanner Nmap. Defenders should review logs for connections to update.vpn-patch[.]example[.]com and to the IP 192.0.2.10. Configuration files such as config.json and backup.cab should be checked for tampering.
+
+The vendor, Palo Alto Networks, has released fixes. See also Log4Shell, which the same actors exploited in 2022. Report incidents to soc-team@agency.example.gov.

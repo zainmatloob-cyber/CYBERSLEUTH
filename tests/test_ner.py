@@ -261,6 +261,23 @@ def test_model_noise_is_filtered(full, text):
 
 
 @needs_model
+def test_model_entity_inside_dotted_identifier_dropped(full):
+    found = _found(full, "They abused the System.Management.Automation namespace in memory.")
+    assert not {name for kind, name in found if kind is EntityType.ORGANIZATION}
+
+
+@needs_model
+def test_model_entity_leading_article_removed(full):
+    names = {e.name for e in full.extract(_doc("Reports were shared with the NCSC yesterday."))
+             if e.source is EntitySource.MODEL}
+    assert all(not n.lower().startswith("the ") for n in names)
+
+
+def test_tooling_is_a_tool_context_keyword(rules):
+    assert _found(rules, "Observed tooling included Sliver.") == {(EntityType.TOOL, "Sliver")}
+
+
+@needs_model
 def test_country_vs_malware_resolved_by_context(full):
     found = _found(full, "Trade with Cuba grew. Cuba ransomware encrypted servers.")
     assert {(EntityType.LOCATION, "Cuba"), (EntityType.MALWARE, "Cuba")} <= found

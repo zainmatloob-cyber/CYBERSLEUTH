@@ -1,0 +1,26 @@
+{
+ "document": "dev_04_edge_devices.txt",
+ "iocs": [
+  {"type": "cve", "value": "CVE-2023-4966"},
+  {"type": "cve", "value": "CVE-2024-3400"},
+  {"type": "ipv4", "value": "203.0.113.250"},
+  {"type": "ipv4", "value": "198.51.100.77"},
+  {"type": "ipv4", "value": "192.0.2.10"},
+  {"type": "domain", "value": "update.vpn-patch.example.com"},
+  {"type": "email", "value": "soc-team@agency.example.gov"}
+ ],
+ "entities": [
+  {"type": "threat_actor", "value": "Quartzite Typhoon"},
+  {"type": "tool", "value": "Impacket"},
+  {"type": "tool", "value": "Sliver"},
+  {"type": "tool", "value": "Nmap"},
+  {"type": "vulnerability", "value": "Citrix Bleed"},
+  {"type": "vulnerability", "value": "Log4Shell"},
+  {"type": "attack_technique", "value": "Remote Code Execution"},
+  {"type": "attack_technique", "value": "Web Shell"},
+  {"type": "attack_technique", "value": "Denial of Service"},
+  {"type": "organization", "value": "Palo Alto Networks"},
+  {"type": "location", "value": "Canada"},
+  {"type": "location", "value": "Estonia"}
+ ]
+}

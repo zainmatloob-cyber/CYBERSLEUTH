@@ -1,0 +1,22 @@
+{
+ "document": "test_03_lockbit.txt",
+ "iocs": [
+  {"type": "ipv4", "value": "10.1.1.25"},
+  {"type": "url", "value": "http://lb3leaks.example.com/post/8812"},
+  {"type": "sha256", "value": "9f30214852fbcdfa59f7b8643c65e08417f374b7518a4c8076323b17885530fb"},
+  {"type": "md5", "value": "f5ae7a37ed552a50de0a220aa42c90ec"}
+ ],
+ "entities": [
+  {"type": "malware", "value": "LockBit"},
+  {"type": "malware", "value": "LockBit 3.0"},
+  {"type": "malware", "value": "Conti"},
+  {"type": "tool", "value": "Process Hacker"},
+  {"type": "tool", "value": "wbadmin"},
+  {"type": "vulnerability", "value": "Zerologon"},
+  {"type": "attack_technique", "value": "Brute Force"},
+  {"type": "attack_technique", "value": "Double Extortion"},
+  {"type": "organization", "value": "Sophos"},
+  {"type": "organization", "value": "ACN"},
+  {"type": "location", "value": "Italy"}
+ ]
+}

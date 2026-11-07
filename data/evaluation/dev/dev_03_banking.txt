@@ -1,0 +1,13 @@
+SYNTHETIC EVALUATION DOCUMENT - fictional activity written for testing.
+
+Banking Trojan Activity in Latin America
+
+During February 2026, FIN7 affiliates distributed Grandoreiro through malvertising and SEO poisoning campaigns aimed at customers of banks in Brazil and Mexico. Victims who searched for tax software were redirected to hxxps://receita-download[.]example[.]com/setup and installed a trojanized installer.
+
+The installer, version 1.4.22.9, contacted 198.51.100.14 over port 443 and a fallback at 10.20.30.40 inside one compromised network. Stolen credentials were posted to hxxp://203.0.113.9:8080/gate.php. The malware also used a domain generation algorithm; one generated name was kqzv-update[.]top.
+
+The operators deployed AnyDesk for remote access and used Cobalt Strike beacons on a few high-value hosts. In one case, they attempted password spraying against the Outlook Web Access portal of Banco Exemplo.
+
+SHA-256 43906815bf6d140644c16ed48199f1e0d5a01177edc95be6b3699a72a7ba350a
+SHA-256 986cd6284e2f23d036553026b6bb23fcdd43a0916f706443988a5f54243ed325
+Note: the string 1234567890123456789012345678901234567890 in the config is a placeholder, not a hash.
