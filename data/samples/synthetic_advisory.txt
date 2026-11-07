@@ -1,0 +1,19 @@
+SYNTHETIC SAMPLE - FOR TESTING ONLY. All indicators are fictional or reserved.
+
+Threat Advisory: GLASS PANTHER Phishing Campaign
+
+Executive Summary. In March 2026 the fictional actor GLASS PANTHER targeted finance organisations with spear-phishing emails. Victims received a message from billing[@]invoice-portal.example.com containing a link to hxxps://invoice-portal[.]example[.]com/download.php.
+
+Technical Details. The downloaded archive executed a PowerShell script that contacted 198.51.100.23 and 203.0.113[.]77 over port 443. The loader, version 2.4.1, then deployed a ransomware payload that encrypted files on network shares.
+
+Initial access was achieved by exploiting CVE-2024-3400 on exposed VPN gateways, e.g. devices that had not been patched since Jan. 2026.
+
+Indicators of Compromise
+
+MD5: 44d88612fea8a8f36de82e1278abb02f
+
+SHA-256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
+
+Domain: update-service.example.net
+
+Recommendations. Block the listed indicators, patch VPN appliances, and enforce multi-factor authentication for remote access.
