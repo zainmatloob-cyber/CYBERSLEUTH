@@ -85,5 +85,5 @@ def tactic_heatmap(matrix: pd.DataFrame) -> go.Figure:
     ))
     fig.update_xaxes(tickangle=-30, gridcolor="rgba(0,0,0,0)")
     fig.update_yaxes(autorange="reversed")  # most active tactic on top, read top-down
-    return _layout(fig, "ATT&CK tactics per document (non-negated techniques)",
+    return _layout(fig, "ATT&CK tactics per document (explicit or confirmed techniques)",
                    height=max(260, 60 + 30 * len(matrix.index)))

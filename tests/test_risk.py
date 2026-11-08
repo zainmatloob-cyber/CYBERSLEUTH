@@ -11,7 +11,12 @@ import pytest
 from src.ingestion.models import ExtractedDocument, FileType, PageText
 from src.intelligence.assertion import AssertionStatus
 from src.intelligence.evidence_manager import VulnerabilityRecord
-from src.intelligence.mitre_mapper import MappingMethod, TechniqueEvidence, TechniqueMapping
+from src.intelligence.mitre_mapper import (
+    AnalystVerdict,
+    MappingMethod,
+    TechniqueEvidence,
+    TechniqueMapping,
+)
 from src.intelligence.risk_scorer import RiskConfigError, RiskScorer, load_risk_config
 from src.intelligence.threat_assessment import (
     CategoryEvidence,
@@ -178,8 +183,32 @@ def test_attack_status_and_method_factors(scorer):
 
     assert value() == 100
     assert value(status=AssertionStatus.CAPABILITY) == 50
-    assert value(method=MappingMethod.MODEL) == 50  # unverified suggestion
+    assert value(method=MappingMethod.MODEL) == 0  # unverified suggestion: a lead, not scored
     assert value(status=AssertionStatus.NEGATED) == 0
+
+
+def test_verdicts_change_the_attack_component(scorer):
+    def value(mapping):
+        return _component(_score(scorer, mappings=[mapping]), "attack_behaviour")
+
+    model = _mapping("T1486", ("impact",), method=MappingMethod.MODEL)
+    assert value(model).value == 0
+    assert any("1 unverified model suggestion" in line for line in value(model).explanation)
+    model.verdict = AnalystVerdict.CONFIRMED  # confirmed suggestions count like explicit ones
+    assert value(model).value == 100
+    explicit = _mapping("T1486", ("impact",))
+    explicit.verdict = AnalystVerdict.REJECTED
+    assert value(explicit).value == 0
+
+
+def test_rescore_keeps_confidence_and_reflects_verdicts(scorer):
+    model = _mapping("T1486", ("impact",), method=MappingMethod.MODEL)
+    before = _score(scorer, mappings=[model])
+    model.verdict = AnalystVerdict.CONFIRMED
+    after = scorer.rescore(before, [], [], [], [model], [])
+    assert after.score > before.score
+    assert after.confidence == before.confidence
+    assert after.config_version == load_risk_config()["version"]
 
 
 def test_attack_breadth_bonus_is_capped(scorer):
@@ -214,8 +243,12 @@ def test_model_suggestions_do_not_add_breadth(scorer):
     tactics = ["discovery", "execution", "persistence", "collection", "stealth"]
     mappings = [_mapping(f"T10{i:02d}", (t,), method=MappingMethod.MODEL, sentence=i)
                 for i, t in enumerate(tactics)]
-    # 60 (persistence/collection) x 0.5, and no breadth bonus from single model suggestions
-    assert _component(_score(scorer, mappings=mappings), "attack_behaviour").value == 30
+    # Unverified model suggestions contribute neither severity nor breadth.
+    assert _component(_score(scorer, mappings=mappings), "attack_behaviour").value == 0
+    for mapping in mappings[:2]:
+        mapping.verdict = AnalystVerdict.CONFIRMED
+    # Confirmed: max(35 discovery, 55 execution) + breadth 3 for two corroborated tactics.
+    assert _component(_score(scorer, mappings=mappings), "attack_behaviour").value == 58
 
 
 def test_every_attack_tactic_has_a_severity():
@@ -246,12 +279,13 @@ def test_confidence_is_independent_of_severity(scorer):
     assert len(degraded.confidence.reasons) == 3
 
 
-def test_model_only_mappings_lower_confidence(scorer):
+def test_model_only_mappings_do_not_change_severity_or_confidence(scorer):
     mappings = [_mapping(f"T10{i:02d}", ("execution",), method=MappingMethod.MODEL, sentence=i)
                 for i in range(5)]
-    risk = _score(scorer, mappings=mappings)
-    assert risk.confidence.level == "medium"
-    assert any("model suggestions" in r for r in risk.confidence.reasons)
+    with_leads = _score(scorer, mappings=mappings)
+    without = _score(scorer, mappings=[])
+    assert with_leads.score == without.score
+    assert with_leads.confidence == without.confidence
 
 
 # --- threat assessment ----------------------------------------------------------

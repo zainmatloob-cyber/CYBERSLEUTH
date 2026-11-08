@@ -238,7 +238,7 @@ load (the weights must sum to 1; the bands must start at 0 and increase). The pa
 |---|---|---|
 | V | Per merged CVE: mentioned 50 · named 70 · in CISA KEV 90 · KEV with known ransomware use 100 (bundled KEV snapshot, catalogue 2026.11.06) | Max CVE + 5 per extra CVE, capped at +10. CVE IDs and names are already merged per CVE |
 | M | Malware named 50 (ATT&CK-known 60) · ransomware behaviour in a non-negated sentence 85 · +10 if file hashes are present | Hashes alone contribute nothing to M; their count is irrelevant |
-| A | Per technique: max tactic severity × status factor (observed 1 · capability 0.5 · possible 0.25 · negated 0) × method factor (explicit 1 · model 0.5) | Max + 3 per extra tactic, capped at +15. Breadth counts only explicit or multi-sentence techniques |
+| A | Per technique: max tactic severity × status factor (observed 1 · capability 0.5 · possible 0.25 · negated 0) × method factor (explicit 1 · unverified model 0 · analyst-confirmed model 1); rejected mappings 0 | Max + 3 per extra tactic, capped at +15. Breadth counts only explicit or multi-sentence techniques |
 | E | 40 × share of techniques that are observed and corroborated · 30 × evidence sentences (full at 10) · 30 × IOC **type** diversity (full at 4) | Types, never counts. IOCs alone give at most 0.20 × 30 = 6 points |
 
 * **Missing evidence**: the component is 0 with the explanation "no evidence". Weights are
@@ -262,6 +262,17 @@ documents:
   lowered from 0.8 to 0.5, and breadth now counts only explicit or corroborated techniques.
 * `defense-evasion` was replaced by `defense-impairment`. ATT&CK v20.1 split the old tactic
   into `stealth` and `defense-impairment`, so the table had silently scored the new tactic as 0.
+
+**Revision 2026-11-08**, after the real-world evaluation on 14 CISA advisories
+([analysis](evaluation/real_world_analysis.md)):
+* **Model suggestions no longer count.** Only 10% of model-only suggestions matched a technique
+  CISA cites, so they are now *leads*: factor 0 until an analyst confirms them, then 1 (like
+  an explicit match). Rejected mappings count for nothing.
+* **The stored score follows verdicts.** Confirming or rejecting a technique re-scores the
+  stored analysis (`views.rescore_analysis`). Confidence is unchanged, because it measures
+  data quality.
+* **This is a policy change, not a tuned value.** The 14-advisory test set is not re-scored to
+  claim an improvement in risk discrimination; that needs new documents.
 
 Example outputs on the synthetic documents (full pipeline, illustrative only):
 

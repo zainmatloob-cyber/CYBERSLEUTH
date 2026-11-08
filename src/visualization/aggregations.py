@@ -5,7 +5,9 @@ DataFrames, so they can be unit-tested without Streamlit or a browser.
 
 Counting rule used everywhere: **documents, not mentions**. A technique mentioned 40 times
 in one report counts as one document. Negated findings are excluded from "seen in"
-counts, but remain visible in the explorers with their status.
+counts, but remain visible in the explorers with their status. Unverified model-only
+technique suggestions (leads) are excluded from tactic counts too, and are shown separately
+in the ATT&CK explorer.
 """
 
 from __future__ import annotations
@@ -33,7 +35,20 @@ CATEGORY_LABELS = {
 
 def category_label(category: str) -> str:
     return CATEGORY_LABELS.get(category, category.replace("_", " ").title())
+
+
 _NEGATED = "negated"
+
+
+def is_lead(record: TechniqueMappingRecord) -> bool:
+    """Stored counterpart of ``TechniqueMapping.is_unverified_lead``."""
+    return not record.explicit and record.verdict.value != "confirmed"
+
+
+def _counts(record: TechniqueMappingRecord) -> bool:
+    """A mapping that counts as present: not negated, not rejected, not a lead."""
+    return (record.status.value != _NEGATED and record.verdict.value != "rejected"
+            and not is_lead(record))
 
 
 def risk_band_counts(analyses: Sequence[Analysis]) -> pd.DataFrame:
@@ -57,7 +72,7 @@ def category_document_counts(categories: Sequence[ThreatCategoryRecord]) -> pd.D
 def tactic_document_counts(mappings: Sequence[TechniqueMappingRecord]) -> pd.DataFrame:
     documents: dict[str, set[int]] = defaultdict(set)
     for record in mappings:
-        if record.status.value != _NEGATED:
+        if _counts(record):
             for tactic in record.tactics:
                 documents[tactic].add(record.analysis.document_id)
     rows = [{"Tactic": t, "Documents": len(d)} for t, d in documents.items()]
@@ -143,32 +158,35 @@ def technique_explorer(mappings: Sequence[TechniqueMappingRecord]) -> pd.DataFra
         groups[record.technique_id].append(record)
     rows = []
     for technique_id, records in groups.items():
-        active = [r for r in records if r.status.value != _NEGATED]
+        active = [r for r in records if _counts(r)]
         verdicts = [r.verdict.value for r in records]
         rows.append({
             "Technique": technique_id,
             "Name": records[0].name,
             "Tactics": ", ".join(records[0].tactics),
-            "Documents (non-negated)": len({r.analysis.document_id for r in active}),
-            "Negated in": len({r.analysis.document_id for r in records} -
-                              {r.analysis.document_id for r in active}),
+            "Documents (counted)": len({r.analysis.document_id for r in active}),
+            "Negated in": len({r.analysis.document_id for r in records
+                               if r.status.value == _NEGATED}),
+            "Model lead in": len({r.analysis.document_id for r in records
+                                  if is_lead(r) and r.status.value != _NEGATED}),
             "Explicit in": len({r.analysis.document_id for r in records if r.explicit}),
             "Confirmed": verdicts.count("confirmed"),
             "Rejected": verdicts.count("rejected"),
             "Unverified": verdicts.count("unverified"),
             "ATT&CK": records[0].url,
         })
-    columns = ["Technique", "Name", "Tactics", "Documents (non-negated)", "Negated in",
-               "Explicit in", "Confirmed", "Rejected", "Unverified", "ATT&CK"]
+    columns = ["Technique", "Name", "Tactics", "Documents (counted)", "Negated in",
+               "Model lead in", "Explicit in", "Confirmed", "Rejected", "Unverified",
+               "ATT&CK"]
     return pd.DataFrame(rows, columns=columns).sort_values(
-        ["Documents (non-negated)", "Technique"], ascending=[False, True], ignore_index=True)
+        ["Documents (counted)", "Technique"], ascending=[False, True], ignore_index=True)
 
 
 def tactic_document_matrix(mappings: Sequence[TechniqueMappingRecord]) -> pd.DataFrame:
-    """Rows = tactics, columns = documents, values = number of non-negated techniques."""
+    """Rows = tactics, columns = documents, values = techniques that count as present."""
     counts: dict[tuple[str, str], int] = defaultdict(int)
     for record in mappings:
-        if record.status.value == _NEGATED:
+        if not _counts(record):
             continue
         for tactic in record.tactics:
             counts[(tactic, record.analysis.document.filename)] += 1

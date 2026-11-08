@@ -27,7 +27,7 @@ from src.database.views import StoredAnalysis
 from src.nlp.ioc_models import Indicator, IOCType
 from src.visualization.aggregations import category_label
 
-REPORT_SCHEMA_VERSION = "1.0"
+REPORT_SCHEMA_VERSION = "1.1"
 GENERATOR = "CyberSleuth"
 
 _NETWORK_TYPES = {IOCType.URL, IOCType.DOMAIN, IOCType.IPV4, IOCType.EMAIL}
@@ -146,10 +146,11 @@ def executive_summary(view: StoredAnalysis) -> list[str]:
         shown = ", ".join(f"{m.technique_id} {m.name}" for m in explicit[:5])
         more = f" and {len(explicit) - 5} more" if len(explicit) > 5 else ""
         lines.append(f"Techniques named explicitly in the text: {shown}{more}.")
-    suggested = [m for m in view.mappings if not m.explicit]
-    if suggested:
-        lines.append(f"{len(suggested)} technique(s) were suggested by the model only and "
-                     "need analyst review.")
+    leads = [m for m in view.mappings if m.is_unverified_lead]
+    if leads:
+        lines.append(f"{len(leads)} technique(s) were suggested by the model only. They are "
+                     "unverified leads, listed separately and excluded from the risk score "
+                     "until an analyst confirms them.")
     verified = sum(1 for i in view.indicators if i.verification.value != "unverified")
     reviewed = sum(1 for m in view.mappings if m.verdict.value != "unverified")
     lines.append(f"Analyst review so far: {verified} of {len(view.indicators)} indicators and "

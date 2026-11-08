@@ -254,6 +254,29 @@ class AnalysisRepository:
         self._set_verdict(TechniqueMappingRecord, VerificationTarget.TECHNIQUE_MAPPING,
                           mapping_id, "verdict", verdict, note, analyst)
 
+    def update_risk(self, analysis_id: int, risk) -> None:
+        """Replace an analysis' severity (score, band, components, model version).
+
+        Used after analyst verdicts change (see ``views.rescore_analysis``). Confidence is
+        stored as given; the scorer keeps it unchanged on a rescore.
+        """
+        with self.session() as session:
+            analysis = session.get(Analysis, analysis_id)
+            if analysis is None:
+                raise DatabaseError(f"analysis {analysis_id} not found.")
+            analysis.risk_score = risk.score
+            analysis.risk_band = risk.band
+            analysis.risk_config_version = risk.config_version
+            analysis.confidence = risk.confidence.level
+            analysis.confidence_reasons = list(risk.confidence.reasons)
+            analysis.risk_components.clear()
+            session.flush()  # delete old component rows before inserting replacements
+            for position, c in enumerate(risk.components):
+                analysis.risk_components.append(RiskComponentRecord(
+                    position=position, key=c.key, label=c.label, weight=c.weight,
+                    value=c.value, contribution=round(c.contribution, 2),
+                    explanation=list(c.explanation)))
+
     def delete_document(self, document_id: int) -> None:
         with self.session() as session:
             document = session.get(Document, document_id)

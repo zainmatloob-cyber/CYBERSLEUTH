@@ -99,7 +99,7 @@ def test_report_stem_is_filesystem_safe(analyzer):
 def test_json_report_carries_verdicts_notes_and_history(stored):
     _, view, events = stored
     report = json.loads(json_report.to_json(view, events))
-    assert report["report"]["schema_version"] == "1.0"
+    assert report["report"]["schema_version"] == "1.1"
     ip = next(i for i in report["indicators"] if i["value"] == "198.51.100.7")
     assert ip["verification"] == "malicious" and ip["analyst_note"] == "Seen in our proxy logs"
     assert ip["value_defanged"] == "198[.]51[.]100[.]7"

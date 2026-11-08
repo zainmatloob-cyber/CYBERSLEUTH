@@ -27,7 +27,7 @@ are views of the JSON, so the formats can't disagree.
 **Known gap:** sentence defanging covers the indicators the extractor found. A URL the
 extractor rejected (for example, an invalid TLD) stays as written in the evidence sentence.
 
-## JSON schema (version 1.0)
+## JSON schema (version 1.1)
 
 ```text
 report              generator, schema_version, generated_at, limitations[]
@@ -47,6 +47,7 @@ vulnerabilities[]   cve, names[], mentioned_by, id_mentions, name_mentions, page
 threat_categories[] category, status, sources[], sentence_count, max_model_score,
                     evidence[]{page, sentence_index, source, status, score, terms[], sentence}
 attack_techniques[] technique_id, name, tactics[], reference, status, methods[], explicit,
+                    unverified_model_lead,
                     max_model_score, verification, analyst_note,
                     evidence[]{page, sentence_index, method, status, matched_text, score,
                     alternatives[[id, score]], sentence}
@@ -83,3 +84,9 @@ CSV exports are never truncated. The PDF uses fpdf2's built-in fonts, so it need
 access or bundled fonts. The cost is that characters outside Latin-1 print as `?`; dashes,
 quotes and accented Latin letters are transliterated. This limitation is stated in the report
 itself.
+
+## Changelog
+* **1.1 (2026-11-08):** `attack_techniques[].unverified_model_lead`. Model-only suggestions no
+  analyst has confirmed are flagged. The PDF lists them in a separate "unverified leads" table,
+  and they don't count toward the risk score. Reason: the real-world evaluation in
+  `docs/evaluation/real_world_analysis.md`.

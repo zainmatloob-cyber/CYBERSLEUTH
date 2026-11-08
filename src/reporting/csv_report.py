@@ -60,6 +60,7 @@ def build_tables(report: dict) -> dict[str, tuple[list[str], list[dict]]]:
          for v in report["vulnerabilities"]])
     tables["attack_techniques.csv"] = (
         ["technique_id", "name", "tactics", "status", "methods", "explicit",
+         "unverified_model_lead",
          "max_model_score", "verification", "analyst_note", "evidence_count", "reference"],
         [{**m, "tactics": _join(m["tactics"]), "methods": _join(m["methods"]),
           "evidence_count": len(m["evidence"])} for m in report["attack_techniques"]])

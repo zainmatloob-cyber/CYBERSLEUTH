@@ -15,7 +15,12 @@ Design rules:
   are not redistributed: a report without vulnerability evidence is less
   vulnerability-driven.
 * **Confidence is separate from severity.** It reflects data quality (fallback modes, OCR
-  gaps, model-only findings, very short text), not how dangerous the content is.
+  gaps, very short text), not how dangerous the content is.
+* **Analyst verdicts count.** A rejected mapping contributes nothing. An unverified model-only
+  suggestion contributes nothing either (its factor is 0 since the real-world evaluation,
+  see docs/evaluation/real_world_analysis.md). Once an analyst confirms it, it counts like an
+  explicit match. :meth:`RiskScorer.rescore` recomputes a stored assessment after verdicts
+  change.
 """
 
 from __future__ import annotations
@@ -30,7 +35,7 @@ from config.settings import PROJECT_ROOT, settings
 from src.ingestion.models import ExtractedDocument
 from src.intelligence.assertion import AssertionStatus
 from src.intelligence.evidence_manager import VulnerabilityRecord
-from src.intelligence.mitre_mapper import MappingMethod, TechniqueMapping
+from src.intelligence.mitre_mapper import AnalystVerdict, MappingMethod, TechniqueMapping
 from src.intelligence.threat_assessment import ThreatCategoryFinding
 from src.nlp.entity_models import Entity, EntitySource, EntityType
 from src.nlp.ioc_models import Indicator, IOCType
@@ -174,17 +179,32 @@ class RiskScorer:
         return _clamp(value), lines
 
     def _effective(self, mapping: TechniqueMapping) -> float:
-        """Best status × method factor over a mapping's evidence (0 if all negated)."""
+        """Best status × method factor over a mapping's evidence.
+
+        0 if every sentence is negated, if an analyst rejected the mapping, or if it is an
+        unverified model-only suggestion (model factor 0).
+        """
+        if mapping.verdict is AnalystVerdict.REJECTED:
+            return 0.0
         cfg = self.config["attack_behaviour"]
-        return max(
-            cfg["status_factor"][e.status.value]
-            * cfg["method_factor"]["model" if e.method is MappingMethod.MODEL else "explicit"]
-            for e in mapping.evidence
-        )
+        confirmed = mapping.verdict is AnalystVerdict.CONFIRMED
+
+        def method_factor(method: MappingMethod) -> float:
+            if method is not MappingMethod.MODEL:
+                return cfg["method_factor"]["explicit"]
+            return cfg["method_factor"]["confirmed_model" if confirmed else "model"]
+
+        return max(cfg["status_factor"][e.status.value] * method_factor(e.method)
+                   for e in mapping.evidence)
 
     @staticmethod
     def _corroborated(mapping: TechniqueMapping) -> bool:
-        return mapping.explicit or len({e.sentence_index for e in mapping.evidence}) >= 2
+        return (mapping.explicit or mapping.verdict is AnalystVerdict.CONFIRMED
+                or len({e.sentence_index for e in mapping.evidence}) >= 2)
+
+    @staticmethod
+    def _excluded_leads(mappings: Sequence[TechniqueMapping]) -> int:
+        return sum(1 for m in mappings if m.is_unverified_lead and m.status.value != "negated")
 
     def _attack(self, mappings: Sequence[TechniqueMapping]) -> tuple[float, list[str]]:
         cfg = self.config["attack_behaviour"]
@@ -197,8 +217,12 @@ class RiskScorer:
             tactic = max(mapping.tactics, key=lambda t: severity.get(t, 0), default=None)
             base = severity.get(tactic, 0) if tactic else 0
             scored.append((base * factor, mapping, tactic, factor))
+        leads = self._excluded_leads(mappings)
+        lead_line = (f"{leads} unverified model suggestion(s) excluded until an analyst "
+                     "confirms them." if leads else None)
         if not scored:
-            return 0.0, ["No non-negated ATT&CK technique evidence."]
+            return 0.0, ["No scoring ATT&CK technique evidence (explicit, or confirmed by an "
+                         "analyst).", *([lead_line] if lead_line else [])]
         scored.sort(key=lambda item: -item[0])
         # Kill-chain breadth counts only techniques that are explicit or supported by several
         # sentences: single unverified model suggestions must not inflate breadth.
@@ -210,6 +234,8 @@ class RiskScorer:
         lines.append(f"Highest technique score {scored[0][0]:.0f} + kill-chain breadth bonus "
                      f"{bonus} ({len(tactics)} tactics from explicit or multi-sentence "
                      f"techniques, capped at {cfg['breadth_bonus_cap']}).")
+        if lead_line:
+            lines.append(lead_line)
         return _clamp(scored[0][0] + bonus), lines
 
     def _evidence(self, mappings: Sequence[TechniqueMapping],
@@ -252,11 +278,6 @@ class RiskScorer:
             reasons.append("Some pages are scanned images; their text was not analysed.")
         if len(document.sentences) < cfg["min_sentences"]:
             reasons.append(f"Very little text ({len(document.sentences)} sentences).")
-        active = [m for m in mappings if self._effective(m) > 0]
-        model_only = [m for m in active if not m.explicit]
-        if active and len(model_only) / len(active) > cfg["model_only_share_warning"]:
-            reasons.append(f"{len(model_only)}/{len(active)} techniques rest only on "
-                           "unverified model suggestions.")
         if all(c.value == 0 for c in components if c.key != "evidence"):
             return Confidence("low", (*reasons, "No substantive threat evidence was found."))
         level = "high" if not reasons else "medium" if len(reasons) <= 2 else "low"
@@ -273,6 +294,35 @@ class RiskScorer:
         mappings: Sequence[TechniqueMapping], categories: Sequence[ThreatCategoryFinding],
         degraded: Sequence[str] = (),
     ) -> RiskAssessment:
+        components = self._components(indicators, entities, vulnerabilities, mappings,
+                                      categories)
+        return self._assessment(
+            components, self._confidence(document, mappings, components, degraded))
+
+    def rescore(
+        self, previous: RiskAssessment, indicators: Sequence[Indicator],
+        entities: Sequence[Entity], vulnerabilities: Sequence[VulnerabilityRecord],
+        mappings: Sequence[TechniqueMapping], categories: Sequence[ThreatCategoryFinding],
+    ) -> RiskAssessment:
+        """Recompute severity after analyst verdicts change.
+
+        Confidence is kept: it describes data quality, which a verdict does not change.
+        """
+        components = self._components(indicators, entities, vulnerabilities, mappings,
+                                      categories)
+        return self._assessment(components, previous.confidence)
+
+    def _assessment(self, components: tuple[RiskComponent, ...],
+                    confidence: Confidence) -> RiskAssessment:
+        total = round(sum(c.contribution for c in components), 1)
+        return RiskAssessment(score=total, band=self.band(total), components=components,
+                              confidence=confidence, config_version=self.config["version"])
+
+    def _components(
+        self, indicators: Sequence[Indicator], entities: Sequence[Entity],
+        vulnerabilities: Sequence[VulnerabilityRecord], mappings: Sequence[TechniqueMapping],
+        categories: Sequence[ThreatCategoryFinding],
+    ) -> tuple[RiskComponent, ...]:
         weights = self.config["weights"]
         values = {
             "vulnerability": self._vulnerability(vulnerabilities),
@@ -280,16 +330,8 @@ class RiskScorer:
             "attack_behaviour": self._attack(mappings),
             "evidence": self._evidence(mappings, categories, indicators),
         }
-        components = tuple(
+        return tuple(
             RiskComponent(key, LABELS[key], weights[key], round(values[key][0], 1),
                           tuple(values[key][1]))
             for key in COMPONENTS
-        )
-        total = round(sum(c.contribution for c in components), 1)
-        return RiskAssessment(
-            score=total,
-            band=self.band(total),
-            components=components,
-            confidence=self._confidence(document, mappings, components, degraded),
-            config_version=self.config["version"],
         )

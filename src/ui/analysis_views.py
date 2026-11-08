@@ -13,7 +13,7 @@ import pandas as pd
 import streamlit as st
 
 from src.database.db_manager import MAX_NOTE_LENGTH, AnalysisRepository
-from src.database.views import StoredAnalysis
+from src.database.views import StoredAnalysis, rescore_analysis
 from src.ingestion.models import ExtractedDocument
 from src.intelligence.analyzer import AnalysisResult
 from src.intelligence.mitre_mapper import AnalystVerdict
@@ -59,7 +59,10 @@ def render_summary(view: StoredAnalysis) -> None:
     cols[2].metric("Pages", view.page_count)
     cols[3].metric("Unique IOCs", len(view.indicators))
     cols[4].metric("Entities", len(view.entities))
-    cols[5].metric("ATT&CK techniques", len(view.mappings))
+    leads = sum(1 for m in view.mappings if m.is_unverified_lead)
+    cols[5].metric("ATT&CK techniques", len(view.mappings) - leads,
+                   help=f"Explicit or analyst-confirmed. {leads} unverified model "
+                        "suggestion(s) are listed separately in the ATT&CK tab.")
     cols[6].metric("Analysis time", f"{view.timings_ms.get('total', 0) / 1000:.1f} s")
     warnings = [*view.warnings, *view.document_warnings]
     for warning in warnings:
@@ -121,17 +124,27 @@ def render_attack(view: StoredAnalysis, repo: AnalysisRepository | None) -> None
         st.info("No ATT&CK techniques were mapped.")
         return
     st.caption(
-        "**explicit-*** mappings come from the text naming the technique; **model** mappings "
-        "are suggestions (score = SVM margin, not a probability). Status: observed / "
+        "**explicit-*** mappings come from the text naming the technique. Status: observed / "
         "capability / possible / negated. Every mapping is **unverified** until an analyst "
-        "reviews it."
+        "reviews it; confirming or rejecting one updates the risk score."
     )
+    leads = [m for m in mappings if m.is_unverified_lead]
     left, right = st.columns(2)
-    explicit_only = left.checkbox("Explicit mappings only", key="attack_explicit_only")
+    show_leads = left.checkbox(
+        f"Show {len(leads)} unverified model suggestion(s)", key="attack_show_leads",
+        help="Model-only suggestions are leads, not findings: on 14 real CISA advisories only "
+             "10% matched a technique CISA cites. They don't count toward the risk score "
+             "unless you confirm them.")
     hide_negated = right.checkbox("Hide negated", value=True, key="attack_hide_negated")
-    visible = [m for m in mappings if (not explicit_only or m.explicit)
+    if show_leads and leads:
+        st.warning("Model suggestions are shown. Score = SVM margin, not a probability; "
+                   "low scores are usually wrong on real reports. Confirm only what the "
+                   "evidence sentence supports.")
+    visible = [m for m in mappings if (show_leads or not m.is_unverified_lead)
                and (not hide_negated or m.status.value != "negated")]
-    st.caption(f"{len(visible)} of {len(mappings)} techniques")
+    st.caption(f"{len(visible)} of {len(mappings)} techniques"
+               + ("" if show_leads or not leads else
+                  f" · {len(leads)} model suggestion(s) hidden"))
     st.dataframe(
         tables.mappings_frame(visible), hide_index=True, width="stretch",
         column_config={"ATT&CK": st.column_config.LinkColumn("ATT&CK", display_text="ATT&CK ↗")},
@@ -151,7 +164,15 @@ def render_attack(view: StoredAnalysis, repo: AnalysisRepository | None) -> None
         f"mapping_verdict_{view.analysis_id}", labels[selected],
         [v.value for v in AnalystVerdict], mapping.verdict.value,
         view.mapping_notes.get(mapping_id),
-        lambda verdict, note: repo.set_mapping_verdict(mapping_id, verdict, note))
+        lambda verdict, note: _save_mapping_verdict(repo, view.analysis_id, mapping_id,
+                                                    verdict, note))
+
+
+def _save_mapping_verdict(repo: AnalysisRepository, analysis_id: int, mapping_id: int,
+                          verdict: str, note: str | None) -> None:
+    """Record the verdict, then re-score: confirmed suggestions count, rejected ones don't."""
+    repo.set_mapping_verdict(mapping_id, verdict, note)
+    rescore_analysis(repo, analysis_id)
 
 
 def render_iocs(view: StoredAnalysis, repo: AnalysisRepository | None) -> None:

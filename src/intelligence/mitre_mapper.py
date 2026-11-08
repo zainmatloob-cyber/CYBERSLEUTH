@@ -99,6 +99,16 @@ class TechniqueMapping:
         return any(e.method is not MappingMethod.MODEL for e in self.evidence)
 
     @property
+    def is_unverified_lead(self) -> bool:
+        """A model-only suggestion no analyst has confirmed: a lead, not a finding.
+
+        Leads are hidden by default in the UI, listed separately in reports and excluded from
+        the risk score, because on real CISA advisories only 10% of model-only suggestions
+        matched a technique CISA cites (docs/evaluation/real_world_analysis.md).
+        """
+        return not self.explicit and self.verdict is not AnalystVerdict.CONFIRMED
+
+    @property
     def status(self) -> AssertionStatus:
         """Strongest status across evidence: one observed sentence makes it observed."""
         return min((e.status for e in self.evidence), key=STATUS_RANK.__getitem__)

@@ -46,8 +46,8 @@ def test_risk_band_counts_include_empty_bands(repo):
 
 def test_technique_explorer_counts_documents_and_negation(repo):
     frame = agg.technique_explorer(repo.latest_mappings()).set_index("Technique")
-    assert frame.loc["T1558.003", "Documents (non-negated)"] == 2
-    assert frame.loc["T1566", "Documents (non-negated)"] == 0
+    assert frame.loc["T1558.003", "Documents (counted)"] == 2
+    assert frame.loc["T1566", "Documents (counted)"] == 0
     assert frame.loc["T1566", "Negated in"] == 1
     assert frame.loc["T1558.003", "Unverified"] == 2
 

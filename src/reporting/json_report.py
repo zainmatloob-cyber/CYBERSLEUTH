@@ -1,6 +1,6 @@
 """Complete, machine-readable analysis export (versioned schema).
 
-Layout (``schema_version`` 1.0, documented in ``docs/reports.md``)::
+Layout (``schema_version`` 1.1, documented in ``docs/reports.md``)::
 
     report      generator, schema version, generation time, limitations
     document    filename, hash, type, size, pages, sentences, OCR flag, embedded metadata
@@ -127,7 +127,8 @@ def build_report(view: StoredAnalysis,
             {
                 "technique_id": m.technique_id, "name": m.name, "tactics": list(m.tactics),
                 "reference": m.url, "status": m.status.value, "methods": m.methods,
-                "explicit": m.explicit, "max_model_score": _round(m.max_score),
+                "explicit": m.explicit, "unverified_model_lead": m.is_unverified_lead,
+                "max_model_score": _round(m.max_score),
                 "verification": m.verdict.value,
                 "analyst_note": view.mapping_notes.get(view.mapping_ids.get(m.technique_id, -1)),
                 "evidence": [{"page": e.page_number, "sentence_index": e.sentence_index,

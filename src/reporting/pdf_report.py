@@ -203,10 +203,10 @@ def to_pdf(view: StoredAnalysis, events: Sequence[VerificationEvent] = ()) -> by
 
     # --- ATT&CK -----------------------------------------------------------------------
     pdf.heading("4. MITRE ATT&CK techniques")
-    pdf.note("Status is the strongest assertion across the evidence. 'model' means suggested "
-             "by the classifier only; these are unverified until an analyst confirms them. "
-             "Technique IDs link to attack.mitre.org.")
-    techniques = report["attack_techniques"]
+    pdf.note("Explicit or analyst-confirmed techniques. Status is the strongest assertion "
+             "across the evidence. Technique IDs link to attack.mitre.org.")
+    techniques = [m for m in report["attack_techniques"] if not m["unverified_model_lead"]]
+    leads = [m for m in report["attack_techniques"] if m["unverified_model_lead"]]
     shown = techniques[:MAX_ROWS]
     pdf.data_table(["ID", "Name", "Tactics", "Status", "Method", "Verification"], [
         (m["technique_id"], m["name"], ", ".join(m["tactics"]), m["status"],
@@ -218,6 +218,17 @@ def to_pdf(view: StoredAnalysis, events: Sequence[VerificationEvent] = ()) -> by
         if m["analyst_note"]:
             pdf.note(f"Analyst note: {m['analyst_note']}")
         pdf.bullets(_evidence_lines(m["evidence"]), size=8.5)
+    if leads:
+        pdf.para("Model suggestions (unverified leads)", size=10, style="B")
+        pdf.note("Suggested by the classifier only, not confirmed by an analyst, and excluded "
+                 "from the risk score. On 14 real CISA advisories only 10% of such suggestions "
+                 "matched a technique CISA cites. Score is an SVM margin, not a probability. "
+                 "Evidence sentences are in the JSON export.")
+        pdf.data_table(["ID", "Name", "Status", "Max score", "Verification"], [
+            (m["technique_id"], m["name"], m["status"], _fmt(m["max_model_score"]),
+             m["verification"]) for m in leads[:MAX_ROWS]],
+            widths=(20, 80, 25, 25, 30), links=[m["reference"] for m in leads[:MAX_ROWS]],
+            total=len(leads))
 
     # --- indicators -------------------------------------------------------------------
     pdf.heading("5. Indicators of compromise")

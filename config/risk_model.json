@@ -1,5 +1,5 @@
 {
- "version": "2026-11-07b",
+ "version": "2026-11-08",
  "description": "Explainable risk model R = sum(weight_c * component_c), components on 0-100. All values are configurable initial heuristics chosen by the project author, not cybersecurity standards.",
  "weights": {
   "vulnerability": 0.3,
@@ -65,7 +65,8 @@
   },
   "method_factor": {
    "explicit": 1.0,
-   "model": 0.5
+   "model": 0.0,
+   "confirmed_model": 1.0
   },
   "breadth_bonus_per_extra_tactic": 3,
   "breadth_bonus_cap": 15,
@@ -79,10 +80,10 @@
   "ioc_type_diversity_full_at": 4
  },
  "confidence": {
-  "min_sentences": 5,
-  "model_only_share_warning": 0.7
+  "min_sentences": 5
  },
  "changelog": [
+  "2026-11-08: unverified model-only technique suggestions no longer count (method factor 0.5 -> 0); analyst-confirmed suggestions count like explicit matches (confirmed_model 1.0); rejected mappings count for nothing. Reason: on 14 real CISA advisories only 10% of model-only suggestions matched a technique CISA cites (docs/evaluation/real_world_analysis.md). This is a policy change, not a value tuned on that test set: 0 removes unvalidated output from the score, and the test set is not re-scored to claim an improvement. The model-only confidence warning is removed because leads no longer affect the score.",
   "2026-11-07b: defense-evasion replaced by defense-impairment (ATT&CK v20.1 split it into stealth and defense-impairment); model-suggestion factor 0.8 -> 0.5 and breadth bonus restricted to explicit/corroborated techniques, because model suggestions showed false positives on non-technique sentences (headings, acknowledgements) and their false-positive rate on real reports is unmeasured."
  ]
 }

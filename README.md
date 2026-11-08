@@ -57,6 +57,9 @@ an evidence trail for every finding: document, page and character position.
 * **MITRE ATT&CK mapping** (v20.1): explicit matches (IDs, technique names, curated terms) and
   model suggestions, each with an assertion status (observed / capability / possible /
   negated). Every mapping starts unverified.
+  * Model-only suggestions are **unverified leads**: hidden by default, listed separately in
+    reports, and excluded from the risk score until an analyst confirms them. Confirming or
+    rejecting a technique re-scores the analysis.
 * **Explainable risk score**: R = 0.30V + 0.25M + 0.25A + 0.20E, with a reasoned breakdown for
   each component. It uses the CISA KEV catalogue, guards against inflation and double
   counting, and reports a separate confidence level ([methodology](docs/methodology.md#10-risk-scoring-phase-3)).
@@ -95,8 +98,9 @@ bundle ([results](docs/evaluation/real_world.md), [error analysis](docs/evaluati
 | **Model-only technique suggestions** | **only 10% agree with CISA** (85% of suggestions have a low score; those agree 3% of the time) |
 
 The technique model doesn't transfer from ATT&CK procedure text to real reports at its current
-threshold. Model suggestions should be treated as low-confidence leads; the fix is planned
-and will be validated on separate data.
+threshold. Model suggestions are therefore treated as unverified leads (hidden by default and
+excluded from the risk score until confirmed). Choosing a better threshold needs a separate
+set of real reports.
 
 ### Synthetic extraction test set
 8 synthetic, author-annotated documents, split dev/test. The test split was scored once,

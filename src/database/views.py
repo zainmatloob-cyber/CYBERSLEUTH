@@ -70,6 +70,22 @@ def view_from_result(result: AnalysisResult) -> StoredAnalysis:
         document_warnings=list(doc.warnings), timings_ms=dict(result.timings_ms))
 
 
+def rescore_analysis(repo, analysis_id: int, scorer=None) -> StoredAnalysis:
+    """Recompute a stored analysis' risk from its current verdicts and save it.
+
+    Confirming a model suggestion makes it count; rejecting any mapping removes it. The
+    findings themselves don't change, so this needs no access to the original document.
+    """
+    from src.intelligence.risk_scorer import RiskScorer
+
+    view = hydrate(repo.get_analysis(analysis_id))
+    risk = (scorer or RiskScorer()).rescore(view.risk, view.indicators, view.entities,
+                                            view.vulnerabilities, view.mappings,
+                                            view.categories)
+    repo.update_risk(analysis_id, risk)
+    return hydrate(repo.get_analysis(analysis_id))
+
+
 def hydrate(analysis: Analysis) -> StoredAnalysis:
     document = analysis.document
     indicators, indicator_ids, indicator_notes = [], {}, {}

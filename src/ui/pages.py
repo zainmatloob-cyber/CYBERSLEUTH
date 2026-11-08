@@ -240,8 +240,9 @@ def attack_explorer_page(repo: AnalysisRepository | None) -> None:
     cols[0].metric("Confirmed", coverage["confirmed"])
     cols[1].metric("Rejected", coverage["rejected"])
     cols[2].metric("Unverified", coverage["unverified"])
-    st.caption("Model-suggested mappings are unverified until reviewed. Verdicts are set in "
-               "each analysis's ATT&CK tab.")
+    st.caption("'Documents (counted)' includes explicit or analyst-confirmed techniques; "
+               "negated, rejected and unverified model-only suggestions ('Model lead in') are "
+               "not counted. Verdicts are set in each analysis's ATT&CK tab.")
     explicit_only = st.checkbox("Techniques with explicit evidence only", key="attx_explicit")
     visible = frame[frame["Explicit in"] > 0] if explicit_only else frame
     st.dataframe(visible, hide_index=True, width="stretch", column_config={
