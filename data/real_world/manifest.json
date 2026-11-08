@@ -1,30 +1,78 @@
 {
-  "description": "Public CISA joint cybersecurity advisories (TLP:CLEAR) used as a real-world evaluation set. Documents are not redistributed here: run scripts/fetch_real_world.py, which verifies each file against the SHA-256 recorded below.",
+  "description": "Public CISA joint cybersecurity advisories (TLP:CLEAR) used as a real-world evaluation set. Documents are not redistributed: download each file from its advisory page, save it under data/raw/cisa/ as <id>.pdf and <id>.stix.json, then run scripts/fetch_real_world.py to verify the SHA-256 hashes recorded here.",
   "retrieved": "2026-11-08",
+  "selection": "Chosen and downloaded by the project owner. Excluded: a 3-page joint factsheet on industrial refrigeration (cites no ATT&CK techniques). For AA25-071A, the August 2026 STIX bundle is used because the PDF is the August 18, 2026 update.",
   "documents": [
-    {"id": "aa23-158a", "group": "ransomware", "title": "#StopRansomware: CL0P Ransomware Gang Exploits CVE-2023-34362 MOVEit Vulnerability",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-158a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2023-07/aa23-158a-stopransomware-cl0p-ransomware-gang-exploits-moveit-vulnerability_8.pdf",
-     "stix": "https://www.cisa.gov/sites/default/files/2023-06/AA23-158A%20StopRansomware%20CL0P%20Ransomware%20Gang%20Exploits%20CVE-2023-34362%20MOVEit%20Vulnerability.stix_.json"},
-    {"id": "aa24-109a", "group": "ransomware", "title": "#StopRansomware: Akira Ransomware",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-109a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2025-12/aa24-109a-stopransomware-akira-ransomware.pdf",
-     "stix": "https://www.cisa.gov/sites/default/files/2025-11/AA24-109A-%23StopRansomware-Akira-Ransomware.stix_.json"},
-    {"id": "aa23-352a", "group": "ransomware", "title": "#StopRansomware: Play Ransomware",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-352a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2025-06/aa23-352a-stopransomware-play-ransomware_2_revised.pdf",
-     "stix": "https://www.cisa.gov/sites/default/files/2025-06/AA23-352A_StopRansomware-Play-Ransomware.stix_JSON.json"},
-    {"id": "aa23-320a", "group": "social-engineering", "title": "Scattered Spider",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2025-08/aa23-320a-scattered-spider-508c.pdf",
-     "stix": null},
-    {"id": "aa23-144a", "group": "state-sponsored", "title": "People's Republic of China State-Sponsored Cyber Actor Living off the Land to Evade Detection",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-144a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2023-11/CSA_PRC_State_Sponsored_Cyber_Living_off_the_Land_v1.1_ES-US.pdf",
-     "stix": "https://www.cisa.gov/sites/default/files/STIX/AA23-144A_PRC_State-Sponsored_Cyber_Actor_Living_Off_the_Land_to_Evade_Detection.stix.json"},
-    {"id": "aa23-347a", "group": "state-sponsored", "title": "Russian Foreign Intelligence Service (SVR) Exploiting JetBrains TeamCity CVE Globally",
-     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-347a",
-     "pdf": "https://www.cisa.gov/sites/default/files/2023-12/aa23-347a-russian-foreign-intelligence-service-svr-exploiting-jetbrains-teamcity-cve-globally_0.pdf",
-     "stix": "https://www.cisa.gov/sites/default/files/2023-12/aa23-347a-russian-foreign-intelligence-service-svr-exploiting-jetbrains-teamcity-cve-globally.json"}
+    {
+      "id": "aa24-242a",
+      "group": "ransomware",
+      "title": "#StopRansomware: RansomHub Ransomware",
+      "pdf_name": "aa24-242a-stopransomware-ransomhub-ransomware_1.pdf",
+      "stix_name": "AA24-242A-StopRansomware-RansomHub-Ransomware.stix_.json",
+      "pdf_sha256": "cdb6a5c6a39f0f527b10a79fb7fcfa6fab114e1dc8f48f4180cfaa5ba32d3644",
+      "stix_sha256": "edf562c7fd078d99291524b2967528ba06a5a418f50033ffc0aa574afd5a2dd8"
+    },
+    {
+      "id": "aa25-050a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Ghost (Cring) Ransomware",
+      "pdf_name": "aa25-050a-stopransomware-ghost-cring-ransomware.pdf",
+      "stix_name": "AA25-050A-#StopRansomware-Ghost-(Cring)-Ransomware.stix_.json",
+      "pdf_sha256": "0f85ca1b8973462ef4b4262ae88076da3d9cff125cbfb541934be08e20229ea6",
+      "stix_sha256": "7878e8c6ca0b3ac837b926d898e903b8ce4f5c64629f861c647f2ecfc5ca1390"
+    },
+    {
+      "id": "aa25-071a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Medusa Ransomware (updated August 18, 2026)",
+      "pdf_name": "aa25-071a-stopransomware-medusa-ransomware-508c.pdf",
+      "stix_name": "AA25-071A-stix.json",
+      "pdf_sha256": "7d5f87c304aacd1c6eea340b9b8738b14f1b7e5491efd8ab1cef4c6285a36dde",
+      "stix_sha256": "8a9723e9c8f51da960fdc647965282f495303ed284a23a07bfd94629ec5264f4"
+    },
+    {
+      "id": "aa25-203a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Interlock",
+      "pdf_name": "aa25-203a-stopransomware-interlock-072225.pdf",
+      "stix_name": "AA25-203A-interlock-stix.json",
+      "pdf_sha256": "23a7f30ae72261ce9e6e18062bd48077143a9a5e1045bf905029cbeacfadafa2",
+      "stix_sha256": "c084b40e67e96e116478c79355a665c5cc89e414d1df66162845c7d64aae10cf"
+    },
+    {
+      "id": "aa26-222a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Gunra Ransomware",
+      "pdf_name": "aa26-222a-stopransomware-gunra-ransomware_508c.pdf",
+      "stix_name": "AA26-222A-stix.json",
+      "pdf_sha256": "2fa56304c97c2d8a68501afbcfd9adb3a5efc5bd56eebe4e454127baf26b1378",
+      "stix_sha256": "b699465192e59d8cbd15ffe9da0b7997118c16c881f42ddcd2dbe5941d1eaede"
+    },
+    {
+      "id": "aa26-293a",
+      "group": "ransomware",
+      "title": "#StopRansomware: SafePay Ransomware",
+      "pdf_name": "aa26-293a-stopransomware-safepay-ransomware-508c_0.pdf",
+      "stix_name": "AA26-293A-stix.json",
+      "pdf_sha256": "d5162f75b2be8edfae2f7437dfbd6804f4f48fe687e313011c02d998e1e05725",
+      "stix_sha256": "73cbd07da8d74a322aa0c76a08933c8731045590e8abdee3409639f7ef40f5d0"
+    },
+    {
+      "id": "aa26-281a",
+      "group": "state-sponsored",
+      "title": "Chinese Government-linked Cyber Threat Actors Combine Automated and Hands-on Hacking Tools to Steal Sensitive Data",
+      "pdf_name": "chinese-government-linked-cyber-threat-actors-combine-automated-and-hands-on-hacking-tools-to-steal-sensitive-data-508c.pdf",
+      "stix_name": "AA26-281A-stix.json",
+      "pdf_sha256": "f951f60a3f4482b787121f88dbb56f4802756beac55344b06447af27f4c3237d",
+      "stix_sha256": "d11856d9c6f1af276c2e0fb18cd1cc5607e042745903cef21f76dfad9d27198c"
+    },
+    {
+      "id": "aa26-237a",
+      "group": "red-team",
+      "title": "A Tale of Two SOCs: Insights from Two Red Team Assessments",
+      "pdf_name": "aa26-237a-tale-of-two-SOCs-insights-two-red-team-assessments-508c.pdf",
+      "stix_name": null,
+      "pdf_sha256": "1c7ce430e1f4e6c7cd11dd837a864923474a88e0ad9c6fac126d22167d7bc932"
+    }
   ]
 }

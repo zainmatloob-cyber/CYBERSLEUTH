@@ -62,13 +62,13 @@ test is the expected effect of tuning on dev.
 folder. Reproduce with `python scripts/evaluate_extraction.py --split test [--rules-only]`.
 
 ## Real-world evaluation (CISA advisories, Phase 5)
-Six public CISA joint advisories (three ransomware, two state-sponsored, one social
-engineering). **The gold labels come from CISA, not the author:** technique labels are the
+Eight public CISA joint advisories (six ransomware, one state-sponsored, one red-team
+assessment), chosen by the project owner. **The gold labels come from CISA, not the author:** technique labels are the
 ATT&CK IDs each advisory cites, and indicator labels are CISA's STIX bundle. The documents
 aren't redistributed. `data/real_world/manifest.json` pins every file by URL and SHA-256.
 
 ```text
-python scripts/fetch_real_world.py              # fetch + verify (or download manually, see output)
+python scripts/fetch_real_world.py              # verify hand-downloaded files (lists any missing)
 python scripts/fetch_real_world.py --record     # first time only: record hashes
 python scripts/evaluate_real_world.py           # write gold labels only (inspect first)
 python scripts/evaluate_real_world.py --final   # score once -> real_world.md / .json

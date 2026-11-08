@@ -124,7 +124,7 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     stix = json.dumps(STIX).encode()
     (raw / "doc1.stix.json").write_bytes(stix)
     manifest = {"documents": [{
-        "id": "doc1", "group": "test", "title": "Synthetic", "pdf": "x", "stix": "y",
+        "id": "doc1", "group": "test", "title": "Synthetic", "pdf_name": "x", "stix_name": "y",
         "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
         "stix_sha256": hashlib.sha256(stix).hexdigest()}]}
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
@@ -151,7 +151,7 @@ def test_evaluation_script_refuses_missing_files(tmp_path, monkeypatch):
     script = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(script)
     (tmp_path / "m.json").write_text(json.dumps({"documents": [
-        {"id": "x", "pdf": "u", "stix": None, "pdf_sha256": "0"}]}))
+        {"id": "x", "pdf_name": "u", "stix_name": None, "pdf_sha256": "0"}]}))
     monkeypatch.setattr(script, "MANIFEST", tmp_path / "m.json")
     monkeypatch.setattr(script, "RAW_DIR", tmp_path)
     with pytest.raises(SystemExit, match="missing x.pdf"):

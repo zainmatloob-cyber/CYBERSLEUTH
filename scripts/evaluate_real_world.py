@@ -38,7 +38,7 @@ def load_documents() -> list[dict]:
     problems = []
     for doc in manifest["documents"]:
         for kind, suffix in (("pdf", "pdf"), ("stix", "stix.json")):
-            if not doc.get(kind):
+            if not doc.get(f"{kind}_name"):
                 continue
             path = RAW_DIR / f"{doc['id']}.{suffix}"
             if not path.exists():
@@ -242,11 +242,13 @@ def render_markdown(results: dict, gold: dict) -> str:
         "",
         "## 6. Limitations",
         "",
-        "* Six advisories is a small sample; per-document numbers vary widely. No confidence "
-        "intervals are claimed.",
+        f"* {len(results['documents'])} advisories is a small sample; per-document numbers "
+        "vary widely. No confidence intervals are claimed.",
+        "* The set is mostly ransomware (#StopRansomware) advisories, chosen by the project "
+        "owner; other threat types are under-represented.",
         "* CISA's technique list is incomplete by design, so agreement understates precision "
         "and recall against it measures coverage of *CISA's* labels only.",
-        "* All six are US-government joint advisories with a consistent structure; vendor "
+        "* All are US-government joint advisories with a consistent structure; vendor "
         "reports and blogs may behave differently.",
         "* Gold IDs are read from the same PyMuPDF text extraction the system uses; text the "
         "extractor misses is missing from both.",
