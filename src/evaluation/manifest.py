@@ -68,6 +68,30 @@ def record_hash(doc: dict, file: ManifestFile, digest: str) -> None:
         doc["stix_sha256"] = digest
 
 
+def verified_documents(manifest: dict, raw_dir: Path) -> list[dict]:
+    """The documents with ``pdf_path`` and ``stix_paths`` set, every file hash-checked.
+
+    Raises ``SystemExit`` listing every missing or changed file.
+    """
+    import hashlib
+
+    problems = []
+    for doc in manifest["documents"]:
+        doc["stix_paths"] = []
+        for file in manifest_files(doc, raw_dir):
+            if not file.path.exists():
+                problems.append(f"missing {file.path.name}")
+            elif hashlib.sha256(file.path.read_bytes()).hexdigest() != file.sha256:
+                problems.append(f"hash mismatch {file.path.name}")
+            if file.kind == "pdf":
+                doc["pdf_path"] = file.path
+            else:
+                doc["stix_paths"].append(file.path)
+    if problems:
+        raise SystemExit("Run scripts/fetch_real_world.py first: " + "; ".join(problems))
+    return manifest["documents"]
+
+
 SPLITS = ("dev", "test")
 
 

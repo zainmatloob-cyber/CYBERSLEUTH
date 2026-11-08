@@ -11,6 +11,13 @@ Two kinds of mapping are kept distinct:
   threshold chosen on validation data, and abstains otherwise. Scores are SVM margins, not
   probabilities.
 
+Model-only suggestions in documents face a second, stricter cut-off,
+``model_only_min_score`` in ``config/technique_mapping.json``. It was chosen on real CISA
+advisories (a development split), because the training threshold was set on ATT&CK
+procedure sentences and lets through many low-score guesses in real reports. A suggestion
+is kept when its best sentence score reaches the cut-off. Mappings with explicit evidence are
+never removed by it.
+
 Every piece of evidence carries an assertion status (observed / capability / possible /
 negated), and every mapping starts ``unverified`` until an analyst confirms or rejects it.
 """
@@ -46,6 +53,7 @@ from src.utils.exceptions import CyberSleuthError
 logger = logging.getLogger(__name__)
 
 TECHNIQUE_MODEL_PATH = PROJECT_ROOT / "models" / "technique_model.joblib"
+TECHNIQUE_CONFIG_PATH = PROJECT_ROOT / "config" / "technique_mapping.json"
 CURATED_PATH = settings.knowledge_base_dir / "curated_entities.json"
 MODEL_FORMAT_VERSION = 1
 MIN_MODEL_WORDS = 4  # headings and fragments are not mapped by the model
@@ -230,11 +238,25 @@ def load_term_technique_ids(path: Path = CURATED_PATH) -> dict[str, tuple[str, .
 
 # --- mapper ---------------------------------------------------------------------------
 
+FROM_CONFIG = object()  # sentinel: read model_only_min_score from the config file
+
+
+def load_model_only_min_score(path: Path = TECHNIQUE_CONFIG_PATH) -> float | None:
+    """The cut-off for model-only suggestions, or ``None`` when the file sets none."""
+    data = json.loads(path.read_text(encoding="utf-8"))
+    value = data.get("model_only_min_score")
+    return None if value is None else float(value)
+
 
 class TechniqueMapper:
     def __init__(self, kb: TechniqueKB | None = None, model: TechniqueModel | None = None,
-                 use_model: bool = True) -> None:
+                 use_model: bool = True,
+                 model_only_min_score: float | None | object = FROM_CONFIG) -> None:
+        """``model_only_min_score=None`` turns the document-level cut-off off (evaluation)."""
         self.kb = kb or default_technique_kb()
+        if model_only_min_score is FROM_CONFIG:
+            model_only_min_score = load_model_only_min_score()
+        self.model_only_min_score = model_only_min_score
         self.explicit = ExplicitTechniqueMatcher(self.kb)
         self.term_ids = load_term_technique_ids()
         self.model = model
@@ -295,4 +317,10 @@ class TechniqueMapper:
                         MappingMethod.MODEL, assertion_status(sentence.text), None,
                         round(score, 4), tuple((t, round(s, 4)) for t, s in top[1:])))
 
-        return sorted(mappings.values(), key=lambda m: (not m.explicit, m.technique_id))
+        kept = [m for m in mappings.values() if self._keep(m)]
+        return sorted(kept, key=lambda m: (not m.explicit, m.technique_id))
+
+    def _keep(self, mapping: TechniqueMapping) -> bool:
+        if mapping.explicit or self.model_only_min_score is None:
+            return True
+        return mapping.max_score is not None and mapping.max_score >= self.model_only_min_score

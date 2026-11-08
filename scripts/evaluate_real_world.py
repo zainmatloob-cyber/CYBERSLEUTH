@@ -16,7 +16,6 @@ its ``report_stem``. Scoring requires both trained models.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -44,22 +43,7 @@ def load_manifest(path: Path | None = None) -> dict:
 def load_documents(manifest: dict | None = None) -> list[dict]:
     """The manifest's documents with ``pdf_path`` and ``stix_paths``, hashes verified."""
     manifest = manifest if manifest is not None else load_manifest()
-    raw_dir = rm.raw_dir(manifest, ROOT, RAW_DIR)
-    problems = []
-    for doc in manifest["documents"]:
-        doc["stix_paths"] = []
-        for file in rm.manifest_files(doc, raw_dir):
-            if not file.path.exists():
-                problems.append(f"missing {file.path.name}")
-            elif hashlib.sha256(file.path.read_bytes()).hexdigest() != file.sha256:
-                problems.append(f"hash mismatch {file.path.name}")
-            if file.kind == "pdf":
-                doc["pdf_path"] = file.path
-            else:
-                doc["stix_paths"].append(file.path)
-    if problems:
-        raise SystemExit("Run scripts/fetch_real_world.py first: " + "; ".join(problems))
-    return manifest["documents"]
+    return rm.verified_documents(manifest, rm.raw_dir(manifest, ROOT, RAW_DIR))
 
 
 def document_text(pdf_path: Path) -> str:

@@ -100,6 +100,9 @@ Fixing these by looking at this test set and re-scoring would be tuning on test.
 * **Done:** item 3. Line-wrapped URL rejoining, `&nbsp;` removal, placeholder rejection and
   `.onion` support, each covered by synthetic unit tests. The development-split extraction
   report is unchanged. These 14 advisories were **not** re-scored to claim an improvement.
-* **Open:** item 2 needs a new batch of advisories.
+* **In progress:** item 2. A second set of 17 advisories was split once into development (9)
+  and test (8). On the development split, the pre-declared rule chose a cut-off of 0.75
+  for model-only suggestions ([selection](real_world_threshold.md)). The test split has not
+  been scored yet.
 
 The scores in [real_world.md](real_world.md) remain the record for code version `0f1e6e9`.

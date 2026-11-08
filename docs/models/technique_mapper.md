@@ -50,6 +50,13 @@ coverage 0.97.
   only 10% of model-only suggestions (55 of 550) match a technique CISA cites. Below a decision
   score of 0.25 (85% of suggestions), agreement is 3%; at 0.75 or above it is 65%. See
   [real-world analysis](../evaluation/real_world_analysis.md).
+* **Document-level cut-off (2026-11-08):** model-only suggestions in documents must now
+  reach a decision score of **0.75** (`config/technique_mapping.json`). The value was chosen
+  on a separate development split of 9 further CISA advisories by a rule fixed beforehand
+  ([selection](../evaluation/real_world_threshold.md)). There it keeps 17 of 358
+  suggestions, 10 of which agree with CISA (0.59, 95% interval 0.36–0.78). It is not yet
+  tested; the 8-advisory test split will give the number to report. The trained model and
+  the sentence-level results above are unchanged.
 * Trained on ATT&CK procedure prose. Real reports differ in style and length.
 * Parent-technique level only for the model. Sub-techniques come only from explicit matches.
 * Assertion detection is a cue heuristic without an annotated evaluation set.

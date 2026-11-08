@@ -116,4 +116,8 @@ advisories with several STIX bundles list them all (`"stix": [...]`).
 python scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json
 python scripts/evaluate_real_world.py --manifest data/real_world/batch2/manifest.json  # gold only
 python scripts/analyse_real_world_errors.py --manifest data/real_world/batch2/manifest.json --split dev
+python scripts/choose_real_world_threshold.py --manifest data/real_world/batch2/manifest.json
 ```
+
+**Cut-off selection (development split):** [real_world_threshold.md](real_world_threshold.md).
+The rule chose 0.75, set in `config/technique_mapping.json`.

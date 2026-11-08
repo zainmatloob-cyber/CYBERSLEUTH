@@ -1,0 +1,2982 @@
+{
+  "documents": [
+    "aa22-047a",
+    "aa22-294a",
+    "aa22-320a",
+    "aa22-335a",
+    "aa23-059a",
+    "aa23-144a",
+    "aa23-165a",
+    "aa23-349a",
+    "aa25-141a"
+  ],
+  "rule": {
+    "candidates": [
+      0.25,
+      0.5,
+      0.75
+    ],
+    "target_agreement": 0.5,
+    "choose": "lowest candidate reaching the target"
+  },
+  "baseline": {
+    "threshold": -0.6465533983345989,
+    "kept": 358,
+    "agree": 24,
+    "agreement": 0.0670391061452514,
+    "interval": [
+      0.045,
+      0.098
+    ],
+    "documents_with_suggestions": 9
+  },
+  "candidates": [
+    {
+      "threshold": 0.25,
+      "kept": 51,
+      "agree": 20,
+      "agreement": 0.39215686274509803,
+      "interval": [
+        0.27,
+        0.529
+      ],
+      "documents_with_suggestions": 8
+    },
+    {
+      "threshold": 0.5,
+      "kept": 30,
+      "agree": 14,
+      "agreement": 0.4666666666666667,
+      "interval": [
+        0.302,
+        0.639
+      ],
+      "documents_with_suggestions": 8
+    },
+    {
+      "threshold": 0.75,
+      "kept": 17,
+      "agree": 10,
+      "agreement": 0.5882352941176471,
+      "interval": [
+        0.36,
+        0.784
+      ],
+      "documents_with_suggestions": 7
+    }
+  ],
+  "chosen": 0.75,
+  "per_document": {
+    "aa22-047a": {
+      "all": 43,
+      "kept": 2,
+      "kept_agree": 2
+    },
+    "aa22-294a": {
+      "all": 25,
+      "kept": 2,
+      "kept_agree": 1
+    },
+    "aa22-320a": {
+      "all": 25,
+      "kept": 1,
+      "kept_agree": 0
+    },
+    "aa22-335a": {
+      "all": 32,
+      "kept": 0,
+      "kept_agree": 0
+    },
+    "aa23-059a": {
+      "all": 54,
+      "kept": 4,
+      "kept_agree": 4
+    },
+    "aa23-144a": {
+      "all": 39,
+      "kept": 1,
+      "kept_agree": 1
+    },
+    "aa23-165a": {
+      "all": 34,
+      "kept": 1,
+      "kept_agree": 1
+    },
+    "aa23-349a": {
+      "all": 45,
+      "kept": 0,
+      "kept_agree": 0
+    },
+    "aa25-141a": {
+      "all": 61,
+      "kept": 6,
+      "kept_agree": 1
+    }
+  },
+  "suggestions": [
+    {
+      "document": "aa22-047a",
+      "technique": "T1018",
+      "name": "Remote System Discovery",
+      "score": 0.0249,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1029",
+      "name": "Scheduled Transfer",
+      "score": -0.5935,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.5157,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1056",
+      "name": "Input Capture",
+      "score": -0.6041,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": -0.175,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1068",
+      "name": "Exploitation for Privilege Escalation",
+      "score": -0.4024,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1069",
+      "name": "Permission Groups Discovery",
+      "score": 0.4887,
+      "sentences": 8,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1071",
+      "name": "Application Layer Protocol",
+      "score": -0.3419,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1072",
+      "name": "Software Deployment Tools",
+      "score": -0.443,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1082",
+      "name": "System Information Discovery",
+      "score": -0.6178,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1087",
+      "name": "Account Discovery",
+      "score": 0.4284,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1090",
+      "name": "Proxy",
+      "score": 1.8144,
+      "sentences": 3,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1098",
+      "name": "Account Manipulation",
+      "score": -0.3384,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1102",
+      "name": "Web Service",
+      "score": -0.5636,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1106",
+      "name": "Native API",
+      "score": -0.5894,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.4797,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1124",
+      "name": "System Time Discovery",
+      "score": -0.2693,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1134",
+      "name": "Access Token Manipulation",
+      "score": -0.4275,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1135",
+      "name": "Network Share Discovery",
+      "score": -0.33,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1195",
+      "name": "Supply Chain Compromise",
+      "score": -0.4799,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1199",
+      "name": "Trusted Relationship",
+      "score": -0.3118,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1204",
+      "name": "User Execution",
+      "score": -0.6416,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1211",
+      "name": "Exploitation for Stealth",
+      "score": -0.2993,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1213",
+      "name": "Data from Information Repositories",
+      "score": 1.0834,
+      "sentences": 2,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.6275,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1505",
+      "name": "Server Software Component",
+      "score": -0.5962,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": 0.1111,
+      "sentences": 23,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1543",
+      "name": "Create or Modify System Process",
+      "score": -0.4284,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1550",
+      "name": "Use Alternate Authentication Material",
+      "score": -0.6087,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1552",
+      "name": "Unsecured Credentials",
+      "score": -0.1156,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": 0.2055,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1558",
+      "name": "Steal or Forge Kerberos Tickets",
+      "score": -0.2156,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1578",
+      "name": "Modify Cloud Compute Infrastructure",
+      "score": -0.6125,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1583",
+      "name": "Acquire Infrastructure",
+      "score": -0.134,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1584",
+      "name": "Compromise Infrastructure",
+      "score": 0.1798,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.2945,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.5632,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1589",
+      "name": "Gather Victim Identity Information",
+      "score": 0.4518,
+      "sentences": 3,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.5801,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1595",
+      "name": "Active Scanning",
+      "score": 0.0434,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1598",
+      "name": "Phishing for Information",
+      "score": -0.2748,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1621",
+      "name": "Multi-Factor Authentication Request Generation",
+      "score": -0.373,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-047a",
+      "technique": "T1685",
+      "name": "Disable or Modify Tools",
+      "score": -0.0336,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.472,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1021",
+      "name": "Remote Services",
+      "score": 1.2331,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1029",
+      "name": "Scheduled Transfer",
+      "score": -0.6297,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": -0.5478,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "score": 0.0578,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": -0.5862,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": -0.3088,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1090",
+      "name": "Proxy",
+      "score": 0.5277,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.6153,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.5632,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1133",
+      "name": "External Remote Services",
+      "score": 0.2698,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1204",
+      "name": "User Execution",
+      "score": -0.2763,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1490",
+      "name": "Inhibit System Recovery",
+      "score": -0.4961,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1491",
+      "name": "Defacement",
+      "score": -0.3895,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.6145,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.0413,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1528",
+      "name": "Steal Application Access Token",
+      "score": -0.5867,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1550",
+      "name": "Use Alternate Authentication Material",
+      "score": 1.2921,
+      "sentences": 2,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": -0.5693,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1570",
+      "name": "Lateral Tool Transfer",
+      "score": -0.3925,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1578",
+      "name": "Modify Cloud Compute Infrastructure",
+      "score": -0.5226,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1583",
+      "name": "Acquire Infrastructure",
+      "score": -0.5884,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1585",
+      "name": "Establish Accounts",
+      "score": -0.2792,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.4212,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-294a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.4514,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1008",
+      "name": "Fallback Channels",
+      "score": -0.5145,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.5614,
+      "sentences": 8,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1016",
+      "name": "System Network Configuration Discovery",
+      "score": 0.6058,
+      "sentences": 6,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": 1.6172,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.3247,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1053",
+      "name": "Scheduled Task/Job",
+      "score": 0.7007,
+      "sentences": 3,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1056",
+      "name": "Input Capture",
+      "score": -0.5289,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1057",
+      "name": "Process Discovery",
+      "score": -0.3916,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": -0.0924,
+      "sentences": 1,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1069",
+      "name": "Permission Groups Discovery",
+      "score": 0.7479,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1087",
+      "name": "Account Discovery",
+      "score": -0.0877,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.6153,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1113",
+      "name": "Screen Capture",
+      "score": -0.1055,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.362,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1496",
+      "name": "Resource Hijacking",
+      "score": -0.0774,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.3642,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.476,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1528",
+      "name": "Steal Application Access Token",
+      "score": -0.5867,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1547",
+      "name": "Boot or Logon Autostart Execution",
+      "score": -0.562,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1552",
+      "name": "Unsecured Credentials",
+      "score": -0.2493,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1558",
+      "name": "Steal or Forge Kerberos Tickets",
+      "score": 0.3847,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1578",
+      "name": "Modify Cloud Compute Infrastructure",
+      "score": -0.5937,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.6102,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1595",
+      "name": "Active Scanning",
+      "score": -0.1583,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-320a",
+      "technique": "T1686",
+      "name": "Disable or Modify System Firewall",
+      "score": 0.0968,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1008",
+      "name": "Fallback Channels",
+      "score": -0.2257,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.472,
+      "sentences": 8,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1016",
+      "name": "System Network Configuration Discovery",
+      "score": 0.14,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1027",
+      "name": "Obfuscated Files or Information",
+      "score": -0.3626,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": -0.2398,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": 0.3226,
+      "sentences": 1,
+      "cited_parent": true
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1071",
+      "name": "Application Layer Protocol",
+      "score": -0.237,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": 0.5859,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1087",
+      "name": "Account Discovery",
+      "score": -0.3727,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.6153,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1105",
+      "name": "Ingress Tool Transfer",
+      "score": -0.4429,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1106",
+      "name": "Native API",
+      "score": -0.6021,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1114",
+      "name": "Email Collection",
+      "score": -0.4619,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.366,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1201",
+      "name": "Password Policy Discovery",
+      "score": -0.2245,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1203",
+      "name": "Exploitation for Client Execution",
+      "score": -0.3749,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1210",
+      "name": "Exploitation of Remote Services",
+      "score": -0.3691,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1218",
+      "name": "System Binary Proxy Execution",
+      "score": -0.5417,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1486",
+      "name": "Data Encrypted for Impact",
+      "score": -0.122,
+      "sentences": 15,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1490",
+      "name": "Inhibit System Recovery",
+      "score": -0.5513,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.035,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1543",
+      "name": "Create or Modify System Process",
+      "score": -0.6064,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": 0.1744,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1567",
+      "name": "Exfiltration Over Web Service",
+      "score": -0.3597,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1570",
+      "name": "Lateral Tool Transfer",
+      "score": -0.5945,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1574",
+      "name": "Hijack Execution Flow",
+      "score": -0.3222,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1578",
+      "name": "Modify Cloud Compute Infrastructure",
+      "score": -0.6049,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1585",
+      "name": "Establish Accounts",
+      "score": -0.1422,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.4547,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.6365,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1598",
+      "name": "Phishing for Information",
+      "score": -0.5881,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa22-335a",
+      "technique": "T1657",
+      "name": "Financial Theft",
+      "score": -0.4129,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1001",
+      "name": "Data Obfuscation",
+      "score": -0.042,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1008",
+      "name": "Fallback Channels",
+      "score": -0.3731,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.3451,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": -0.5625,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "score": -0.487,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1053",
+      "name": "Scheduled Task/Job",
+      "score": 0.1021,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1056",
+      "name": "Input Capture",
+      "score": -0.2674,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1057",
+      "name": "Process Discovery",
+      "score": 0.0432,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": -0.28,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1068",
+      "name": "Exploitation for Privilege Escalation",
+      "score": -0.3242,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1069",
+      "name": "Permission Groups Discovery",
+      "score": 0.923,
+      "sentences": 6,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1070",
+      "name": "Indicator Removal",
+      "score": 0.3457,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1072",
+      "name": "Software Deployment Tools",
+      "score": -0.5442,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1082",
+      "name": "System Information Discovery",
+      "score": -0.6117,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1090",
+      "name": "Proxy",
+      "score": 0.8561,
+      "sentences": 9,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.3893,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1102",
+      "name": "Web Service",
+      "score": -0.4512,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1112",
+      "name": "Modify Registry",
+      "score": 0.4177,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.5818,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1125",
+      "name": "Video Capture",
+      "score": -0.1683,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1133",
+      "name": "External Remote Services",
+      "score": -0.4706,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1134",
+      "name": "Access Token Manipulation",
+      "score": -0.4055,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1135",
+      "name": "Network Share Discovery",
+      "score": -0.3136,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1140",
+      "name": "Deobfuscate/Decode Files or Information",
+      "score": -0.2753,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "score": -0.5992,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1199",
+      "name": "Trusted Relationship",
+      "score": -0.5724,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1213",
+      "name": "Data from Information Repositories",
+      "score": 0.0675,
+      "sentences": 9,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1480",
+      "name": "Execution Guardrails",
+      "score": -0.453,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1484",
+      "name": "Domain or Tenant Policy Modification",
+      "score": -0.2596,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1485",
+      "name": "Data Destruction",
+      "score": -0.5706,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1489",
+      "name": "Service Stop",
+      "score": -0.14,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.583,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.0919,
+      "sentences": 14,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1526",
+      "name": "Cloud Service Discovery",
+      "score": -0.4643,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1543",
+      "name": "Create or Modify System Process",
+      "score": -0.4211,
+      "sentences": 2,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1550",
+      "name": "Use Alternate Authentication Material",
+      "score": 0.608,
+      "sentences": 4,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": 1.7263,
+      "sentences": 4,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1556",
+      "name": "Modify Authentication Process",
+      "score": -0.6099,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1558",
+      "name": "Steal or Forge Kerberos Tickets",
+      "score": 1.1243,
+      "sentences": 10,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1570",
+      "name": "Lateral Tool Transfer",
+      "score": -0.2473,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1572",
+      "name": "Protocol Tunneling",
+      "score": -0.4645,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1578",
+      "name": "Modify Cloud Compute Infrastructure",
+      "score": -0.3647,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1584",
+      "name": "Compromise Infrastructure",
+      "score": -0.2233,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.4585,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1589",
+      "name": "Gather Victim Identity Information",
+      "score": 0.3723,
+      "sentences": 5,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1595",
+      "name": "Active Scanning",
+      "score": -0.5843,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1599",
+      "name": "Network Boundary Bridging",
+      "score": -0.6316,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1608",
+      "name": "Stage Capabilities",
+      "score": -0.6117,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1621",
+      "name": "Multi-Factor Authentication Request Generation",
+      "score": -0.3816,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1659",
+      "name": "Content Injection",
+      "score": -0.6126,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1684",
+      "name": "Social Engineering",
+      "score": -0.5248,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1685",
+      "name": "Disable or Modify Tools",
+      "score": 0.4538,
+      "sentences": 15,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1686",
+      "name": "Disable or Modify System Firewall",
+      "score": -0.3431,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-059a",
+      "technique": "T1689",
+      "name": "Downgrade Attack",
+      "score": -0.5376,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1001",
+      "name": "Data Obfuscation",
+      "score": -0.5964,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1012",
+      "name": "Query Registry",
+      "score": 0.1769,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1018",
+      "name": "Remote System Discovery",
+      "score": -0.2414,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1027",
+      "name": "Obfuscated Files or Information",
+      "score": -0.2587,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1029",
+      "name": "Scheduled Transfer",
+      "score": -0.1715,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": 0.0611,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.0679,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": 0.3229,
+      "sentences": 11,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1071",
+      "name": "Application Layer Protocol",
+      "score": -0.5993,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1074",
+      "name": "Data Staged",
+      "score": 0.269,
+      "sentences": 10,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": -0.1998,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1087",
+      "name": "Account Discovery",
+      "score": -0.2285,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.6153,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1102",
+      "name": "Web Service",
+      "score": -0.5755,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1105",
+      "name": "Ingress Tool Transfer",
+      "score": -0.3433,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1113",
+      "name": "Screen Capture",
+      "score": -0.456,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.3743,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1120",
+      "name": "Peripheral Device Discovery",
+      "score": -0.5238,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1124",
+      "name": "System Time Discovery",
+      "score": 0.0584,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1135",
+      "name": "Network Share Discovery",
+      "score": -0.4828,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1136",
+      "name": "Create Account",
+      "score": -0.6163,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1140",
+      "name": "Deobfuscate/Decode Files or Information",
+      "score": 0.3819,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1218",
+      "name": "System Binary Proxy Execution",
+      "score": -0.377,
+      "sentences": 26,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1480",
+      "name": "Execution Guardrails",
+      "score": -0.2085,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.174,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.3119,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1546",
+      "name": "Event Triggered Execution",
+      "score": -0.4989,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1564",
+      "name": "Hide Artifacts",
+      "score": 0.0633,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1567",
+      "name": "Exfiltration Over Web Service",
+      "score": -0.6345,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1583",
+      "name": "Acquire Infrastructure",
+      "score": -0.2768,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1584",
+      "name": "Compromise Infrastructure",
+      "score": 0.5043,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.5403,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.2831,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1592",
+      "name": "Gather Victim Host Information",
+      "score": -0.4166,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1608",
+      "name": "Stage Capabilities",
+      "score": -0.6364,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1654",
+      "name": "Log Enumeration",
+      "score": -0.549,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1685",
+      "name": "Disable or Modify Tools",
+      "score": 1.4253,
+      "sentences": 18,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1686",
+      "name": "Disable or Modify System Firewall",
+      "score": 0.5847,
+      "sentences": 9,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-144a",
+      "technique": "T1690",
+      "name": "Prevent Command History Logging",
+      "score": -0.5696,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1001",
+      "name": "Data Obfuscation",
+      "score": -0.3814,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1008",
+      "name": "Fallback Channels",
+      "score": -0.401,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.4342,
+      "sentences": 17,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1011",
+      "name": "Exfiltration Over Other Network Medium",
+      "score": -0.6336,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1016",
+      "name": "System Network Configuration Discovery",
+      "score": -0.2352,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1040",
+      "name": "Network Sniffing",
+      "score": -0.571,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1041",
+      "name": "Exfiltration Over C2 Channel",
+      "score": 0.3993,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.0229,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1057",
+      "name": "Process Discovery",
+      "score": -0.3916,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1059",
+      "name": "Command and Scripting Interpreter",
+      "score": 0.8266,
+      "sentences": 9,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1068",
+      "name": "Exploitation for Privilege Escalation",
+      "score": -0.1287,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1080",
+      "name": "Taint Shared Content",
+      "score": -0.6311,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": -0.5617,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1090",
+      "name": "Proxy",
+      "score": -0.041,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.409,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1120",
+      "name": "Peripheral Device Discovery",
+      "score": -0.1897,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1125",
+      "name": "Video Capture",
+      "score": -0.4987,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1140",
+      "name": "Deobfuscate/Decode Files or Information",
+      "score": 0.5637,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1203",
+      "name": "Exploitation for Client Execution",
+      "score": -0.231,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1484",
+      "name": "Domain or Tenant Policy Modification",
+      "score": 0.0606,
+      "sentences": 1,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1491",
+      "name": "Defacement",
+      "score": 0.3353,
+      "sentences": 1,
+      "cited_parent": true
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.2787,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1528",
+      "name": "Steal Application Access Token",
+      "score": -0.5867,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1531",
+      "name": "Account Access Removal",
+      "score": -0.6465,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1571",
+      "name": "Non-Standard Port",
+      "score": 0.3125,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1573",
+      "name": "Encrypted Channel",
+      "score": -0.5842,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1585",
+      "name": "Establish Accounts",
+      "score": -0.3664,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.1559,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": 0.565,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.5375,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1595",
+      "name": "Active Scanning",
+      "score": -0.5353,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1657",
+      "name": "Financial Theft",
+      "score": -0.2982,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1686",
+      "name": "Disable or Modify System Firewall",
+      "score": -0.1769,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-165a",
+      "technique": "T1689",
+      "name": "Downgrade Attack",
+      "score": -0.2561,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1007",
+      "name": "System Service Discovery",
+      "score": -0.3448,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.472,
+      "sentences": 11,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1016",
+      "name": "System Network Configuration Discovery",
+      "score": -0.605,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1018",
+      "name": "Remote System Discovery",
+      "score": -0.4371,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1027",
+      "name": "Obfuscated Files or Information",
+      "score": -0.3973,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1033",
+      "name": "System Owner/User Discovery",
+      "score": -0.0571,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.4719,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1057",
+      "name": "Process Discovery",
+      "score": -0.3916,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1068",
+      "name": "Exploitation for Privilege Escalation",
+      "score": -0.5023,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1069",
+      "name": "Permission Groups Discovery",
+      "score": -0.0232,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1070",
+      "name": "Indicator Removal",
+      "score": 0.0077,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1074",
+      "name": "Data Staged",
+      "score": -0.5509,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1082",
+      "name": "System Information Discovery",
+      "score": 0.0816,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": -0.4425,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1095",
+      "name": "Non-Application Layer Protocol",
+      "score": -0.6019,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1098",
+      "name": "Account Manipulation",
+      "score": -0.0545,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1102",
+      "name": "Web Service",
+      "score": -0.4964,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1105",
+      "name": "Ingress Tool Transfer",
+      "score": -0.3864,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1119",
+      "name": "Automated Collection",
+      "score": -0.3944,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1120",
+      "name": "Peripheral Device Discovery",
+      "score": -0.6049,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1125",
+      "name": "Video Capture",
+      "score": -0.1683,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1135",
+      "name": "Network Share Discovery",
+      "score": -0.4894,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1190",
+      "name": "Exploit Public-Facing Application",
+      "score": -0.2598,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1201",
+      "name": "Password Policy Discovery",
+      "score": -0.2617,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1203",
+      "name": "Exploitation for Client Execution",
+      "score": -0.3978,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1204",
+      "name": "User Execution",
+      "score": 0.0602,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1213",
+      "name": "Data from Information Repositories",
+      "score": -0.6057,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1221",
+      "name": "Template Injection",
+      "score": -0.313,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1222",
+      "name": "File and Directory Permissions Modification",
+      "score": -0.3961,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1489",
+      "name": "Service Stop",
+      "score": -0.0465,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.4213,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1505",
+      "name": "Server Software Component",
+      "score": -0.5635,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.1044,
+      "sentences": 17,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1534",
+      "name": "Internal Spearphishing",
+      "score": -0.5172,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1543",
+      "name": "Create or Modify System Process",
+      "score": -0.4518,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1548",
+      "name": "Abuse Elevation Control Mechanism",
+      "score": -0.253,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1552",
+      "name": "Unsecured Credentials",
+      "score": -0.6374,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1553",
+      "name": "Subvert Trust Controls",
+      "score": -0.2404,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": 0.0358,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1570",
+      "name": "Lateral Tool Transfer",
+      "score": -0.5022,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1583",
+      "name": "Acquire Infrastructure",
+      "score": -0.6309,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.5974,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.4977,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1591",
+      "name": "Gather Victim Org Information",
+      "score": -0.3662,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa23-349a",
+      "technique": "T1685",
+      "name": "Disable or Modify Tools",
+      "score": -0.5927,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1001",
+      "name": "Data Obfuscation",
+      "score": -0.4777,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1007",
+      "name": "System Service Discovery",
+      "score": 0.0855,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1010",
+      "name": "Application Window Discovery",
+      "score": -0.4977,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1016",
+      "name": "System Network Configuration Discovery",
+      "score": 1.051,
+      "sentences": 7,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1027",
+      "name": "Obfuscated Files or Information",
+      "score": -0.4571,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1033",
+      "name": "System Owner/User Discovery",
+      "score": 0.6009,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1036",
+      "name": "Masquerading",
+      "score": 0.0714,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1047",
+      "name": "Windows Management Instrumentation",
+      "score": 1.0077,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1049",
+      "name": "System Network Connections Discovery",
+      "score": -0.2208,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1055",
+      "name": "Process Injection",
+      "score": -0.3347,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1057",
+      "name": "Process Discovery",
+      "score": -0.0455,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1071",
+      "name": "Application Layer Protocol",
+      "score": 0.3872,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1074",
+      "name": "Data Staged",
+      "score": -0.4457,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1078",
+      "name": "Valid Accounts",
+      "score": 0.054,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1082",
+      "name": "System Information Discovery",
+      "score": 1.0874,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1083",
+      "name": "File and Directory Discovery",
+      "score": -0.4144,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1090",
+      "name": "Proxy",
+      "score": 0.6713,
+      "sentences": 6,
+      "cited_parent": true
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1102",
+      "name": "Web Service",
+      "score": -0.3168,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1105",
+      "name": "Ingress Tool Transfer",
+      "score": -0.2383,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1112",
+      "name": "Modify Registry",
+      "score": 1.0463,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1120",
+      "name": "Peripheral Device Discovery",
+      "score": -0.4405,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1123",
+      "name": "Audio Capture",
+      "score": -0.3307,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1132",
+      "name": "Data Encoding",
+      "score": 0.4109,
+      "sentences": 9,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1134",
+      "name": "Access Token Manipulation",
+      "score": -0.5461,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1135",
+      "name": "Network Share Discovery",
+      "score": -0.4328,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1201",
+      "name": "Password Policy Discovery",
+      "score": 0.0753,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1205",
+      "name": "Traffic Signaling",
+      "score": -0.4588,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1211",
+      "name": "Exploitation for Stealth",
+      "score": -0.4547,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1213",
+      "name": "Data from Information Repositories",
+      "score": -0.4545,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1217",
+      "name": "Browser Information Discovery",
+      "score": -0.2654,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1218",
+      "name": "System Binary Proxy Execution",
+      "score": -0.4946,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1219",
+      "name": "Remote Access Tools",
+      "score": -0.579,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1222",
+      "name": "File and Directory Permissions Modification",
+      "score": 0.9642,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1482",
+      "name": "Domain Trust Discovery",
+      "score": -0.5007,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1497",
+      "name": "Virtualization/Sandbox Evasion",
+      "score": -0.014,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1518",
+      "name": "Software Discovery",
+      "score": -0.1065,
+      "sentences": 5,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1543",
+      "name": "Create or Modify System Process",
+      "score": 0.588,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1547",
+      "name": "Boot or Logon Autostart Execution",
+      "score": 2.0605,
+      "sentences": 4,
+      "cited_parent": true
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1550",
+      "name": "Use Alternate Authentication Material",
+      "score": -0.2473,
+      "sentences": 6,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1554",
+      "name": "Compromise Host Software Binary",
+      "score": 0.222,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1555",
+      "name": "Credentials from Password Stores",
+      "score": -0.1138,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1559",
+      "name": "Inter-Process Communication",
+      "score": -0.1827,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1564",
+      "name": "Hide Artifacts",
+      "score": 0.3148,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1567",
+      "name": "Exfiltration Over Web Service",
+      "score": -0.6067,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1569",
+      "name": "System Services",
+      "score": -0.2553,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1570",
+      "name": "Lateral Tool Transfer",
+      "score": -0.5934,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1571",
+      "name": "Non-Standard Port",
+      "score": -0.6383,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1583",
+      "name": "Acquire Infrastructure",
+      "score": -0.3092,
+      "sentences": 42,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1584",
+      "name": "Compromise Infrastructure",
+      "score": 0.2625,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1587",
+      "name": "Develop Capabilities",
+      "score": -0.3379,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1588",
+      "name": "Obtain Capabilities",
+      "score": -0.3345,
+      "sentences": 4,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1589",
+      "name": "Gather Victim Identity Information",
+      "score": 0.1576,
+      "sentences": 3,
+      "cited_parent": true
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1590",
+      "name": "Gather Victim Network Information",
+      "score": -0.2489,
+      "sentences": 2,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1594",
+      "name": "Search Victim-Owned Websites",
+      "score": -0.5047,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1598",
+      "name": "Phishing for Information",
+      "score": -0.599,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1614",
+      "name": "System Location Discovery",
+      "score": -0.0518,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1621",
+      "name": "Multi-Factor Authentication Request Generation",
+      "score": -0.2587,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1657",
+      "name": "Financial Theft",
+      "score": -0.6361,
+      "sentences": 1,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1685",
+      "name": "Disable or Modify Tools",
+      "score": 0.358,
+      "sentences": 13,
+      "cited_parent": true
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1686",
+      "name": "Disable or Modify System Firewall",
+      "score": -0.2545,
+      "sentences": 3,
+      "cited_parent": false
+    },
+    {
+      "document": "aa25-141a",
+      "technique": "T1689",
+      "name": "Downgrade Attack",
+      "score": -0.3457,
+      "sentences": 4,
+      "cited_parent": false
+    }
+  ]
+}

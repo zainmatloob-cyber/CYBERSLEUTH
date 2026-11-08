@@ -99,8 +99,9 @@ bundle ([results](docs/evaluation/real_world.md), [error analysis](docs/evaluati
 
 The technique model doesn't transfer from ATT&CK procedure text to real reports at its current
 threshold. Model suggestions are therefore treated as unverified leads (hidden by default and
-excluded from the risk score until confirmed). Choosing a better threshold needs a separate
-set of real reports.
+excluded from the risk score until confirmed). A stricter cut-off for model-only suggestions
+(decision score 0.75) was then chosen on a separate development set of real advisories
+([selection](docs/evaluation/real_world_threshold.md)). Its test result is pending.
 
 ### Synthetic extraction test set
 8 synthetic, author-annotated documents, split dev/test. The test split was scored once,

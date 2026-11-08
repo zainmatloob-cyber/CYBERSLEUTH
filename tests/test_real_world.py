@@ -426,3 +426,40 @@ def test_error_analysis_refuses_the_test_split(tmp_path, monkeypatch):
                                      str(tmp_path / "m.json"), "--split", "test"])
     with pytest.raises(SystemExit, match="only after its final scoring"):
         script.main()
+
+
+# --- real-world cut-off selection -----------------------------------------------------
+
+
+def test_threshold_rule_picks_the_lowest_candidate_reaching_the_target():
+    script = _script("choose_real_world_threshold")
+    suggestions = ([{"document": "a", "score": 0.3, "cited_parent": False}] * 6
+                   + [{"document": "a", "score": 0.6, "cited_parent": True}] * 3
+                   + [{"document": "b", "score": 0.9, "cited_parent": True}] * 3)
+    rows = [script.at_threshold(suggestions, t) for t in script.CANDIDATES]
+    assert [(r["kept"], r["agree"]) for r in rows] == [(12, 6), (6, 6), (3, 3)]
+    assert rows[0]["documents_with_suggestions"] == 2
+    assert script.choose(rows) == 0.25  # 6/12 = 0.5 reaches the target exactly
+    assert script.choose(rows, target=0.51) == 0.5
+    none = [script.at_threshold(suggestions[:6], t) for t in script.CANDIDATES]
+    assert none[1]["agreement"] is None and script.choose(none) is None
+
+
+def test_wilson_interval():
+    script = _script("choose_real_world_threshold")
+    low, high = script.wilson(10, 17)
+    assert round(low, 2) == 0.36 and round(high, 2) == 0.78
+    assert script.wilson(0, 0) is None
+    low, high = script.wilson(0, 5)
+    assert low == pytest.approx(0, abs=1e-12) and 0 < high < 0.5
+
+
+def test_threshold_selection_needs_a_split_manifest(tmp_path, monkeypatch):
+    import json
+
+    script = _script("choose_real_world_threshold")
+    path = tmp_path / "m.json"
+    path.write_text(json.dumps({"documents": []}))
+    monkeypatch.setattr("sys.argv", ["x", "--manifest", str(path)])
+    with pytest.raises(SystemExit, match="no development split"):
+        script.main()

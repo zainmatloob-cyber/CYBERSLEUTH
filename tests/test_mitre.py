@@ -202,3 +202,50 @@ def test_model_errors(tmp_path):
         TechniqueModel().top_k(["x"])
     with pytest.raises(TechniqueModelError, match="not found"):
         TechniqueModel.load(tmp_path / "missing.joblib")
+
+
+# --- document-level cut-off for model-only suggestions --------------------------------
+
+
+class _FixedModel:
+    """Stands in for TechniqueModel: every sentence gets the same ranked scores."""
+
+    threshold = -1.0
+
+    def __init__(self, ranked):
+        self.ranked = ranked
+
+    def top_k(self, texts, k=3):
+        return [self.ranked for _ in texts]
+
+
+def _mapped(kb, score, text, cut_off):
+    model = _FixedModel([("T1486", score), ("T1059", score - 1)])
+    mapper = TechniqueMapper(kb, model, model_only_min_score=cut_off)
+    return {m.technique_id: m for m in mapper.map(_doc(text))}
+
+
+def test_model_only_suggestion_below_cut_off_is_dropped(kb):
+    text = "The actors encrypted every file on the servers."
+    assert "T1486" not in _mapped(kb, 0.5, text, 0.75)
+    assert _mapped(kb, 0.8, text, 0.75)["T1486"].max_score == 0.8
+    assert "T1486" in _mapped(kb, 0.5, text, None)  # None turns the cut-off off
+
+
+def test_cut_off_never_removes_explicit_mappings(kb):
+    text = "The actors used T1486 to encrypt every file on the servers."
+    mapping = _mapped(kb, 0.1, text, 0.75)["T1486"]
+    assert mapping.explicit and "model" in mapping.methods  # low model evidence is kept too
+
+
+def test_cut_off_is_read_from_config(tmp_path):
+    from src.intelligence import mitre_mapper
+
+    path = tmp_path / "c.json"
+    path.write_text(json.dumps({"model_only_min_score": 0.75}))
+    assert mitre_mapper.load_model_only_min_score(path) == 0.75
+    path.write_text(json.dumps({"model_only_min_score": None}))
+    assert mitre_mapper.load_model_only_min_score(path) is None
+    shipped = mitre_mapper.load_model_only_min_score()
+    assert shipped == 0.75  # chosen on the real-world development split
+    assert TechniqueMapper(use_model=False).model_only_min_score == shipped
