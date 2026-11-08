@@ -93,10 +93,27 @@ advisories with several STIX bundles list them all (`"stix": [...]`).
 * **Inclusion rule**, applied before any analysis: an Enterprise ATT&CK section citing about 9
   or more technique IDs, and not focused on ICS. Rejected downloads and the reasons are
   listed in the manifest.
-* **Scoring is locked** (`"final_scoring": false`) until the split is recorded, so
-  `--final` refuses to run on it.
+* **The split was drawn once** by `scripts/split_real_world.py`, stratified by publication
+  period, with the allocation and seed (20261108) fixed in the script beforehand. The script
+  refuses to redraw it.
+
+  | Period | Development | Test |
+  |---|---|---|
+  | 2022 | 4 | 3 |
+  | 2023 | 4 | 3 |
+  | 2024 onward | 1 | 2 |
+  | **Total** | **9** (248 cited techniques, 5 with STIX) | **8** (214 cited techniques, 5 with STIX) |
+
+* **Development:** aa22-047a, aa22-294a, aa22-320a, aa22-335a, aa23-059a, aa23-144a,
+  aa23-165a, aa23-349a, aa25-141a.
+* **Test:** aa22-152a, aa22-174a, aa22-249a, aa23-250a, aa23-278a, aa23-320a, aa24-057a,
+  aa24-109a.
+* **Guards:** `--final` scores only `--split test` (reports go to
+  `real_world_batch2_test.md` / `.json`). The error-analysis script refuses the test split
+  until it has been scored (`--after-final`).
 
 ```text
 python scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json
 python scripts/evaluate_real_world.py --manifest data/real_world/batch2/manifest.json  # gold only
+python scripts/analyse_real_world_errors.py --manifest data/real_world/batch2/manifest.json --split dev
 ```

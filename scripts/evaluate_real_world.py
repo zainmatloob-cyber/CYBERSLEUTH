@@ -7,9 +7,10 @@ Usage:
     python scripts/evaluate_real_world.py --manifest data/real_world/batch2/manifest.json
 
 Without --final no predictions are computed, so the gold labels can be inspected before
-the code is frozen and scored. Gold labels are written next to the manifest. A manifest
-with ``"final_scoring": false`` (a set not yet split into development and test documents)
-cannot be scored with --final. Scoring requires both trained models.
+the code is frozen and scored. Gold labels (for every document) are written next to the
+manifest. A manifest with ``"final_scoring": false`` (not yet split) cannot be scored; a
+split manifest can be scored only with ``--split test``, and its reports are named after
+its ``report_stem``. Scoring requires both trained models.
 """
 
 from __future__ import annotations
@@ -286,13 +287,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=None,
                         help="manifest of the set (default: the first 14-advisory set)")
+    parser.add_argument("--split", choices=rm.SPLITS, default=None,
+                        help="score only this split of a split manifest")
     parser.add_argument("--final", action="store_true", help="score once and write reports")
     args = parser.parse_args()
     manifest_path = args.manifest or MANIFEST
     manifest = load_manifest(manifest_path)
-    if args.final and manifest.get("final_scoring") is False:
-        raise SystemExit(f"{manifest_path.name} is not open for final scoring: "
-                         "split it into development and test documents first.")
+    if args.final:
+        rm.check_final_scoring(manifest, args.split)
     gold_path = manifest_path.parent / "gold.json"
     kb = default_technique_kb()
     documents = load_documents(manifest)
@@ -305,10 +307,15 @@ def main() -> int:
     if not args.final:
         print(f"Gold written to {gold_path}. Re-run with --final to score.")
         return 0
+    documents = rm.in_split(manifest, documents, args.split)
+    out_json, out_md = OUT_JSON, OUT_MD
+    if manifest.get("report_stem"):
+        out_json = OUT_JSON.with_name(f"{manifest['report_stem']}.json")
+        out_md = OUT_MD.with_name(f"{manifest['report_stem']}.md")
     results = evaluate(documents, gold, kb)
-    OUT_JSON.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
-    OUT_MD.write_text(render_markdown(results, gold), encoding="utf-8")
-    print(f"Wrote {OUT_JSON.relative_to(ROOT)} and {OUT_MD.relative_to(ROOT)}")
+    out_json.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")
+    out_md.write_text(render_markdown(results, gold), encoding="utf-8")
+    print(f"Wrote {out_json} and {out_md}")
     return 0
 
 

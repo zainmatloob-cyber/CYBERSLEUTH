@@ -2,7 +2,7 @@
   "description": "Second set of public CISA advisories (TLP:CLEAR), used to choose a real-world abstention threshold for model-only technique suggestions (development split) and to test it (test split). None of these documents is in the first 14-advisory set. Documents are not redistributed: download each file from its advisory page and save it under raw_dir with the local names in src/evaluation/manifest.py, then run scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json.",
   "retrieved": "2026-11-08",
   "raw_dir": "data/raw/cisa/batch2",
-  "final_scoring": false,
+  "final_scoring": "test",
   "selection": "Downloaded by the project owner after an advisory list was suggested; archived advisories were allowed. Inclusion rule, applied before any analysis was run: an Enterprise ATT&CK technique section citing about 9 or more technique IDs, not focused on industrial control systems, and not in the first set. File names were given a '-new-batch' suffix on download; it is removed from the published names recorded here.",
   "excluded": {
     "AA23-025A, AA23-131A": "byte-identical to files already in the first set",
@@ -18,7 +18,8 @@
       "published": "2022-02",
       "pdf_name": "AA22-047A Russian State-Sponsored Cyber Actors Target CDC Networks.pdf",
       "pdf_sha256": "cc46b044aeab17405f4317abe36d9176dc1328942db053ce1a77b7f4bec3ca35",
-      "stix": []
+      "stix": [],
+      "split": "dev"
     },
     {
       "id": "aa22-152a",
@@ -32,7 +33,8 @@
           "name": "AA22-152A.stix.xml",
           "sha256": "6ea639b3bae77fda93311702c13a3fe0efeed0c3195b754cfb395531a15b4f50"
         }
-      ]
+      ],
+      "split": "test"
     },
     {
       "id": "aa22-174a",
@@ -46,7 +48,8 @@
           "name": "AA22-174A.stix.xml",
           "sha256": "b92ae55f1e0efff75228b2a3ff11100da9dccaad0cd8e550448ae327d54cae3b"
         }
-      ]
+      ],
+      "split": "test"
     },
     {
       "id": "aa22-249a",
@@ -60,7 +63,8 @@
           "name": "AA22-249A.stix.xml",
           "sha256": "35c45ff5927a9b7014d3fb462b3badd9ab6028a958a078a5c0b12bc7310cffdf"
         }
-      ]
+      ],
+      "split": "test"
     },
     {
       "id": "aa22-294a",
@@ -74,7 +78,8 @@
           "name": "aa22-294a.stix_.xml",
           "sha256": "b4d69a9e4f7c7e4cf0ae2082083dc1a02a3045734eab3e5436e79b4bafdacbe5"
         }
-      ]
+      ],
+      "split": "dev"
     },
     {
       "id": "aa22-320a",
@@ -88,7 +93,8 @@
           "name": "AA22-320A.stix.xml",
           "sha256": "3ff8023c310cf7daeb5451dca9cb0666952a6ed5ddcdfe0dbad645ff90c30f1c"
         }
-      ]
+      ],
+      "split": "dev"
     },
     {
       "id": "aa22-335a",
@@ -107,7 +113,8 @@
           "sha256": "5d7e53c192b7a9fe3d1ed7920fa157e3553fd19dc45a5f0c1aef682cde34b256"
         }
       ],
-      "note": "Indicators are published in two STIX files; both are used."
+      "note": "Indicators are published in two STIX files; both are used.",
+      "split": "dev"
     },
     {
       "id": "aa23-059a",
@@ -116,7 +123,8 @@
       "published": "2023-02",
       "pdf_name": "aa23-059a-cisa_red_team_shares_key_findings_to_improve_monitoring_and_hardening_of_networks_1.pdf",
       "pdf_sha256": "fda60b1d63b8720a5b142389ff1554f661fcaedf56ec3aacd093a15829607f7f",
-      "stix": []
+      "stix": [],
+      "split": "dev"
     },
     {
       "id": "aa23-144a",
@@ -131,7 +139,8 @@
           "sha256": "a44ae1fff3f239877a663cae1ba244d1c15bbc013e1cc5a6338f1d5d2c1cb789"
         }
       ],
-      "note": "The PDF (v1.1) does not print its advisory ID; AA23-144A is taken from the STIX file."
+      "note": "The PDF (v1.1) does not print its advisory ID; AA23-144A is taken from the STIX file.",
+      "split": "dev"
     },
     {
       "id": "aa23-165a",
@@ -140,7 +149,8 @@
       "published": "2023-06",
       "pdf_name": "aa23-165a_understanding_TA_LockBit_0.pdf",
       "pdf_sha256": "ee5f1bd8d8ab0bedac1b11b69dc482ec7073f280d4f0c644334c015a463cf29c",
-      "stix": []
+      "stix": [],
+      "split": "dev"
     },
     {
       "id": "aa23-250a",
@@ -154,7 +164,8 @@
           "name": "AA23-250A Multiple Nation-State Threat Actors Exploit CVE-2022-47966 and CVE-2022-42475.stix_.json",
           "sha256": "73487d99faa533b9aaaee5228b49431ce37be91a84088880a781a5a4bde4f29c"
         }
-      ]
+      ],
+      "split": "test"
     },
     {
       "id": "aa23-278a",
@@ -164,7 +175,8 @@
       "pdf_name": "JOINT_CSA_TOP_TEN_MISCONFIGURATIONS_TLP-CLEAR.pdf",
       "pdf_sha256": "de94d8c2e226f273a1d412f1abebbe4f9a1aa3fcbff273ac8c77751c0516ef54",
       "stix": [],
-      "note": "The PDF does not print its advisory ID; AA23-278A is CISA's number for this October 2023 advisory (to be confirmed on the advisory page)."
+      "note": "The PDF does not print its advisory ID; AA23-278A is CISA's number for this October 2023 advisory (to be confirmed on the advisory page).",
+      "split": "test"
     },
     {
       "id": "aa23-320a",
@@ -173,7 +185,8 @@
       "published": "2023-11",
       "pdf_name": "aa23-320a_scattered_spider_0.pdf",
       "pdf_sha256": "896169adc12391372fe2b69d0f83321f21a5baa7753f8c155122ff37e3d946ae",
-      "stix": []
+      "stix": [],
+      "split": "test"
     },
     {
       "id": "aa23-349a",
@@ -182,7 +195,8 @@
       "published": "2023-12",
       "pdf_name": "aa23-349a-risk-vulnerability-assessment-healthcare-public-health-sector.pdf",
       "pdf_sha256": "d6287622ea34d6b99c282648cc54a147c56b8ee4b1cc6101d3dd484dbd0f403f",
-      "stix": []
+      "stix": [],
+      "split": "dev"
     },
     {
       "id": "aa24-057a",
@@ -192,7 +206,8 @@
       "pdf_name": "Advisory-SVR-cyber-actors-adapt-tactics-for-initial-cloud-access.pdf",
       "pdf_sha256": "a6b0fef6485adfc3e47c7bf5eb25e61e9364b1c26431d610a6f16b2dafb4bc98",
       "stix": [],
-      "note": "The PDF (UK NCSC layout, February 2024) does not print its advisory ID; AA24-057A is CISA's number for it (to be confirmed on the advisory page)."
+      "note": "The PDF (UK NCSC layout, February 2024) does not print its advisory ID; AA24-057A is CISA's number for it (to be confirmed on the advisory page).",
+      "split": "test"
     },
     {
       "id": "aa24-109a",
@@ -207,7 +222,8 @@
           "sha256": "3998fc8b3ad54b69787c466ce1559e1e057b0b39445f5db44f7bab08ad7be923"
         }
       ],
-      "note": "The PDF is the November 2025 update."
+      "note": "The PDF is the November 2025 update.",
+      "split": "test"
     },
     {
       "id": "aa25-141a",
@@ -222,7 +238,27 @@
           "sha256": "c6102ca1da59c0865a4671f406f36c74a7ed1783c004a0641296655bb7c80dea"
         }
       ],
-      "note": "The PDF (v1.1, April 2026) does not print its advisory ID; AA25-141A is taken from the STIX file."
+      "note": "The PDF (v1.1, April 2026) does not print its advisory ID; AA25-141A is taken from the STIX file.",
+      "split": "dev"
     }
-  ]
+  ],
+  "split": {
+    "method": "stratified by publication period, fixed allocation, seeded shuffle (scripts/split_real_world.py)",
+    "seed": 20261108,
+    "allocation": {
+      "2022": {
+        "dev": 4,
+        "test": 3
+      },
+      "2023": {
+        "dev": 4,
+        "test": 3
+      },
+      "2024+": {
+        "dev": 1,
+        "test": 2
+      }
+    }
+  },
+  "report_stem": "real_world_batch2_test"
 }

@@ -340,3 +340,89 @@ def test_final_scoring_refused_for_an_unsplit_manifest(tmp_path, monkeypatch):
     with pytest.raises(SystemExit, match="not open for final scoring"):
         script.main()
     assert not (tmp_path / "gold.json").exists()  # refused before anything is written
+
+
+# --- development/test split ----------------------------------------------------------
+
+
+def _script(name):
+    import importlib.util
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent.parent / "scripts" / f"{name}.py"
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _docs():
+    years = ["2022"] * 7 + ["2023"] * 7 + ["2024", "2025", "2025"]
+    return [{"id": f"d{n:02d}", "published": f"{y}-01"} for n, y in enumerate(years)]
+
+
+def test_split_is_stratified_reproducible_and_order_independent():
+    script = _script("split_real_world")
+    docs = _docs()
+    first = script.split(docs)
+    assert first == script.split(list(reversed(docs)))  # file order doesn't matter
+    for period, (dev, test) in script.ALLOCATION.items():
+        ids = [d["id"] for d in docs if script.period(d["published"]) == period]
+        assert sum(first[i] == "dev" for i in ids) == dev
+        assert sum(first[i] == "test" for i in ids) == test
+    assert script.split(docs, seed=1) != first  # the seed, not the order, decides
+
+
+def test_split_refuses_a_mismatched_allocation():
+    script = _script("split_real_world")
+    with pytest.raises(ValueError, match="allocation"):
+        script.split(_docs()[:-1])
+    with pytest.raises(ValueError, match="periods"):
+        script.split([{"id": "x", "published": "2021-01"}] + _docs())
+
+
+def test_split_is_never_redrawn(tmp_path, monkeypatch):
+    import json
+
+    script = _script("split_real_world")
+    path = tmp_path / "set9" / "manifest.json"
+    path.parent.mkdir()
+    path.write_text(json.dumps({"final_scoring": False, "documents": _docs()}))
+    monkeypatch.setattr("sys.argv", ["split_real_world.py", "--manifest", str(path)])
+    assert script.main() == 0
+    manifest = json.loads(path.read_text())
+    assert manifest["final_scoring"] == "test" and manifest["split"]["seed"] == script.SEED
+    assert manifest["report_stem"] == "real_world_set9_test"
+    assert {d["split"] for d in manifest["documents"]} == {"dev", "test"}
+    with pytest.raises(SystemExit, match="never redrawn"):
+        script.main()
+
+
+def test_in_split_and_final_scoring_rules():
+    from src.evaluation import manifest as rm
+
+    docs = [{"id": "a", "split": "dev"}, {"id": "b", "split": "test"}]
+    split = {"split": {"seed": 1}, "final_scoring": "test"}
+    assert [d["id"] for d in rm.in_split(split, docs, "dev")] == ["a"]
+    assert [d["id"] for d in rm.in_split(split, docs, "test")] == ["b"]
+    with pytest.raises(SystemExit, match="choose --split"):
+        rm.in_split(split, docs, None)
+    with pytest.raises(SystemExit, match="no development/test split"):
+        rm.in_split({}, docs, "dev")
+    assert rm.in_split({}, docs, None) == docs
+
+    rm.check_final_scoring(split, "test")
+    rm.check_final_scoring({}, None)  # the first set: no restriction
+    for manifest, chosen in ((split, "dev"), (split, None)):
+        with pytest.raises(SystemExit, match="only on --split test"):
+            rm.check_final_scoring(manifest, chosen)
+    with pytest.raises(SystemExit, match="not open"):
+        rm.check_final_scoring({"final_scoring": False}, "test")
+
+
+def test_error_analysis_refuses_the_test_split(tmp_path, monkeypatch):
+    script = _script("analyse_real_world_errors")
+    monkeypatch.setattr("sys.argv", ["analyse_real_world_errors.py", "--manifest",
+                                     str(tmp_path / "m.json"), "--split", "test"])
+    with pytest.raises(SystemExit, match="only after its final scoring"):
+        script.main()

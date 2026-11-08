@@ -68,6 +68,31 @@ def record_hash(doc: dict, file: ManifestFile, digest: str) -> None:
         doc["stix_sha256"] = digest
 
 
+SPLITS = ("dev", "test")
+
+
+def in_split(manifest: dict, documents: list[dict], split: str | None) -> list[dict]:
+    """The documents of ``split``. A split manifest must be used one split at a time."""
+    is_split = "split" in manifest
+    if not is_split:
+        if split is not None:
+            raise SystemExit("This manifest has no development/test split.")
+        return documents
+    if split not in SPLITS:
+        raise SystemExit("This manifest is split: choose --split dev or --split test.")
+    return [doc for doc in documents if doc.get("split") == split]
+
+
+def check_final_scoring(manifest: dict, split: str | None) -> None:
+    """Refuse ``--final`` unless the manifest allows scoring this split."""
+    allowed = manifest.get("final_scoring", True)
+    if allowed is False:
+        raise SystemExit("This manifest is not open for final scoring: split it into "
+                         "development and test documents first.")
+    if allowed is not True and split != allowed:
+        raise SystemExit(f"Final scoring is allowed only on --split {allowed}.")
+
+
 def raw_dir(manifest: dict, root: Path, default: Path | None = None) -> Path:
     """Where the manifest's files are saved: its ``raw_dir`` (relative to ``root``)."""
     if manifest.get("raw_dir"):

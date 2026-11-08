@@ -1,7 +1,10 @@
 """Error analysis for the real-world (CISA) evaluation. Read-only: it changes nothing.
 
 Usage:  python scripts/analyse_real_world_errors.py
-        python scripts/analyse_real_world_errors.py --manifest <set>/manifest.json
+        python scripts/analyse_real_world_errors.py --manifest <set>/manifest.json --split dev
+
+On a split manifest only the development split may be analysed, until the test split has
+been scored once (then pass --after-final to analyse its errors).
 
 Prints the most frequent model-only technique suggestions, agreement with CISA by model
 score band, the most common name/term-only matches, and indicator misses/extras versus
@@ -32,8 +35,15 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path,
                         default=ROOT / "data" / "real_world" / "manifest.json")
+    parser.add_argument("--split", choices=rm.SPLITS, default=None)
+    parser.add_argument("--after-final", action="store_true",
+                        help="allow the test split (only after it was scored with --final)")
     args = parser.parse_args()
+    if args.split == "test" and not args.after_final:
+        raise SystemExit("The test split is analysed only after its final scoring "
+                         "(--after-final).")
     manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    selected = {d["id"] for d in rm.in_split(manifest, manifest["documents"], args.split)}
     kb, analyzer = default_technique_kb(), Analyzer()
     gold = json.loads((args.manifest.parent / "gold.json").read_text())
     raw = rm.raw_dir(manifest, ROOT)
@@ -42,6 +52,8 @@ def main() -> None:
     scored: list[tuple[float, bool]] = []
     missed, extra = collections.defaultdict(list), collections.defaultdict(list)
     for doc_id, entry in gold["documents"].items():
+        if doc_id not in selected:
+            continue
         result = analyzer.analyze((raw / f"{doc_id}.pdf").read_bytes(), f"{doc_id}.pdf")
         truth = rw.parents(entry["techniques"], kb)
         if truth:  # same rule as the evaluation: no ATT&CK section, no technique scoring
