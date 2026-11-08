@@ -128,6 +128,7 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     (raw / "doc2.stix.xml").write_text(STIX1, encoding="utf-8")
     manifest = {"documents": [{
         "id": "doc1", "group": "test", "title": "Synthetic", "pdf_name": "x", "stix_name": "y",
+        "published": "2022-05",
         "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
         "stix_sha256": hashlib.sha256(stix).hexdigest()}, {
         "id": "doc2", "group": "test", "title": "No ATT&CK", "pdf_name": "x",
@@ -159,7 +160,13 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     doc1 = results["documents"]["doc1"]
     assert doc1["techniques_evaluated"] is True and doc1["published"]["exact"]["support"] == 2
     assert set(results["overall"]["published_groups"]) == {"id", "name_or_term", "model_only"}
-    assert "Real-world evaluation" in (tmp_path / "out.md").read_text(encoding="utf-8")
+    report = (tmp_path / "out.md").read_text(encoding="utf-8")
+    assert "Real-world evaluation" in report
+    assert "without the cut-off (comparison)" in report and "### By publication period" in report
+    assert "| before 2023 | 1 |" in report and "Advisory types: test 2." in report
+    assert results["model_only_min_score"] == 0.75
+    uncut = results["overall"]["model_only_uncut"]
+    assert uncut["predicted"] >= results["overall"]["published_groups"]["model_only"]["predicted"]
     assert (tmp_path / "gold.json").exists()  # gold is written next to the manifest
 
 

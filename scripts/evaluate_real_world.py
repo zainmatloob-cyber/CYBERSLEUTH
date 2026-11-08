@@ -70,10 +70,16 @@ def _counts(c: Counts) -> dict:
 
 def evaluate(documents: list[dict], gold: dict, kb) -> dict:
     from src.intelligence.analyzer import Analyzer
+    from src.intelligence.mitre_mapper import TechniqueMapper
 
     analyzer = Analyzer()
-    results: dict = {"documents": {}, "attack_version": kb.version}
+    configured = analyzer.technique_mapper
+    # Same KB and model, no document-level cut-off: shows what the cut-off removes.
+    uncut = TechniqueMapper(configured.kb, configured.model, model_only_min_score=None)
+    results: dict = {"documents": {}, "attack_version": kb.version,
+                     "model_only_min_score": configured.model_only_min_score}
     totals = {"published": {g: rw.GroupAgreement() for g in GROUPS},
+              "model_only_uncut": rw.GroupAgreement(),
               "published_counts": [], "masked_counts": {k: [] for k in
                                                         ("all", "name_or_term", "model_only")},
               "ioc": {}}
@@ -91,6 +97,7 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
             "gold_techniques": len(truth), "techniques_evaluated": bool(truth),
             "analysis_seconds": round(published.timings_ms.get("total", 0) / 1000, 2),
             "risk": [round(published.risk.score, 1), published.risk.band],
+            "published_on": doc.get("published"),
         }
         # An advisory without an ATT&CK section gives no technique gold: scoring it would
         # count every prediction as "not cited". Such documents count for IOCs only.
@@ -101,6 +108,12 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
                 total.predicted += group.predicted
                 total.cited_exact += group.cited_exact
                 total.cited_parent += group.cited_parent
+            uncut_group = rw.group_agreement(
+                uncut.map(published.document, published.entities), truth, kb)["model_only"]
+            totals["model_only_uncut"].predicted += uncut_group.predicted
+            totals["model_only_uncut"].cited_exact += uncut_group.cited_exact
+            totals["model_only_uncut"].cited_parent += uncut_group.cited_parent
+            entry["model_only_uncut"] = uncut_group.as_dict()
             published_counts = rw.technique_counts(published.mappings, truth, kb)
             totals["published_counts"].append(published_counts)
             masked_counts = {
@@ -135,6 +148,7 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
 
     results["overall"] = {
         "published_groups": {k: v.as_dict() for k, v in totals["published"].items()},
+        "model_only_uncut": totals["model_only_uncut"].as_dict(),
         "published": {lvl: _counts(micro(c[lvl] for c in totals["published_counts"]))
                       for lvl in ("exact", "parent")},
         "masked": {k: {lvl: _counts(micro(c[lvl] for c in v)) for lvl in ("exact", "parent")}
@@ -147,6 +161,35 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
 
 def _pct(value) -> str:
     return "n/a" if value is None else f"{value:.2f}"
+
+
+def _group_counts(results: dict) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for d in results["documents"].values():
+        counts[d["group"]] = counts.get(d["group"], 0) + 1
+    return counts
+
+
+def _period_section(results: dict) -> list[str]:
+    """Older (before 2023) vs recent advisories, when publication dates are known."""
+    docs = [d for d in results["documents"].values()
+            if d.get("published_on") and d["techniques_evaluated"]]
+    if not docs:
+        return []
+    lines = ["### By publication period", "",
+             "| Period | Advisories | Model-only predicted | Model-only agreement (parent) | "
+             "Masked recall, all methods (parent) |", "|---|---|---|---|---|"]
+    for label, keep in (("before 2023", lambda y: y < 2023), ("2023 onward", lambda y: y >= 2023)):
+        group = [d for d in docs if keep(int(d["published_on"][:4]))]
+        if not group:
+            continue
+        predicted = sum(d["published_groups"]["model_only"]["predicted"] for d in group)
+        cited = sum(d["published_groups"]["model_only"]["cited_parent"] for d in group)
+        recall = micro(Counts(**{k: d["masked"]["all"]["parent"][k] for k in ("tp", "fp", "fn")})
+                       for d in group).recall
+        lines.append(f"| {label} | {len(group)} | {predicted} | "
+                     f"{_pct(cited / predicted if predicted else None)} | {_pct(recall)} |")
+    return [*lines, ""]
 
 
 def render_markdown(results: dict, gold: dict) -> str:
@@ -182,6 +225,22 @@ def render_markdown(results: dict, gold: dict) -> str:
         g = overall["published_groups"][group]
         lines.append(f"| {label} | {g['predicted']} | {_pct(g['agreement_exact'])} | "
                      f"{_pct(g['agreement_parent'])} |")
+    if overall.get("model_only_uncut"):
+        g = overall["model_only_uncut"]
+        lines.append(f"| Model only, without the cut-off (comparison) | {g['predicted']} | "
+                     f"{_pct(g['agreement_exact'])} | {_pct(g['agreement_parent'])} |")
+    cut_off = results.get("model_only_min_score")
+    mo = overall["published_groups"]["model_only"]
+    interval = rw.wilson(mo["cited_parent"], mo["predicted"])
+    lines += [
+        "",
+        f"Model-only cut-off: **{cut_off if cut_off is not None else 'none'}** "
+        "(`config/technique_mapping.json`). Model-only agreement (parent): "
+        f"{mo['cited_parent']} of {mo['predicted']}"
+        + (f", Wilson 95% interval {interval[0]:.2f}–{interval[1]:.2f} (treats suggestions "
+           "as independent; they are not, so the real uncertainty is wider)."
+           if interval else "."),
+    ]
     p = overall["published"]
     lines += [
         "",
@@ -244,6 +303,7 @@ def render_markdown(results: dict, gold: dict) -> str:
     translated = {k: v["translated"] for k, v in gold["documents"].items() if v["translated"]}
     lines += [
         "",
+        *_period_section(results),
         "## 5. Gold-label notes",
         "",
         f"* Cited IDs translated from revoked/deprecated to v20.1: {translated or 'none'}.",
@@ -253,8 +313,8 @@ def render_markdown(results: dict, gold: dict) -> str:
         "",
         f"* {len(results['documents'])} advisories is a small sample; per-document numbers "
         "vary widely. No confidence intervals are claimed.",
-        "* The set was chosen by the project owner and is weighted towards ransomware "
-        "(#StopRansomware) and state-sponsored advisories.",
+        "* The set was chosen by the project owner. Advisory types: "
+        + ", ".join(f"{g} {n}" for g, n in sorted(_group_counts(results).items())) + ".",
         "* CISA's technique list is incomplete by design, so agreement understates precision "
         "and recall against it measures coverage of *CISA's* labels only.",
         "* All are US-government joint advisories with a consistent structure; vendor "

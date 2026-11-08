@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 from pathlib import Path
 
@@ -34,22 +33,12 @@ sys.path.insert(0, str(ROOT))
 
 from src.evaluation import manifest as rm  # noqa: E402
 from src.evaluation import real_world as rw  # noqa: E402
+from src.evaluation.real_world import wilson  # noqa: E402
 
 CANDIDATES = (0.25, 0.5, 0.75)
 TARGET_AGREEMENT = 0.5
 OUT_JSON = ROOT / "docs" / "evaluation" / "real_world_threshold.json"
 OUT_MD = ROOT / "docs" / "evaluation" / "real_world_threshold.md"
-
-
-def wilson(successes: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
-    """Wilson 95% interval for a proportion (treats suggestions as independent)."""
-    if n == 0:
-        return None
-    p = successes / n
-    centre = p + z * z / (2 * n)
-    margin = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
-    denominator = 1 + z * z / n
-    return (centre - margin) / denominator, (centre + margin) / denominator
 
 
 def at_threshold(suggestions: list[dict], threshold: float) -> dict:

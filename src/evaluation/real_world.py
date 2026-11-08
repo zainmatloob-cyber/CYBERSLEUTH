@@ -23,6 +23,7 @@ behaviour they describe. Those figures are labelled agreement, not precision.
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Iterable
 from dataclasses import dataclass, field
@@ -97,6 +98,17 @@ def prediction_group(mapping: TechniqueMapping) -> str:
 def asserted(mappings: Iterable[TechniqueMapping]) -> list[TechniqueMapping]:
     """Mappings the system presents as present (negated ones are excluded)."""
     return [m for m in mappings if m.status.value != "negated"]
+
+
+def wilson(successes: int, n: int, z: float = 1.96) -> tuple[float, float] | None:
+    """Wilson 95% interval for a proportion (treats suggestions as independent)."""
+    if n == 0:
+        return None
+    p = successes / n
+    centre = p + z * z / (2 * n)
+    margin = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    denominator = 1 + z * z / n
+    return (centre - margin) / denominator, (centre + margin) / denominator
 
 
 @dataclass
