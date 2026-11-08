@@ -33,6 +33,16 @@ BAND_ICONS = {"Low": "🟢 Low", "Moderate": "🟡 Moderate", "High": "🟠 High
 FONT = 'system-ui, -apple-system, "Segoe UI", sans-serif'
 
 
+def plain(label: object) -> str:
+    """A chart label shown as text.
+
+    Plotly renders a few HTML tags in labels and hover text, including ``<a href>``, so a
+    document named ``<a href="https://…">x</a>.pdf`` would become a link. Plotly decodes
+    ``&amp; &lt; &gt;``, so escaping them shows the name literally.
+    """
+    return str(label).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def _layout(fig: go.Figure, title: str, height: int) -> go.Figure:
     fig.update_layout(
         title={"text": title, "x": 0, "font": {"size": 15, "color": TEXT_PRIMARY}},
@@ -53,7 +63,8 @@ def horizontal_bar(frame: pd.DataFrame, label: str, value: str, title: str,
     """Single-series magnitude bars, largest at the top."""
     data = frame.iloc[::-1]
     fig = go.Figure(go.Bar(
-        x=data[value], y=data[label], orientation="h", marker={"color": SERIES},
+        x=data[value], y=[plain(v) for v in data[label]], orientation="h",
+        marker={"color": SERIES},
         hovertemplate=f"%{{y}}: %{{x}} {unit}<extra></extra>",
     ))
     fig.update_xaxes(dtick=1 if (frame[value].max() if len(frame) else 0) <= 10 else None)
@@ -77,7 +88,8 @@ def risk_band_bar(frame: pd.DataFrame) -> go.Figure:
 
 def tactic_heatmap(matrix: pd.DataFrame) -> go.Figure:
     fig = go.Figure(go.Heatmap(
-        z=matrix.values, x=list(matrix.columns), y=list(matrix.index),
+        z=matrix.values, x=[plain(c) for c in matrix.columns],
+        y=[plain(i) for i in matrix.index],
         colorscale=[[i / (len(SEQUENTIAL) - 1), c] for i, c in enumerate(SEQUENTIAL)],
         zmin=0, xgap=2, ygap=2,
         colorbar={"title": {"text": "Techniques"}, "tickfont": {"color": MUTED}, "dtick": 1},

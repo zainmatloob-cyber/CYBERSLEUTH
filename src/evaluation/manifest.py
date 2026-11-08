@@ -16,10 +16,14 @@ Two formats are accepted for the STIX files. The current one is a list,
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
 DEFAULT_RAW_DIR = Path("data") / "raw" / "cisa"
+# Advisory IDs become file names: allow only a plain lower-case slug, so no ID can name a
+# path outside raw_dir ("../x") or an absolute path.
+_DOC_ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 
 
 @dataclass(frozen=True)
@@ -46,6 +50,8 @@ def _stix_suffix(published_name: str) -> str:
 
 def manifest_files(doc: dict, raw_dir: Path) -> list[ManifestFile]:
     """Every file of one advisory, with its local path and recorded hash."""
+    if not _DOC_ID.match(str(doc.get("id", ""))):
+        raise ValueError(f"invalid advisory id {doc.get('id')!r}: use a lower-case slug")
     files = []
     if doc.get("pdf_name"):
         files.append(ManifestFile("pdf", doc["pdf_name"], raw_dir / f"{doc['id']}.pdf",

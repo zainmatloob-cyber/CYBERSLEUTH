@@ -65,6 +65,7 @@ _NBSP_TAIL = re.compile(r"(?:&nbsp;?)+$", re.IGNORECASE)
 # A continuation token on the next line: URL characters up to whitespace.
 _CONTINUATION = re.compile(r"[A-Za-z0-9/._~%?=&#:+\-]+")
 _URL_STRUCTURE = frozenset("/.?=&%#_~")
+MAX_URL_LENGTH = 2048
 _FIRST_CVE_YEAR = 1999
 
 # --- regex building blocks ----------------------------------------------------
@@ -228,6 +229,8 @@ class IOCExtractor:
         return tld in self.tlds or tld in _RESERVED_TLDS
 
     def _url(self, raw: str) -> tuple[str, frozenset[IOCFlag]] | None:
+        if len(raw) > MAX_URL_LENGTH:
+            return None  # longer than browsers and servers accept; also the storage limit
         literal = _NBSP_TAIL.sub("", refang(raw).replace("\n", ""))
         scheme, _, rest = literal.partition("://")
         host_end = len(rest)

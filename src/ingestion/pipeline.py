@@ -20,7 +20,7 @@ from src.ingestion.text_cleaner import clean_pages
 from src.ingestion.txt_reader import read_txt
 from src.ingestion.validator import validate_upload
 from src.nlp.preprocessing import SentenceSplitter, split_sentences
-from src.utils.exceptions import EmptyDocumentError
+from src.utils.exceptions import EmptyDocumentError, FileTooLargeError
 
 logger = logging.getLogger(__name__)
 
@@ -71,6 +71,11 @@ def ingest(
 
     report(Stage.EXTRACTING)
     document = _read(file, limits)
+    if document.char_count > limits.max_text_chars:
+        raise FileTooLargeError(
+            f"Extracted text has {document.char_count:,} characters "
+            f"(limit {limits.max_text_chars:,})."
+        )
 
     report(Stage.CLEANING)
     document.pages = clean_pages(document.pages)

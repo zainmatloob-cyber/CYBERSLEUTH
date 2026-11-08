@@ -49,6 +49,7 @@ def read_pdf(file: ValidatedFile, limits: IngestionSettings | None = None) -> Ex
         pages: list[PageText] = []
         scanned_pages: list[int] = []
         failed_pages: list[int] = []
+        total_chars = 0
 
         for index, page in enumerate(doc):
             number = index + 1
@@ -63,6 +64,11 @@ def read_pdf(file: ValidatedFile, limits: IngestionSettings | None = None) -> Ex
             else:
                 if len(text.strip()) < limits.min_chars_per_text_page and page.get_images():
                     scanned_pages.append(number)
+            total_chars += len(text)
+            if total_chars > limits.max_text_chars:  # stop early: don't extract the rest
+                raise FileTooLargeError(
+                    f"PDF text exceeds {limits.max_text_chars:,} characters by page {number}."
+                )
             pages.append(PageText(page_number=number, text=text))
 
         raw_metadata = doc.metadata or {}

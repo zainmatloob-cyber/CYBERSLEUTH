@@ -233,8 +233,9 @@ Evaluate extraction quality: `python scripts/evaluate_extraction.py --split dev`
 
 ## Configuration
 
-Limits are defined in [`config/settings.py`](config/settings.py). Override them
-with environment variables:
+Limits are defined in [`config/settings.py`](config/settings.py); see
+[docs/security.md](docs/security.md) for the security review and the reasons for each limit.
+Override them with environment variables:
 
 | Variable | Default |
 |---|---|
@@ -242,6 +243,7 @@ with environment variables:
 | `CYBERSLEUTH_MAX_PDF_PAGES` | 500 |
 | `CYBERSLEUTH_MAX_DOCX_UNCOMPRESSED_MB` | 100 |
 | `CYBERSLEUTH_MAX_DOCX_ZIP_ENTRIES` | 2000 |
+| `CYBERSLEUTH_MAX_TEXT_CHARS` | 2000000 (extracted text, all formats) |
 | `CYBERSLEUTH_MIN_CHARS_PER_TEXT_PAGE` | 20 |
 | `CYBERSLEUTH_LOG_LEVEL` | INFO |
 | `CYBERSLEUTH_SPACY_MODEL` | en_core_web_sm |
