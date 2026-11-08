@@ -1,6 +1,7 @@
 """Error analysis for the real-world (CISA) evaluation. Read-only: it changes nothing.
 
 Usage:  python scripts/analyse_real_world_errors.py
+        python scripts/analyse_real_world_errors.py --manifest <set>/manifest.json
 
 Prints the most frequent model-only technique suggestions, agreement with CISA by model
 score band, the most common name/term-only matches, and indicator misses/extras versus
@@ -10,6 +11,7 @@ here is used to tune the system: the real-world set is a test set.
 
 from __future__ import annotations
 
+import argparse
 import collections
 import json
 import sys
@@ -18,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation import manifest as rm  # noqa: E402
 from src.evaluation import real_world as rw  # noqa: E402
 from src.intelligence.analyzer import Analyzer  # noqa: E402
 from src.intelligence.attack_kb import default_technique_kb  # noqa: E402
@@ -26,9 +29,14 @@ BANDS = ((float("-inf"), 0.25), (0.25, 0.5), (0.5, 0.75), (0.75, float("inf")))
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--manifest", type=Path,
+                        default=ROOT / "data" / "real_world" / "manifest.json")
+    args = parser.parse_args()
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
     kb, analyzer = default_technique_kb(), Analyzer()
-    gold = json.loads((ROOT / "data" / "real_world" / "gold.json").read_text())
-    raw = ROOT / "data" / "raw" / "cisa"
+    gold = json.loads((args.manifest.parent / "gold.json").read_text())
+    raw = rm.raw_dir(manifest, ROOT)
     model_tech: collections.Counter = collections.Counter()
     name_only: collections.Counter = collections.Counter()
     scored: list[tuple[float, bool]] = []

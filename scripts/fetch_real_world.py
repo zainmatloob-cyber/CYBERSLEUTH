@@ -1,13 +1,14 @@
-"""Verify the real-world evaluation set (public CISA advisories).
+"""Verify a real-world evaluation set (public CISA advisories).
 
-Usage:  python scripts/fetch_real_world.py            # verify files against the manifest
-        python scripts/fetch_real_world.py --record   # first time only: record SHA-256s
+Usage:  python scripts/fetch_real_world.py                      # verify the first set
+        python scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json
+        python scripts/fetch_real_world.py --record             # first time only
 
 The documents are not redistributed and are downloaded by hand: cisa.gov's CDN refuses
 automated clients, and this project does not try to get around that. For each advisory in
-data/real_world/manifest.json, open the advisory page, download the PDF (and the STIX JSON
-when listed), and save them in data/raw/cisa/ as ``<id>.pdf`` and ``<id>.stix.json`` (or
-``<id>.stix.xml`` for an older STIX 1.x file).
+the manifest, open the advisory page, download the PDF (and the STIX files when listed),
+and save them in the manifest's ``raw_dir`` under the local names described in
+``src/evaluation/manifest.py`` (``<id>.pdf``, ``<id>.stix.json``, ...).
 Every file must match the recorded SHA-256, so the evaluation always runs on exactly the
 documents it was scored on.
 """
@@ -17,21 +18,16 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from src.evaluation import manifest as rm  # noqa: E402
+
 MANIFEST = ROOT / "data" / "real_world" / "manifest.json"
-RAW_DIR = ROOT / "data" / "raw" / "cisa"
 PAGE_URL = "https://www.cisa.gov/news-events/cybersecurity-advisories/{id}"
-KINDS = ("pdf", "stix")
-
-
-def local_path(doc_id: str, kind: str, published_name: str) -> Path:
-    """<id>.pdf, <id>.stix.json (STIX 2.x) or <id>.stix.xml (STIX 1.x)."""
-    if kind == "pdf":
-        return RAW_DIR / f"{doc_id}.pdf"
-    xml = published_name.lower().endswith(".xml")
-    return RAW_DIR / f"{doc_id}.stix.{'xml' if xml else 'json'}"
 
 
 def sha256(path: Path) -> str:
@@ -40,34 +36,31 @@ def sha256(path: Path) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--manifest", type=Path, default=MANIFEST)
     parser.add_argument("--record", action="store_true",
                         help="record hashes of the files in the manifest")
     args = parser.parse_args()
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    manifest = json.loads(args.manifest.read_text(encoding="utf-8"))
+    raw_dir = rm.raw_dir(manifest, ROOT)
     failures = 0
     for doc in manifest["documents"]:
-        for kind in KINDS:
-            published_name = doc.get(f"{kind}_name")
-            if not published_name:
-                continue
-            path = local_path(doc["id"], kind, published_name)
-            if not path.exists():
-                print(f"MISSING {path.name}: download '{published_name}' from "
-                      f"{PAGE_URL.format(id=doc['id'])}\n  and save it as {path}")
+        for file in rm.manifest_files(doc, raw_dir):
+            if not file.path.exists():
+                print(f"MISSING {file.path.name}: download '{file.published_name}' from "
+                      f"{PAGE_URL.format(id=doc['id'])}\n  and save it as {file.path}")
                 failures += 1
                 continue
-            digest = sha256(path)
-            key = f"{kind}_sha256"
+            digest = sha256(file.path)
             if args.record:
-                doc[key] = digest
-            elif doc.get(key) != digest:
-                print(f"HASH MISMATCH {path.name}: expected {doc.get(key)}, got {digest}")
+                rm.record_hash(doc, file, digest)
+            elif file.sha256 != digest:
+                print(f"HASH MISMATCH {file.path.name}: expected {file.sha256}, got {digest}")
                 failures += 1
             else:
-                print(f"OK {path.name}")
+                print(f"OK {file.path.name}")
     if args.record and not failures:
-        MANIFEST.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
-                            encoding="utf-8")
+        args.manifest.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
+                                 encoding="utf-8")
         print("Hashes recorded.")
     return 1 if failures else 0
 

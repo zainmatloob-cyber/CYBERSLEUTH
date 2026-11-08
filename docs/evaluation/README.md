@@ -83,3 +83,20 @@ suggestions agree with CISA only 10% of the time; IP and hash extraction are nea
 Method and caveats are in `src/evaluation/real_world.py`. The main question is how often
 model-only technique suggestions agree with what CISA cites. A suggestion CISA doesn't cite
 isn't necessarily wrong, so this is reported as agreement, not precision.
+
+### Second set (threshold selection and test)
+Seventeen further CISA advisories, published from 2022 to 2025, none of them in the first
+set: `data/real_world/batch2/manifest.json`. Files live in `data/raw/cisa/batch2/`, and
+advisories with several STIX bundles list them all (`"stix": [...]`).
+* **Purpose:** choose a real-world abstention threshold for model-only suggestions on a
+  development split, then test it once on the remaining advisories.
+* **Inclusion rule**, applied before any analysis: an Enterprise ATT&CK section citing about 9
+  or more technique IDs, and not focused on ICS. Rejected downloads and the reasons are
+  listed in the manifest.
+* **Scoring is locked** (`"final_scoring": false`) until the split is recorded, so
+  `--final` refuses to run on it.
+
+```text
+python scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json
+python scripts/evaluate_real_world.py --manifest data/real_world/batch2/manifest.json  # gold only
+```

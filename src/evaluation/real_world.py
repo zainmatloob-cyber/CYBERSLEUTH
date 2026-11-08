@@ -246,6 +246,15 @@ def load_stix(path) -> dict[IOCType, set[str]]:
     return stix_indicators(json.loads(text))
 
 
+def load_stix_files(paths) -> dict[IOCType, set[str]]:
+    """The union of several STIX files (an advisory may publish more than one bundle)."""
+    merged: dict[IOCType, set[str]] = {}
+    for path in paths:
+        for ioc_type, values in load_stix(path).items():
+            merged.setdefault(ioc_type, set()).update(values)
+    return merged
+
+
 def extracted_indicators(indicators: Iterable[Indicator]) -> dict[IOCType, set[str]]:
     found: dict[IOCType, set[str]] = {t: set() for t in COMPARED_IOC_TYPES}
     for indicator in indicators:

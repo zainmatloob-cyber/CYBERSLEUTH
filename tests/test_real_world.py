@@ -136,7 +136,6 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     assert plain  # the sample set exists
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
     for name, value in {"MANIFEST": tmp_path / "manifest.json", "RAW_DIR": raw,
-                        "GOLD_PATH": tmp_path / "gold.json",
                         "OUT_JSON": tmp_path / "out.json", "OUT_MD": tmp_path / "out.md",
                         "ROOT": tmp_path}.items():
         monkeypatch.setattr(script, name, value)
@@ -161,6 +160,7 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     assert doc1["techniques_evaluated"] is True and doc1["published"]["exact"]["support"] == 2
     assert set(results["overall"]["published_groups"]) == {"id", "name_or_term", "model_only"}
     assert "Real-world evaluation" in (tmp_path / "out.md").read_text(encoding="utf-8")
+    assert (tmp_path / "gold.json").exists()  # gold is written next to the manifest
 
 
 def test_evaluation_script_refuses_missing_files(tmp_path, monkeypatch):
@@ -231,3 +231,112 @@ def test_load_stix_picks_parser_by_extension(tmp_path):
     (tmp_path / "b.stix.json").write_text(json.dumps(STIX), encoding="utf-8")
     assert rw.load_stix(tmp_path / "a.stix.xml")[IOCType.MD5]
     assert rw.load_stix(tmp_path / "b.stix.json")[IOCType.SHA1] == {"e" * 40}
+
+
+# --- manifests (src/evaluation/manifest.py) ------------------------------------------
+
+
+def test_manifest_reads_both_stix_formats_and_names_local_files(tmp_path):
+    from src.evaluation import manifest as rm
+
+    legacy = {"id": "a1", "pdf_name": "A1.pdf", "pdf_sha256": "p",
+              "stix_name": "A1.stix_.xml", "stix_sha256": "s"}
+    files = rm.manifest_files(legacy, tmp_path)
+    assert [(f.kind, f.path.name, f.sha256) for f in files] == [
+        ("pdf", "a1.pdf", "p"), ("stix", "a1.stix.xml", "s")]
+
+    several = {"id": "b2", "pdf_name": "B2.pdf", "stix": [
+        {"name": "B2 part one.stix.xml", "sha256": None},
+        {"name": "B2-2.stix_.json", "sha256": "t"}]}
+    names = [f.path.name for f in rm.manifest_files(several, tmp_path)]
+    assert names == ["b2.pdf", "b2.stix-1.xml", "b2.stix-2.json"]
+    assert rm.manifest_files({"id": "c3", "pdf_name": "C3.pdf"}, tmp_path)[0].kind == "pdf"
+    assert len(rm.manifest_files({"id": "c3", "pdf_name": "C3.pdf",
+                                  "stix_name": None}, tmp_path)) == 1
+
+
+def test_manifest_record_hash_keeps_the_format(tmp_path):
+    from src.evaluation import manifest as rm
+
+    legacy = {"id": "a1", "pdf_name": "A1.pdf", "stix_name": "A1.json"}
+    for f in rm.manifest_files(legacy, tmp_path):
+        rm.record_hash(legacy, f, f"h-{f.kind}")
+    assert legacy["pdf_sha256"] == "h-pdf" and legacy["stix_sha256"] == "h-stix"
+    assert "stix" not in legacy
+
+    several = {"id": "b2", "pdf_name": "B2.pdf",
+               "stix": [{"name": "x.xml"}, {"name": "y.json"}]}
+    for f in rm.manifest_files(several, tmp_path):
+        rm.record_hash(several, f, f.path.name)
+    assert [e["sha256"] for e in several["stix"]] == ["b2.stix-1.xml", "b2.stix-2.json"]
+    assert "stix_sha256" not in several
+
+
+def test_manifest_raw_dir(tmp_path):
+    from src.evaluation import manifest as rm
+
+    assert rm.raw_dir({"raw_dir": "data/raw/x"}, tmp_path) == tmp_path / "data/raw/x"
+    assert rm.raw_dir({}, tmp_path) == tmp_path / rm.DEFAULT_RAW_DIR
+    assert rm.raw_dir({}, tmp_path, tmp_path / "d") == tmp_path / "d"
+
+
+def test_load_stix_files_merges_bundles(tmp_path):
+    import json
+    (tmp_path / "a.stix-1.xml").write_text(STIX1, encoding="utf-8")
+    (tmp_path / "a.stix-2.json").write_text(json.dumps(STIX), encoding="utf-8")
+    merged = rw.load_stix_files([tmp_path / "a.stix-1.xml", tmp_path / "a.stix-2.json"])
+    one, two = rw.load_stix(tmp_path / "a.stix-1.xml"), rw.load_stix(tmp_path / "a.stix-2.json")
+    for ioc_type in set(one) | set(two):
+        assert merged[ioc_type] == one.get(ioc_type, set()) | two.get(ioc_type, set())
+    assert merged[IOCType.MD5] and merged[IOCType.SHA1] == {"e" * 40}
+
+
+def _evaluation_script():
+    import importlib.util
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parent.parent
+    spec = importlib.util.spec_from_file_location(
+        "evaluate_real_world", root / "scripts" / "evaluate_real_world.py")
+    script = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(script)
+    return script
+
+
+def test_load_documents_uses_raw_dir_and_several_stix_files(tmp_path, monkeypatch):
+    import hashlib
+    import json
+
+    script = _evaluation_script()
+    raw = tmp_path / "data" / "raw" / "set2"
+    raw.mkdir(parents=True)
+    contents = {"d1.pdf": b"%PDF-1.4 x", "d1.stix-1.xml": STIX1.encode(),
+                "d1.stix-2.json": json.dumps(STIX).encode()}
+    for name, data in contents.items():
+        (raw / name).write_bytes(data)
+    digest = {n: hashlib.sha256(d).hexdigest() for n, d in contents.items()}
+    manifest = {"raw_dir": "data/raw/set2", "documents": [{
+        "id": "d1", "pdf_name": "D1.pdf", "pdf_sha256": digest["d1.pdf"],
+        "stix": [{"name": "D1.xml", "sha256": digest["d1.stix-1.xml"]},
+                 {"name": "D1-2.json", "sha256": digest["d1.stix-2.json"]}]}]}
+    monkeypatch.setattr(script, "ROOT", tmp_path)
+    doc = script.load_documents(manifest)[0]
+    assert doc["pdf_path"] == raw / "d1.pdf"
+    assert doc["stix_paths"] == [raw / "d1.stix-1.xml", raw / "d1.stix-2.json"]
+
+    manifest["documents"][0]["stix"][1]["sha256"] = "0" * 64
+    with pytest.raises(SystemExit, match="hash mismatch d1.stix-2.json"):
+        script.load_documents(manifest)
+
+
+def test_final_scoring_refused_for_an_unsplit_manifest(tmp_path, monkeypatch):
+    import json
+
+    script = _evaluation_script()
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps({"final_scoring": False, "documents": []}))
+    monkeypatch.setattr("sys.argv", ["evaluate_real_world.py", "--manifest", str(path),
+                                     "--final"])
+    with pytest.raises(SystemExit, match="not open for final scoring"):
+        script.main()
+    assert not (tmp_path / "gold.json").exists()  # refused before anything is written

@@ -4,9 +4,12 @@ Usage:
     python scripts/fetch_real_world.py              # get and verify the documents first
     python scripts/evaluate_real_world.py           # verify files + write gold labels only
     python scripts/evaluate_real_world.py --final   # score once; writes docs/evaluation/
+    python scripts/evaluate_real_world.py --manifest data/real_world/batch2/manifest.json
 
 Without --final no predictions are computed, so the gold labels can be inspected before
-the code is frozen and scored. Scoring requires both trained models.
+the code is frozen and scored. Gold labels are written next to the manifest. A manifest
+with ``"final_scoring": false`` (a set not yet split into development and test documents)
+cannot be scored with --final. Scoring requires both trained models.
 """
 
 from __future__ import annotations
@@ -20,39 +23,39 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from src.evaluation import manifest as rm  # noqa: E402
 from src.evaluation import real_world as rw  # noqa: E402
 from src.evaluation.metrics import Counts, micro  # noqa: E402
 from src.ingestion.pipeline import ingest  # noqa: E402
 from src.intelligence.attack_kb import default_technique_kb  # noqa: E402
 
 MANIFEST = ROOT / "data" / "real_world" / "manifest.json"
-GOLD_PATH = ROOT / "data" / "real_world" / "gold.json"
 RAW_DIR = ROOT / "data" / "raw" / "cisa"
 OUT_JSON = ROOT / "docs" / "evaluation" / "real_world.json"
 OUT_MD = ROOT / "docs" / "evaluation" / "real_world.md"
 GROUPS = ("id", "name_or_term", "model_only")
 
 
-def local_suffix(kind: str, published_name: str) -> str:
-    """``pdf``, ``stix.json`` (STIX 2.x) or ``stix.xml`` (STIX 1.x)."""
-    if kind == "pdf":
-        return "pdf"
-    return "stix.xml" if published_name.lower().endswith(".xml") else "stix.json"
+def load_manifest(path: Path | None = None) -> dict:
+    return json.loads((path or MANIFEST).read_text(encoding="utf-8"))
 
 
-def load_documents() -> list[dict]:
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+def load_documents(manifest: dict | None = None) -> list[dict]:
+    """The manifest's documents with ``pdf_path`` and ``stix_paths``, hashes verified."""
+    manifest = manifest if manifest is not None else load_manifest()
+    raw_dir = rm.raw_dir(manifest, ROOT, RAW_DIR)
     problems = []
     for doc in manifest["documents"]:
-        for kind in ("pdf", "stix"):
-            if not doc.get(f"{kind}_name"):
-                continue
-            path = RAW_DIR / f"{doc['id']}.{local_suffix(kind, doc[f'{kind}_name'])}"
-            if not path.exists():
-                problems.append(f"missing {path.name}")
-            elif hashlib.sha256(path.read_bytes()).hexdigest() != doc.get(f"{kind}_sha256"):
-                problems.append(f"hash mismatch {path.name}")
-            doc[f"{kind}_path"] = path
+        doc["stix_paths"] = []
+        for file in rm.manifest_files(doc, raw_dir):
+            if not file.path.exists():
+                problems.append(f"missing {file.path.name}")
+            elif hashlib.sha256(file.path.read_bytes()).hexdigest() != file.sha256:
+                problems.append(f"hash mismatch {file.path.name}")
+            if file.kind == "pdf":
+                doc["pdf_path"] = file.path
+            else:
+                doc["stix_paths"].append(file.path)
     if problems:
         raise SystemExit("Run scripts/fetch_real_world.py first: " + "; ".join(problems))
     return manifest["documents"]
@@ -69,8 +72,8 @@ def build_gold(documents: list[dict], kb) -> dict:
         cited = rw.cited_techniques(document_text(doc["pdf_path"]), kb)
         entry = {"techniques": sorted(cited.resolved), "translated": cited.translated,
                  "unresolved": cited.unresolved}
-        if doc.get("stix_path"):
-            stix = rw.load_stix(doc["stix_path"])
+        if doc["stix_paths"]:
+            stix = rw.load_stix_files(doc["stix_paths"])
             entry["stix"] = {t.value: sorted(v) for t, v in stix.items() if v}
         gold["documents"][doc["id"]] = entry
     return gold
@@ -129,7 +132,7 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
                 "masked": {k: {lvl: _counts(c) for lvl, c in v.items()}
                            for k, v in masked_counts.items()},
             }
-        if doc.get("stix_path"):
+        if doc["stix_paths"]:
             stix = {rw.IOCType(t): set(v) for t, v in gold["documents"][doc["id"]]["stix"].items()}
             stix = {t: stix.get(t, set()) for t in rw.COMPARED_IOC_TYPES}
             agreement = rw.ioc_agreement(rw.extracted_indicators(published.indicators), stix,
@@ -281,18 +284,26 @@ def render_markdown(results: dict, gold: dict) -> str:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--manifest", type=Path, default=None,
+                        help="manifest of the set (default: the first 14-advisory set)")
     parser.add_argument("--final", action="store_true", help="score once and write reports")
     args = parser.parse_args()
+    manifest_path = args.manifest or MANIFEST
+    manifest = load_manifest(manifest_path)
+    if args.final and manifest.get("final_scoring") is False:
+        raise SystemExit(f"{manifest_path.name} is not open for final scoring: "
+                         "split it into development and test documents first.")
+    gold_path = manifest_path.parent / "gold.json"
     kb = default_technique_kb()
-    documents = load_documents()
+    documents = load_documents(manifest)
     gold = build_gold(documents, kb)
-    GOLD_PATH.write_text(json.dumps(gold, indent=2) + "\n", encoding="utf-8")
+    gold_path.write_text(json.dumps(gold, indent=2) + "\n", encoding="utf-8")
     for doc_id, entry in gold["documents"].items():
         stix = {t: len(v) for t, v in entry.get("stix", {}).items()}
         print(f"{doc_id}: {len(entry['techniques'])} techniques, translated "
               f"{entry['translated']}, unresolved {entry['unresolved']}, STIX {stix}")
     if not args.final:
-        print(f"Gold written to {GOLD_PATH.relative_to(ROOT)}. Re-run with --final to score.")
+        print(f"Gold written to {gold_path}. Re-run with --final to score.")
         return 0
     results = evaluate(documents, gold, kb)
     OUT_JSON.write_text(json.dumps(results, indent=2) + "\n", encoding="utf-8")

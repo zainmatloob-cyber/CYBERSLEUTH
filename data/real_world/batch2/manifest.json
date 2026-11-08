@@ -1,0 +1,228 @@
+{
+  "description": "Second set of public CISA advisories (TLP:CLEAR), used to choose a real-world abstention threshold for model-only technique suggestions (development split) and to test it (test split). None of these documents is in the first 14-advisory set. Documents are not redistributed: download each file from its advisory page and save it under raw_dir with the local names in src/evaluation/manifest.py, then run scripts/fetch_real_world.py --manifest data/real_world/batch2/manifest.json.",
+  "retrieved": "2026-11-08",
+  "raw_dir": "data/raw/cisa/batch2",
+  "final_scoring": false,
+  "selection": "Downloaded by the project owner after an advisory list was suggested; archived advisories were allowed. Inclusion rule, applied before any analysis was run: an Enterprise ATT&CK technique section citing about 9 or more technique IDs, not focused on industrial control systems, and not in the first set. File names were given a '-new-batch' suffix on download; it is removed from the published names recorded here.",
+  "excluded": {
+    "AA23-025A, AA23-131A": "byte-identical to files already in the first set",
+    "AA22-057A, AA23-039A, AA23-215A, top CVEs exploited by PRC actors": "no ATT&CK technique IDs cited",
+    "AA25-343A": "mainly ATT&CK for ICS techniques (13 ICS vs 5 Enterprise IDs); the knowledge base is Enterprise only",
+    "AA22-137A (5 IDs), AA23-335A (1 or 6 IDs), AA23-353A (5 IDs), AA26-097A (3 IDs), APT28 router advisory (3 IDs), Fast Flux (1 ID)": "too few cited techniques: most model suggestions would count as disagreement by default"
+  },
+  "documents": [
+    {
+      "id": "aa22-047a",
+      "group": "state-sponsored",
+      "title": "Russian State-Sponsored Cyber Actors Target Cleared Defense Contractor Networks",
+      "published": "2022-02",
+      "pdf_name": "AA22-047A Russian State-Sponsored Cyber Actors Target CDC Networks.pdf",
+      "pdf_sha256": "cc46b044aeab17405f4317abe36d9176dc1328942db053ce1a77b7f4bec3ca35",
+      "stix": []
+    },
+    {
+      "id": "aa22-152a",
+      "group": "ransomware",
+      "title": "Karakurt Data Extortion Group",
+      "published": "2022-06",
+      "pdf_name": "aa22-152a-karakurt-data-extortion-group.pdf",
+      "pdf_sha256": "6cee719defc295025403be7e10cac3c5aedfc8790febbb87c57ef882ec8f1b5c",
+      "stix": [
+        {
+          "name": "AA22-152A.stix.xml",
+          "sha256": "6ea639b3bae77fda93311702c13a3fe0efeed0c3195b754cfb395531a15b4f50"
+        }
+      ]
+    },
+    {
+      "id": "aa22-174a",
+      "group": "exploitation",
+      "title": "Malicious Cyber Actors Continue to Exploit Log4Shell in VMware Horizon Systems",
+      "published": "2022-06",
+      "pdf_name": "AA22-174A_Joint_CSA_Malicious_Cyber_Actors_Exploiting_Log4Shell_in_Unpatched_VMware_Horizon_Systems_FINAL.pdf",
+      "pdf_sha256": "368d090969cd89d72e772bd878691623a9ca7914dbf91a549d9ef77f155373bf",
+      "stix": [
+        {
+          "name": "AA22-174A.stix.xml",
+          "sha256": "b92ae55f1e0efff75228b2a3ff11100da9dccaad0cd8e550448ae327d54cae3b"
+        }
+      ]
+    },
+    {
+      "id": "aa22-249a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Vice Society",
+      "published": "2022-09",
+      "pdf_name": "aa22-249a-stopransomware-vice-society.pdf",
+      "pdf_sha256": "4f2e2f9396f22e42386992e9da6b1e2e591081b861c3fa3187a4093a1796fdb7",
+      "stix": [
+        {
+          "name": "AA22-249A.stix.xml",
+          "sha256": "35c45ff5927a9b7014d3fb462b3badd9ab6028a958a078a5c0b12bc7310cffdf"
+        }
+      ]
+    },
+    {
+      "id": "aa22-294a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Daixin Team",
+      "published": "2022-10",
+      "pdf_name": "aa22-294a-stopransomware-daixin-team.pdf",
+      "pdf_sha256": "f1ae7f1f286d6fceb7e83c39a35f6de99455f49dcb3565d00f0c76c5890b8bec",
+      "stix": [
+        {
+          "name": "aa22-294a.stix_.xml",
+          "sha256": "b4d69a9e4f7c7e4cf0ae2082083dc1a02a3045734eab3e5436e79b4bafdacbe5"
+        }
+      ]
+    },
+    {
+      "id": "aa22-320a",
+      "group": "state-sponsored",
+      "title": "Iranian Government-Sponsored APT Actors Compromise Federal Network",
+      "published": "2022-11",
+      "pdf_name": "aa22-320a_joint_csa_iranian_government-sponsored_apt_actors_compromise_federal network_deploy_crypto miner_credential_harvester.pdf",
+      "pdf_sha256": "beacab7d0ed36ddc4e51b3e7a00e24ac9c612bfb29dffde3ffef01597b4109e2",
+      "stix": [
+        {
+          "name": "AA22-320A.stix.xml",
+          "sha256": "3ff8023c310cf7daeb5451dca9cb0666952a6ed5ddcdfe0dbad645ff90c30f1c"
+        }
+      ]
+    },
+    {
+      "id": "aa22-335a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Cuba Ransomware",
+      "published": "2022-12",
+      "pdf_name": "aa22-335a-stopransomware-cuba-ransomware.pdf",
+      "pdf_sha256": "2e1db6e981415680a46c799fe7090b900819c8eb973e714ed52aa5e642982a0d",
+      "stix": [
+        {
+          "name": "AA22-335A StopRansomware Cuba Ransomware.stix.xml",
+          "sha256": "aebb32e99342f7ba01143965a365167631676be762ba98645f32e91192a904b3"
+        },
+        {
+          "name": "AA22-335A-2.stix.xml",
+          "sha256": "5d7e53c192b7a9fe3d1ed7920fa157e3553fd19dc45a5f0c1aef682cde34b256"
+        }
+      ],
+      "note": "Indicators are published in two STIX files; both are used."
+    },
+    {
+      "id": "aa23-059a",
+      "group": "red-team",
+      "title": "CISA Red Team Shares Key Findings to Improve Monitoring and Hardening of Networks",
+      "published": "2023-02",
+      "pdf_name": "aa23-059a-cisa_red_team_shares_key_findings_to_improve_monitoring_and_hardening_of_networks_1.pdf",
+      "pdf_sha256": "fda60b1d63b8720a5b142389ff1554f661fcaedf56ec3aacd093a15829607f7f",
+      "stix": []
+    },
+    {
+      "id": "aa23-144a",
+      "group": "state-sponsored",
+      "title": "People's Republic of China State-Sponsored Cyber Actor Living off the Land to Evade Detection",
+      "published": "2023-05",
+      "pdf_name": "CSA_PRC_State_Sponsored_Cyber_Living_off_the_Land_v1.1.pdf",
+      "pdf_sha256": "1ba216c39a5dd90c9f7549235eca363a31ccb6532ff4bef1cae7b1d4b023f7d3",
+      "stix": [
+        {
+          "name": "AA23-144A_PRC_State-Sponsored_Cyber_Actor_Living_Off_the_Land_to_Evade_Detection.stix.json",
+          "sha256": "a44ae1fff3f239877a663cae1ba244d1c15bbc013e1cc5a6338f1d5d2c1cb789"
+        }
+      ],
+      "note": "The PDF (v1.1) does not print its advisory ID; AA23-144A is taken from the STIX file."
+    },
+    {
+      "id": "aa23-165a",
+      "group": "ransomware",
+      "title": "Understanding Ransomware Threat Actors: LockBit",
+      "published": "2023-06",
+      "pdf_name": "aa23-165a_understanding_TA_LockBit_0.pdf",
+      "pdf_sha256": "ee5f1bd8d8ab0bedac1b11b69dc482ec7073f280d4f0c644334c015a463cf29c",
+      "stix": []
+    },
+    {
+      "id": "aa23-250a",
+      "group": "state-sponsored",
+      "title": "Multiple Nation-State Threat Actors Exploit CVE-2022-47966 and CVE-2022-42475",
+      "published": "2023-09",
+      "pdf_name": "aa23-250a-apt-actors-exploit-cve-2022-47966-and-cve-2022-42475_1.pdf",
+      "pdf_sha256": "60cf9eee5c2ee48312fe324afda290555e8aec4b6fa643993e383d88737ff567",
+      "stix": [
+        {
+          "name": "AA23-250A Multiple Nation-State Threat Actors Exploit CVE-2022-47966 and CVE-2022-42475.stix_.json",
+          "sha256": "73487d99faa533b9aaaee5228b49431ce37be91a84088880a781a5a4bde4f29c"
+        }
+      ]
+    },
+    {
+      "id": "aa23-278a",
+      "group": "red-team",
+      "title": "NSA and CISA Red and Blue Teams Share Top Ten Cybersecurity Misconfigurations",
+      "published": "2023-10",
+      "pdf_name": "JOINT_CSA_TOP_TEN_MISCONFIGURATIONS_TLP-CLEAR.pdf",
+      "pdf_sha256": "de94d8c2e226f273a1d412f1abebbe4f9a1aa3fcbff273ac8c77751c0516ef54",
+      "stix": [],
+      "note": "The PDF does not print its advisory ID; AA23-278A is CISA's number for this October 2023 advisory (to be confirmed on the advisory page)."
+    },
+    {
+      "id": "aa23-320a",
+      "group": "cybercrime",
+      "title": "Scattered Spider",
+      "published": "2023-11",
+      "pdf_name": "aa23-320a_scattered_spider_0.pdf",
+      "pdf_sha256": "896169adc12391372fe2b69d0f83321f21a5baa7753f8c155122ff37e3d946ae",
+      "stix": []
+    },
+    {
+      "id": "aa23-349a",
+      "group": "assessment",
+      "title": "Enhancing Cyber Resilience: Insights from CISA Healthcare and Public Health Sector Risk and Vulnerability Assessment",
+      "published": "2023-12",
+      "pdf_name": "aa23-349a-risk-vulnerability-assessment-healthcare-public-health-sector.pdf",
+      "pdf_sha256": "d6287622ea34d6b99c282648cc54a147c56b8ee4b1cc6101d3dd484dbd0f403f",
+      "stix": []
+    },
+    {
+      "id": "aa24-057a",
+      "group": "state-sponsored",
+      "title": "SVR Cyber Actors Adapt Tactics for Initial Cloud Access",
+      "published": "2024-02",
+      "pdf_name": "Advisory-SVR-cyber-actors-adapt-tactics-for-initial-cloud-access.pdf",
+      "pdf_sha256": "a6b0fef6485adfc3e47c7bf5eb25e61e9364b1c26431d610a6f16b2dafb4bc98",
+      "stix": [],
+      "note": "The PDF (UK NCSC layout, February 2024) does not print its advisory ID; AA24-057A is CISA's number for it (to be confirmed on the advisory page)."
+    },
+    {
+      "id": "aa24-109a",
+      "group": "ransomware",
+      "title": "#StopRansomware: Akira Ransomware",
+      "published": "2024-04",
+      "pdf_name": "aa24-109a-stopransomware-akira-ransomware.pdf",
+      "pdf_sha256": "e9bfc0fb11c743ce865f860cd5e0eeddfaea0fbdf235e67acc31b324bc95ea1d",
+      "stix": [
+        {
+          "name": "AA24-109A-#StopRansomware-Akira-Ransomware.stix_.json",
+          "sha256": "3998fc8b3ad54b69787c466ce1559e1e057b0b39445f5db44f7bab08ad7be923"
+        }
+      ],
+      "note": "The PDF is the November 2025 update."
+    },
+    {
+      "id": "aa25-141a",
+      "group": "state-sponsored",
+      "title": "Russian GRU Targeting Western Logistics Entities and Technology Companies",
+      "published": "2025-05",
+      "pdf_name": "CSA_Russian_GRU_Target_Logistics_v1-1.pdf",
+      "pdf_sha256": "cc9952eebbb3d2906ccea1abc8abf447b6b9c285f8b89f9caaac6bcff6237f55",
+      "stix": [
+        {
+          "name": "AA25-141A_Russian_GRU_Targeting_Western_Logistics_Entities_and_Technology_Companies.stix.json",
+          "sha256": "c6102ca1da59c0865a4671f406f36c74a7ed1783c004a0641296655bb7c80dea"
+        }
+      ],
+      "note": "The PDF (v1.1, April 2026) does not print its advisory ID; AA25-141A is taken from the STIX file."
+    }
+  ]
+}
