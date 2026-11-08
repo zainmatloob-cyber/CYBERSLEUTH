@@ -33,14 +33,21 @@ OUT_MD = ROOT / "docs" / "evaluation" / "real_world.md"
 GROUPS = ("id", "name_or_term", "model_only")
 
 
+def local_suffix(kind: str, published_name: str) -> str:
+    """``pdf``, ``stix.json`` (STIX 2.x) or ``stix.xml`` (STIX 1.x)."""
+    if kind == "pdf":
+        return "pdf"
+    return "stix.xml" if published_name.lower().endswith(".xml") else "stix.json"
+
+
 def load_documents() -> list[dict]:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     problems = []
     for doc in manifest["documents"]:
-        for kind, suffix in (("pdf", "pdf"), ("stix", "stix.json")):
+        for kind in ("pdf", "stix"):
             if not doc.get(f"{kind}_name"):
                 continue
-            path = RAW_DIR / f"{doc['id']}.{suffix}"
+            path = RAW_DIR / f"{doc['id']}.{local_suffix(kind, doc[f'{kind}_name'])}"
             if not path.exists():
                 problems.append(f"missing {path.name}")
             elif hashlib.sha256(path.read_bytes()).hexdigest() != doc.get(f"{kind}_sha256"):
@@ -63,7 +70,7 @@ def build_gold(documents: list[dict], kb) -> dict:
         entry = {"techniques": sorted(cited.resolved), "translated": cited.translated,
                  "unresolved": cited.unresolved}
         if doc.get("stix_path"):
-            stix = rw.stix_indicators(json.loads(doc["stix_path"].read_text(encoding="utf-8")))
+            stix = rw.load_stix(doc["stix_path"])
             entry["stix"] = {t.value: sorted(v) for t, v in stix.items() if v}
         gold["documents"][doc["id"]] = entry
     return gold
@@ -91,31 +98,37 @@ def evaluate(documents: list[dict], gold: dict, kb) -> dict:
         masked = analyzer.analyze(rw.mask_technique_ids(text).encode("utf-8"),
                                   f"{doc['id']}_masked.txt")
 
-        groups = rw.group_agreement(published.mappings, truth, kb)
-        for name, group in groups.items():
-            total = totals["published"][name]
-            total.predicted += group.predicted
-            total.cited_exact += group.cited_exact
-            total.cited_parent += group.cited_parent
-        published_counts = rw.technique_counts(published.mappings, truth, kb)
-        totals["published_counts"].append(published_counts)
-        masked_counts = {
-            "all": rw.technique_counts(masked.mappings, truth, kb),
-            "name_or_term": rw.technique_counts(masked.mappings, truth, kb, {"name_or_term"}),
-            "model_only": rw.technique_counts(masked.mappings, truth, kb, {"model_only"}),
-        }
-        for key, value in masked_counts.items():
-            totals["masked_counts"][key].append(value)
         entry = {
             "title": doc["title"], "group": doc["group"], "pages": published.document.page_count,
-            "gold_techniques": len(truth),
-            "published_groups": {k: v.as_dict() for k, v in groups.items()},
-            "published": {lvl: _counts(c) for lvl, c in published_counts.items()},
-            "masked": {k: {lvl: _counts(c) for lvl, c in v.items()}
-                       for k, v in masked_counts.items()},
+            "gold_techniques": len(truth), "techniques_evaluated": bool(truth),
             "analysis_seconds": round(published.timings_ms.get("total", 0) / 1000, 2),
             "risk": [round(published.risk.score, 1), published.risk.band],
         }
+        # An advisory without an ATT&CK section gives no technique gold: scoring it would
+        # count every prediction as "not cited". Such documents count for IOCs only.
+        if truth:
+            groups = rw.group_agreement(published.mappings, truth, kb)
+            for name, group in groups.items():
+                total = totals["published"][name]
+                total.predicted += group.predicted
+                total.cited_exact += group.cited_exact
+                total.cited_parent += group.cited_parent
+            published_counts = rw.technique_counts(published.mappings, truth, kb)
+            totals["published_counts"].append(published_counts)
+            masked_counts = {
+                "all": rw.technique_counts(masked.mappings, truth, kb),
+                "name_or_term": rw.technique_counts(masked.mappings, truth, kb,
+                                                    {"name_or_term"}),
+                "model_only": rw.technique_counts(masked.mappings, truth, kb, {"model_only"}),
+            }
+            for key, value in masked_counts.items():
+                totals["masked_counts"][key].append(value)
+            entry |= {
+                "published_groups": {k: v.as_dict() for k, v in groups.items()},
+                "published": {lvl: _counts(c) for lvl, c in published_counts.items()},
+                "masked": {k: {lvl: _counts(c) for lvl, c in v.items()}
+                           for k, v in masked_counts.items()},
+            }
         if doc.get("stix_path"):
             stix = {rw.IOCType(t): set(v) for t, v in gold["documents"][doc["id"]]["stix"].items()}
             stix = {t: stix.get(t, set()) for t in rw.COMPARED_IOC_TYPES}
@@ -150,6 +163,7 @@ def _pct(value) -> str:
 
 def render_markdown(results: dict, gold: dict) -> str:
     overall = results["overall"]
+    technique_docs = sum(d["techniques_evaluated"] for d in results["documents"].values())
     lines = [
         "# Real-world evaluation: CISA joint advisories",
         "",
@@ -163,6 +177,8 @@ def render_markdown(results: dict, gold: dict) -> str:
         "v20.1. **IOC gold** = CISA's STIX bundle for the advisory.",
         "* Negated mappings are excluded from predictions. Parent level counts a sub-technique "
         "as its parent technique.",
+        f"* Technique metrics use the {technique_docs} advisories that have an ATT&CK "
+        "section; the others count for indicators only.",
         "",
         "## 1. As published: agreement with CISA's technique list, by how it was found",
         "",
@@ -226,6 +242,11 @@ def render_markdown(results: dict, gold: dict) -> str:
         "|---|---|---|---|---|---|---|---|---|",
     ]
     for doc_id, d in results["documents"].items():
+        if not d["techniques_evaluated"]:
+            lines.append(f"| {doc_id} | {d['group']} | {d['pages']} | none (no ATT&CK "
+                         f"section; IOCs only) | - | - | - | {d['analysis_seconds']} | "
+                         f"{d['risk'][0]} {d['risk'][1]} |")
+            continue
         mo = d["published_groups"]["model_only"]
         lines.append(f"| {doc_id} | {d['group']} | {d['pages']} | {d['gold_techniques']} | "
                      f"{mo['predicted']} | {_pct(mo['agreement_parent'])} | "
@@ -244,8 +265,8 @@ def render_markdown(results: dict, gold: dict) -> str:
         "",
         f"* {len(results['documents'])} advisories is a small sample; per-document numbers "
         "vary widely. No confidence intervals are claimed.",
-        "* The set is mostly ransomware (#StopRansomware) advisories, chosen by the project "
-        "owner; other threat types are under-represented.",
+        "* The set was chosen by the project owner and is weighted towards ransomware "
+        "(#StopRansomware) and state-sponsored advisories.",
         "* CISA's technique list is incomplete by design, so agreement understates precision "
         "and recall against it measures coverage of *CISA's* labels only.",
         "* All are US-government joint advisories with a consistent structure; vendor "

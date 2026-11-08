@@ -62,8 +62,10 @@ test is the expected effect of tuning on dev.
 folder. Reproduce with `python scripts/evaluate_extraction.py --split test [--rules-only]`.
 
 ## Real-world evaluation (CISA advisories, Phase 5)
-Eight public CISA joint advisories (six ransomware, one state-sponsored, one red-team
-assessment), chosen by the project owner. **The gold labels come from CISA, not the author:** technique labels are the
+Fourteen public CISA advisories chosen by the project owner: six ransomware, four
+state-sponsored, one red-team assessment, one malware, one RMM tool abuse and one exploitation
+advisory. Two have no ATT&CK section, so they count for indicators only. Older STIX 1.x XML
+bundles are parsed too, and any DTD or entity declaration is refused. **The gold labels come from CISA, not the author:** technique labels are the
 ATT&CK IDs each advisory cites, and indicator labels are CISA's STIX bundle. The documents
 aren't redistributed. `data/real_world/manifest.json` pins every file by URL and SHA-256.
 

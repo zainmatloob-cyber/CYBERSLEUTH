@@ -6,7 +6,8 @@ Usage:  python scripts/fetch_real_world.py            # verify files against the
 The documents are not redistributed and are downloaded by hand: cisa.gov's CDN refuses
 automated clients, and this project does not try to get around that. For each advisory in
 data/real_world/manifest.json, open the advisory page, download the PDF (and the STIX JSON
-when listed), and save them in data/raw/cisa/ as ``<id>.pdf`` and ``<id>.stix.json``.
+when listed), and save them in data/raw/cisa/ as ``<id>.pdf`` and ``<id>.stix.json`` (or
+``<id>.stix.xml`` for an older STIX 1.x file).
 Every file must match the recorded SHA-256, so the evaluation always runs on exactly the
 documents it was scored on.
 """
@@ -22,11 +23,15 @@ ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = ROOT / "data" / "real_world" / "manifest.json"
 RAW_DIR = ROOT / "data" / "raw" / "cisa"
 PAGE_URL = "https://www.cisa.gov/news-events/cybersecurity-advisories/{id}"
-SUFFIXES = {"pdf": "pdf", "stix": "stix.json"}
+KINDS = ("pdf", "stix")
 
 
-def local_path(doc_id: str, kind: str) -> Path:
-    return RAW_DIR / f"{doc_id}.{SUFFIXES[kind]}"
+def local_path(doc_id: str, kind: str, published_name: str) -> Path:
+    """<id>.pdf, <id>.stix.json (STIX 2.x) or <id>.stix.xml (STIX 1.x)."""
+    if kind == "pdf":
+        return RAW_DIR / f"{doc_id}.pdf"
+    xml = published_name.lower().endswith(".xml")
+    return RAW_DIR / f"{doc_id}.stix.{'xml' if xml else 'json'}"
 
 
 def sha256(path: Path) -> str:
@@ -41,11 +46,11 @@ def main() -> int:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     failures = 0
     for doc in manifest["documents"]:
-        for kind in SUFFIXES:
+        for kind in KINDS:
             published_name = doc.get(f"{kind}_name")
             if not published_name:
                 continue
-            path = local_path(doc["id"], kind)
+            path = local_path(doc["id"], kind, published_name)
             if not path.exists():
                 print(f"MISSING {path.name}: download '{published_name}' from "
                       f"{PAGE_URL.format(id=doc['id'])}\n  and save it as {path}")

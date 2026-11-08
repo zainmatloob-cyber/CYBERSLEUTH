@@ -1,7 +1,7 @@
 {
   "description": "Public CISA joint cybersecurity advisories (TLP:CLEAR) used as a real-world evaluation set. Documents are not redistributed: download each file from its advisory page, save it under data/raw/cisa/ as <id>.pdf and <id>.stix.json, then run scripts/fetch_real_world.py to verify the SHA-256 hashes recorded here.",
   "retrieved": "2026-11-08",
-  "selection": "Chosen and downloaded by the project owner. Excluded: a 3-page joint factsheet on industrial refrigeration (cites no ATT&CK techniques). For AA25-071A, the August 2026 STIX bundle is used because the PDF is the August 18, 2026 update.",
+  "selection": "Chosen and downloaded by the project owner in two batches. Excluded: a 3-page joint factsheet on industrial refrigeration (cites no ATT&CK techniques, has no STIX). For AA25-071A the August 2026 STIX bundle is used because the PDF is the August 18, 2026 update. AA23-025A and AA23-131A have no ATT&CK section, so they count for the indicator comparison only.",
   "documents": [
     {
       "id": "aa24-242a",
@@ -73,6 +73,59 @@
       "pdf_name": "aa26-237a-tale-of-two-SOCs-insights-two-red-team-assessments-508c.pdf",
       "stix_name": null,
       "pdf_sha256": "1c7ce430e1f4e6c7cd11dd837a864923474a88e0ad9c6fac126d22167d7bc932"
+    },
+    {
+      "id": "aa23-129a",
+      "group": "state-sponsored",
+      "title": "Hunting Russian Intelligence \"Snake\" Malware",
+      "pdf_name": "aa23-129a_snake_malware_2.pdf",
+      "stix_name": null,
+      "pdf_sha256": "99af77a9d4b6384b2d8df7fbf6381a950026b45d93c97c04543dedcd03ad0b7b"
+    },
+    {
+      "id": "aa24-016a",
+      "group": "malware",
+      "title": "Known Indicators of Compromise Associated with Androxgh0st Malware",
+      "pdf_name": "aa24-016a-known-indicators-of-compromise-associated-with-adroxgh0st-malware_0.pdf",
+      "stix_name": "AA24-016A-known-indicators-of-compromise-associated-with-adroxgh0st-malware.stix__0.json",
+      "pdf_sha256": "878931028d9e8f6338dd5a26d27ee776b520cde8b3b733c3b92983fecf5cbcce",
+      "stix_sha256": "c0c27d63feed6aa29f59b349bbf8ab05a5131c1a3c14301cbaeaf86f1f99de10"
+    },
+    {
+      "id": "aa24-207a",
+      "group": "state-sponsored",
+      "title": "North Korea Cyber Group Conducts Global Espionage Campaign to Advance Regime's Military and Nuclear Programs",
+      "pdf_name": "aa24-207a-dprk-cyber-group-conducts-global-espionage-campaign_0.pdf",
+      "stix_name": "AA24-207A-North-Korea-Cyber-Group-Conducts-Global-Espionage-Campaign-to-Advance-Regimes-Military-and-Nuclear-Programs.stix_.json",
+      "pdf_sha256": "4688aee0d07f78ec8e46f58a7e4bfc2658f6d1af00cd405d4c9755a5cb1855bd",
+      "stix_sha256": "130898d5a0baff1aefc1e378fbfda16d76fc889ad6268ae2032d9e5150274f6e"
+    },
+    {
+      "id": "aa24-290a",
+      "group": "state-sponsored",
+      "title": "Iranian Cyber Actors' Brute Force and Credential Access Activity Compromises Critical Infrastructure Organizations",
+      "pdf_name": "aa24-290a-iranian-cyber-actors-conduct-brute-force-and-credential-access-activity.pdf",
+      "stix_name": "AA24-290A.stix_.json",
+      "pdf_sha256": "da8eb982f0441b4231eb020b81c1e675456c14c2de24065a77ccb95f49941250",
+      "stix_sha256": "91efcc7def9685c420f795cea140c4ea11f3f877b31b02fc77e3875dd6c403eb"
+    },
+    {
+      "id": "aa23-025a",
+      "group": "tooling-abuse",
+      "title": "Protecting Against Malicious Use of Remote Monitoring and Management Software",
+      "pdf_name": "aa23-025a-protecting-against-malicious-use-of-rmm-software.pdf",
+      "stix_name": "AA23-025A.stix_.xml",
+      "pdf_sha256": "4365116ee6bb7be8e2b94f40e765238746aec8fbc96b47181651e2fd3ad30d1d",
+      "stix_sha256": "52285709717206895df2e174b7ce845ae422878fd501f8f054e1c0164ce2fc61"
+    },
+    {
+      "id": "aa23-131a",
+      "group": "exploitation",
+      "title": "Malicious Actors Exploit CVE-2023-27350 in PaperCut MF and NG",
+      "pdf_name": "aa23-131a_malicious_actors_exploit_cve-2023-27350_in_papercut_mf_and_ng_1.pdf",
+      "stix_name": "aa23-131a.stix_.xml",
+      "pdf_sha256": "9cc224c25565d4dd28a17c840d548cb042a32c2e615217dae93c716b9768997f",
+      "stix_sha256": "e3116272c9d55a5c6adde786d044cc6d0b9f6f468dcf77980630b243330c1dea"
     }
   ]
 }

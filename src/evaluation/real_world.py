@@ -183,6 +183,69 @@ def stix_indicators(bundle: dict) -> dict[IOCType, set[str]]:
     return found
 
 
+class UnsafeXMLError(ValueError):
+    """The STIX XML declares a DTD or entities, which is refused for untrusted input."""
+
+
+_HEX_HASH_TYPES = {32: IOCType.MD5, 40: IOCType.SHA1, 64: IOCType.SHA256}
+_HEX_RE = re.compile(r"^[0-9a-fA-F]+$")
+
+
+def stix1_indicators(xml_text: str) -> dict[IOCType, set[str]]:
+    """Indicator values from a STIX 1.x (CybOX) XML package.
+
+    The file is untrusted, so any DTD or entity declaration is refused before parsing
+    (that blocks entity-expansion and external-entity attacks), and the standard-library
+    parser never fetches external resources. Values are read from the CybOX object
+    properties: addresses (IPv4 or e-mail), domain names, URIs and hashes. A hash's type
+    comes from its length. Lists packed as ``a##comma##b`` are split.
+    """
+    import xml.etree.ElementTree as ET
+
+    if re.search(r"<!(DOCTYPE|ENTITY)", xml_text, re.IGNORECASE):
+        raise UnsafeXMLError("STIX XML with a DTD or entity declarations is refused.")
+    root = ET.fromstring(xml_text)
+    found: dict[IOCType, set[str]] = {t: set() for t in COMPARED_IOC_TYPES}
+
+    def add(ioc_type: IOCType | None, raw: str) -> None:
+        for value in (v.strip() for v in raw.split("##comma##")):
+            if not value:
+                continue
+            kind = ioc_type
+            if kind is None:  # an Address_Value: IPv4 or e-mail
+                kind = IOCType.EMAIL if "@" in value else _ip_or_none(value)
+            if kind == "hash":
+                kind = _HEX_HASH_TYPES.get(len(value)) if _HEX_RE.match(value) else None
+            if kind in found:
+                found[kind].add(normalise(kind, value))
+
+    for element in root.iter():
+        tag = element.tag.rsplit("}", 1)[-1]
+        namespace = element.tag[1:].split("}", 1)[0] if element.tag.startswith("{") else ""
+        text = element.text or ""
+        if tag == "Address_Value":
+            add(None, text)
+        elif tag == "Value" and namespace.endswith("DomainNameObject-1"):
+            add(IOCType.DOMAIN, text)
+        elif tag == "Value" and namespace.endswith("URIObject-2"):
+            add(IOCType.URL, text)
+        elif tag == "Simple_Hash_Value":
+            add("hash", text)
+    return found
+
+
+def load_stix(path) -> dict[IOCType, set[str]]:
+    """STIX 2.x JSON or STIX 1.x XML, chosen by file extension."""
+    import json
+    from pathlib import Path
+
+    path = Path(path)
+    text = path.read_text(encoding="utf-8")
+    if path.suffix.lower() == ".xml":
+        return stix1_indicators(text)
+    return stix_indicators(json.loads(text))
+
+
 def extracted_indicators(indicators: Iterable[Indicator]) -> dict[IOCType, set[str]]:
     found: dict[IOCType, set[str]] = {t: set() for t in COMPARED_IOC_TYPES}
     for indicator in indicators:

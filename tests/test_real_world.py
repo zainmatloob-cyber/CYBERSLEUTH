@@ -123,19 +123,42 @@ def test_evaluation_script_runs_end_to_end(tmp_path, monkeypatch):
     (raw / "doc1.pdf").write_bytes(pdf)
     stix = json.dumps(STIX).encode()
     (raw / "doc1.stix.json").write_bytes(stix)
+    plain = (root / "data" / "samples" / "synthetic_advisory.txt").read_bytes()
+    (raw / "doc2.pdf").write_bytes(pdf)  # same PDF, but gold is forced empty below
+    (raw / "doc2.stix.xml").write_text(STIX1, encoding="utf-8")
     manifest = {"documents": [{
         "id": "doc1", "group": "test", "title": "Synthetic", "pdf_name": "x", "stix_name": "y",
         "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
-        "stix_sha256": hashlib.sha256(stix).hexdigest()}]}
+        "stix_sha256": hashlib.sha256(stix).hexdigest()}, {
+        "id": "doc2", "group": "test", "title": "No ATT&CK", "pdf_name": "x",
+        "stix_name": "y.xml", "pdf_sha256": hashlib.sha256(pdf).hexdigest(),
+        "stix_sha256": hashlib.sha256((raw / "doc2.stix.xml").read_bytes()).hexdigest()}]}
+    assert plain  # the sample set exists
     (tmp_path / "manifest.json").write_text(json.dumps(manifest))
     for name, value in {"MANIFEST": tmp_path / "manifest.json", "RAW_DIR": raw,
                         "GOLD_PATH": tmp_path / "gold.json",
                         "OUT_JSON": tmp_path / "out.json", "OUT_MD": tmp_path / "out.md",
                         "ROOT": tmp_path}.items():
         monkeypatch.setattr(script, name, value)
+    original = script.build_gold
+
+    def gold_without_doc2_techniques(documents, kb):
+        gold = original(documents, kb)
+        # The stand-in PDF cites no IDs: give doc1 technique gold so that path is exercised,
+        # and keep doc2 empty to simulate an advisory without an ATT&CK section.
+        gold["documents"]["doc1"]["techniques"] = ["T1486", "T1566"]
+        gold["documents"]["doc2"]["techniques"] = []
+        return gold
+
+    monkeypatch.setattr(script, "build_gold", gold_without_doc2_techniques)
     monkeypatch.setattr("sys.argv", ["evaluate_real_world.py", "--final"])
     assert script.main() == 0
     results = json.loads((tmp_path / "out.json").read_text())
+    doc2 = results["documents"]["doc2"]
+    assert doc2["techniques_evaluated"] is False and "published_groups" not in doc2
+    assert "ioc" in doc2  # still used for the indicator comparison
+    doc1 = results["documents"]["doc1"]
+    assert doc1["techniques_evaluated"] is True and doc1["published"]["exact"]["support"] == 2
     assert set(results["overall"]["published_groups"]) == {"id", "name_or_term", "model_only"}
     assert "Real-world evaluation" in (tmp_path / "out.md").read_text(encoding="utf-8")
 
@@ -156,3 +179,55 @@ def test_evaluation_script_refuses_missing_files(tmp_path, monkeypatch):
     monkeypatch.setattr(script, "RAW_DIR", tmp_path)
     with pytest.raises(SystemExit, match="missing x.pdf"):
         script.load_documents()
+
+
+# --- STIX 1.x XML -------------------------------------------------------------------
+
+STIX1 = """<?xml version="1.0" encoding="utf-8" ?>
+<stix:STIX_Package xmlns:stix="http://stix.mitre.org/stix-1"
+    xmlns:cybox="http://cybox.mitre.org/cybox-2"
+    xmlns:cyboxCommon="http://cybox.mitre.org/common-2"
+    xmlns:AddressObj="http://cybox.mitre.org/objects#AddressObject-2"
+    xmlns:DomainNameObj="http://cybox.mitre.org/objects#DomainNameObject-1"
+    xmlns:URIObj="http://cybox.mitre.org/objects#URIObject-2">
+  <cybox:Object><cybox:Properties>
+    <AddressObj:Address_Value condition="Equals">198.51.100.7##comma##203.0.113.9
+    </AddressObj:Address_Value>
+  </cybox:Properties></cybox:Object>
+  <cybox:Object><cybox:Properties>
+    <AddressObj:Address_Value>Bad@Phish.Example.org</AddressObj:Address_Value>
+  </cybox:Properties></cybox:Object>
+  <cybox:Object><cybox:Properties>
+    <DomainNameObj:Value>Evil.Example.com</DomainNameObj:Value>
+    <URIObj:Value>http://evil.example.com/x/</URIObj:Value>
+    <cyboxCommon:Simple_Hash_Value>E574AD52562FCE9EA506F47E79516A52</cyboxCommon:Simple_Hash_Value>
+    <cyboxCommon:Simple_Hash_Value>not-a-hash</cyboxCommon:Simple_Hash_Value>
+  </cybox:Properties></cybox:Object>
+</stix:STIX_Package>"""
+
+
+def test_stix1_indicators():
+    found = rw.stix1_indicators(STIX1)
+    assert found[IOCType.IPV4] == {"198.51.100.7", "203.0.113.9"}
+    assert found[IOCType.EMAIL] == {"bad@phish.example.org"}
+    assert found[IOCType.DOMAIN] == {"evil.example.com"}
+    assert found[IOCType.URL] == {"http://evil.example.com/x"}
+    assert found[IOCType.MD5] == {"e574ad52562fce9ea506f47e79516a52"}
+    assert not found[IOCType.SHA1] and not found[IOCType.SHA256]
+
+
+@pytest.mark.parametrize("payload", [
+    '<?xml version="1.0"?><!DOCTYPE lolz [<!ENTITY lol "lol">]><a>&lol;</a>',
+    '<?xml version="1.0"?><!DOCTYPE a SYSTEM "file:///etc/passwd"><a/>',
+], ids=["entity-expansion", "external-dtd"])
+def test_stix1_refuses_dtds_and_entities(payload):
+    with pytest.raises(rw.UnsafeXMLError):
+        rw.stix1_indicators(payload)
+
+
+def test_load_stix_picks_parser_by_extension(tmp_path):
+    import json
+    (tmp_path / "a.stix.xml").write_text(STIX1, encoding="utf-8")
+    (tmp_path / "b.stix.json").write_text(json.dumps(STIX), encoding="utf-8")
+    assert rw.load_stix(tmp_path / "a.stix.xml")[IOCType.MD5]
+    assert rw.load_stix(tmp_path / "b.stix.json")[IOCType.SHA1] == {"e" * 40}
