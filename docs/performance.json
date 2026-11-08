@@ -1,0 +1,170 @@
+[
+  {
+    "document": "aa23-278a.pdf",
+    "pages": 44,
+    "chars": 91048,
+    "sentences": 827,
+    "indicators": 69,
+    "entities": 199,
+    "techniques": 55,
+    "model_load_s": 1.52,
+    "stages_s": {
+      "ingestion": 1.05,
+      "iocs": 0.05,
+      "entities": 1.49,
+      "classification": 0.75,
+      "mapping": 0.41,
+      "risk": 0.0,
+      "total": 3.74
+    },
+    "peak_memory_mb": 389,
+    "after_load_mb": 354
+  },
+  {
+    "document": "aa25-141a.pdf",
+    "pages": 33,
+    "chars": 62845,
+    "sentences": 749,
+    "indicators": 126,
+    "entities": 200,
+    "techniques": 79,
+    "model_load_s": 1.7,
+    "stages_s": {
+      "ingestion": 0.8,
+      "iocs": 0.04,
+      "entities": 1.19,
+      "classification": 0.5,
+      "mapping": 0.31,
+      "risk": 0.0,
+      "total": 2.84
+    },
+    "peak_memory_mb": 385,
+    "after_load_mb": 353
+  },
+  {
+    "document": "aa24-109a.pdf",
+    "pages": 31,
+    "chars": 62652,
+    "sentences": 602,
+    "indicators": 57,
+    "entities": 190,
+    "techniques": 73,
+    "model_load_s": 1.62,
+    "stages_s": {
+      "ingestion": 0.79,
+      "iocs": 0.07,
+      "entities": 1.12,
+      "classification": 0.52,
+      "mapping": 0.3,
+      "risk": 0.0,
+      "total": 2.81
+    },
+    "peak_memory_mb": 387,
+    "after_load_mb": 354
+  },
+  {
+    "document": "aa23-165a.pdf",
+    "pages": 30,
+    "chars": 57427,
+    "sentences": 509,
+    "indicators": 18,
+    "entities": 243,
+    "techniques": 54,
+    "model_load_s": 1.5,
+    "stages_s": {
+      "ingestion": 0.69,
+      "iocs": 0.03,
+      "entities": 1.04,
+      "classification": 0.43,
+      "mapping": 0.26,
+      "risk": 0.0,
+      "total": 2.46
+    },
+    "peak_memory_mb": 389,
+    "after_load_mb": 354
+  },
+  {
+    "document": "synthetic_100000.txt",
+    "pages": 1,
+    "chars": 99912,
+    "sentences": 1050,
+    "indicators": 47,
+    "entities": 98,
+    "techniques": 18,
+    "model_load_s": 1.62,
+    "stages_s": {
+      "ingestion": 0.02,
+      "iocs": 0.07,
+      "entities": 1.58,
+      "classification": 0.82,
+      "mapping": 0.36,
+      "risk": 0.0,
+      "total": 2.85
+    },
+    "peak_memory_mb": 373,
+    "after_load_mb": 354
+  },
+  {
+    "document": "synthetic_250000.txt",
+    "pages": 1,
+    "chars": 249780,
+    "sentences": 2621,
+    "indicators": 46,
+    "entities": 98,
+    "techniques": 18,
+    "model_load_s": 1.57,
+    "stages_s": {
+      "ingestion": 0.13,
+      "iocs": 0.36,
+      "entities": 3.74,
+      "classification": 1.97,
+      "mapping": 0.91,
+      "risk": 0.0,
+      "total": 7.11
+    },
+    "peak_memory_mb": 379,
+    "after_load_mb": 354
+  },
+  {
+    "document": "synthetic_500000.txt",
+    "pages": 1,
+    "chars": 499559,
+    "sentences": 5247,
+    "indicators": 46,
+    "entities": 98,
+    "techniques": 18,
+    "model_load_s": 1.77,
+    "stages_s": {
+      "ingestion": 0.1,
+      "iocs": 0.4,
+      "entities": 7.54,
+      "classification": 3.99,
+      "mapping": 2.57,
+      "risk": 0.01,
+      "total": 14.62
+    },
+    "peak_memory_mb": 397,
+    "after_load_mb": 353
+  },
+  {
+    "document": "synthetic_1000000.txt",
+    "pages": 1,
+    "chars": 999117,
+    "sentences": 10491,
+    "indicators": 46,
+    "entities": 98,
+    "techniques": 18,
+    "model_load_s": 1.53,
+    "stages_s": {
+      "ingestion": 0.2,
+      "iocs": 0.81,
+      "entities": 15.26,
+      "classification": 8.84,
+      "mapping": 5.0,
+      "risk": 0.01,
+      "total": 30.13
+    },
+    "peak_memory_mb": 429,
+    "after_load_mb": 354
+  }
+]

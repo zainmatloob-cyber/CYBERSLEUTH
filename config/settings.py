@@ -38,7 +38,7 @@ class IngestionSettings:
     max_docx_zip_entries: int = _env_int("MAX_DOCX_ZIP_ENTRIES", 2000)
     # Extracted text can be far larger than the file (compressed PDF streams, DOCX XML):
     # cap it so a small upload can't keep the NLP stages busy indefinitely.
-    max_text_chars: int = _env_int("MAX_TEXT_CHARS", 2_000_000)
+    max_text_chars: int = _env_int("MAX_TEXT_CHARS", 1_000_000)
     # A PDF page with fewer extractable characters than this is treated as image-only.
     min_chars_per_text_page: int = _env_int("MIN_CHARS_PER_TEXT_PAGE", 20)
     allowed_extensions: frozenset[str] = field(

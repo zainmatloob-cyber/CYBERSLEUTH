@@ -96,7 +96,7 @@ def test_text_cap_applies_to_every_format():
 
 
 def test_default_text_cap():
-    assert IngestionSettings().max_text_chars == 2_000_000
+    assert IngestionSettings().max_text_chars == 1_000_000
 
 
 # --- indicator length --------------------------------------------------------------------
@@ -162,3 +162,50 @@ def test_docx_external_entities_are_not_resolved(tmp_path):
         assert "TOP-SECRET" not in str(exc)
         return
     assert "TOP-SECRET" not in " ".join(page.text for page in document.pages)
+
+
+# --- regular-expression denial of service ---------------------------------------------------
+
+HOSTILE = {
+    "no-spaces": "a" * 200_000,
+    "hyphen-runs": "a-" * 100_000,
+    "dots": "a." * 100_000,
+    "digit-dots": "1." * 100_000,
+    "url-path": "http://evil.example.com/" + "a/" * 100_000,
+    "at-signs": "a@" * 100_000,
+    "brackets": "[.]" * 66_000,
+}
+
+
+@pytest.mark.parametrize("text", HOSTILE.values(), ids=HOSTILE.keys())
+def test_text_stages_stay_linear_on_hostile_input(text):
+    """200,000 hostile characters through every regex-heavy stage in well under a few
+    seconds. The old hyphen-rejoin pattern took ~6 s for 20,000 characters (quadratic)."""
+    import time
+
+    from src.ingestion.models import PageText
+    from src.ingestion.text_cleaner import clean_pages
+    from src.nlp.ioc_extractor import IOCExtractor
+    from src.nlp.preprocessing import split_sentences
+
+    extractor = IOCExtractor()
+    started = time.perf_counter()
+    pages = clean_pages([PageText(1, text)])
+    split_sentences(pages)
+    extractor.find(pages[0].text)
+    assert time.perf_counter() - started < 5
+
+
+def test_hyphen_rejoin_fix_changes_no_output():
+    """The token-start anchor only removes wasted attempts: same output as the old pattern."""
+    import random
+    import re
+
+    from src.ingestion import text_cleaner
+
+    old = re.compile(r"(\S+)-[ \t]*\n[ \t]*(\S+)")
+    rng = random.Random(20261108)
+    for _ in range(20_000):
+        s = "".join(rng.choice("ab-\n \t.1[]/X") for _ in range(rng.randint(0, 30)))
+        assert (old.sub(text_cleaner._rejoin_hyphenated, s)
+                == text_cleaner._LINE_BREAK_HYPHEN.sub(text_cleaner._rejoin_hyphenated, s))

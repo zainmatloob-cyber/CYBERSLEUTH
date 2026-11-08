@@ -47,8 +47,13 @@ TLD_FILE: Path = settings.knowledge_base_dir / "iana_tlds.txt"
 # Real TLDs that collide with common file extensions (derived from the bundled
 # IANA list). "invoice.zip" or "loader.py" is usually a filename, so such a
 # domain is only accepted when written defanged (an explicit analyst signal).
+# 2026-11-08: a list of about 150 common file extensions was intersected with the IANA list.
+# "hiv" (registry hive dumps, e.g. sam.hiv), "java" and "pf" (Windows Prefetch) were added.
+# "cc" and "ps" were left out: .cc is widely used by real malicious infrastructure, and
+# PostScript file names are rare in threat reports.
 FILE_EXTENSION_TLDS: frozenset[str] = frozenset(
-    {"app", "cab", "md", "mov", "one", "pl", "py", "rs", "sh", "so", "zip"}
+    {"app", "cab", "hiv", "java", "md", "mov", "one", "pf", "pl", "py", "rs", "sh", "so",
+     "zip"}
 )
 _RESERVED_TLDS = frozenset({"test", "example", "invalid", "localhost"})
 _RESERVED_DOMAINS = ("example.com", "example.net", "example.org")

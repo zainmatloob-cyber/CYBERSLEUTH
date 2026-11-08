@@ -31,7 +31,11 @@ _TYPOGRAPHIC_MAP = str.maketrans({
 })
 # C0/C1 control characters except tab and newline.
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0b-\x1f\x7f-\x9f]")
-_LINE_BREAK_HYPHEN = re.compile(r"(\S+)-[ \t]*\n[ \t]*(\S+)")
+# (?<!\S): a match may only start where a token starts. Without it the engine retries
+# from every position inside a long unbroken run, and each retry backtracks through the
+# rest of the run: quadratic time (20,000 characters without spaces took ~6 s). Leftmost
+# matches already began at a token start, so the output is unchanged.
+_LINE_BREAK_HYPHEN = re.compile(r"(?<!\S)(\S+)-[ \t]*\n[ \t]*(\S+)")
 # Characters that suggest a token is an indicator or identifier, not prose.
 _INDICATOR_HINT = re.compile(r"[\d.\[\]/\\@:_=]")
 _EDGE_PUNCTUATION = "\"'([{)]},.;:!?"

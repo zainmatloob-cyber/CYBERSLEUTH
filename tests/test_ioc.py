@@ -80,6 +80,8 @@ def test_public_ip_has_no_flags(extractor):
         ("evil[.]com", "evil.com"),
         ("evil(dot)com", "evil.com"),
         ("invoice[.]zip", "invoice.zip"),  # defanged → analyst says it is a domain
+        ("backup[.]hiv", "backup.hiv"),
+        ("c2.example-shop.cc", "c2.example-shop.cc"),  # .cc stays a domain (common in C2)
         ("asp.net", "asp.net"),
     ],
 )
@@ -93,6 +95,8 @@ def test_domains(extractor, text, value):
         "svch0st.exe", "payload.dll", "invoice.zip", "loader.py", "readme.md", "run.sh",
         "System.Management.Automation", "Microsoft.Exchange", "e.g. this", "i.e. that",
         "host.local", "report.pdf", "Node.js", "C:\\Temp\\evil.zip", "files/invoice.zip",
+        # registry hive dumps, Java sources, Windows Prefetch files (synthetic examples)
+        "sam.hiv", "SYSTEM.hiv", "security.hiv", "Main.java", "CMD.EXE-0BD30981.pf",
     ],
 )
 def test_domain_false_positives_rejected(extractor, text):

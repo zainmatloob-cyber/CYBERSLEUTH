@@ -243,7 +243,7 @@ Override them with environment variables:
 | `CYBERSLEUTH_MAX_PDF_PAGES` | 500 |
 | `CYBERSLEUTH_MAX_DOCX_UNCOMPRESSED_MB` | 100 |
 | `CYBERSLEUTH_MAX_DOCX_ZIP_ENTRIES` | 2000 |
-| `CYBERSLEUTH_MAX_TEXT_CHARS` | 2000000 (extracted text, all formats) |
+| `CYBERSLEUTH_MAX_TEXT_CHARS` | 1000000 (extracted text, all formats) |
 | `CYBERSLEUTH_MIN_CHARS_PER_TEXT_PAGE` | 20 |
 | `CYBERSLEUTH_LOG_LEVEL` | INFO |
 | `CYBERSLEUTH_SPACY_MODEL` | en_core_web_sm |

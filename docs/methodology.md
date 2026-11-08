@@ -81,8 +81,15 @@ Implemented in `src/nlp/ioc_extractor.py`. It never resolves or contacts any val
    * Hashes must be bounded by non-hex characters and mix digits and letters.
    * CVE years must be between 1999 and next year.
 3. **False-positive guards, derived from data.**
-   * 11 real TLDs collide with file extensions (`zip py md sh app cab mov one pl rs so`).
-     These are accepted as domains only when written defanged.
+   * 14 real TLDs collide with file extensions
+     (`zip py md sh app cab mov one pl rs so hiv java pf`). These are accepted as domains
+     only when written defanged.
+     * `hiv`, `java` and `pf` were added on 2026-11-08. They came from intersecting about
+       150 common file extensions with the IANA list, prompted by `sam.hiv` in a test
+       advisory.
+     * `cc` and `ps` also collide but were left out: `.cc` is common in real malicious
+       infrastructure.
+     * Synthetic tests only; the effect on real documents is unmeasured.
    * Title-case dotted names (`System.Management`) are rejected because `.management`,
      `.exchange` and `.security` are real TLDs.
 4. **Overlap priority:** URL > email > CVE > IPv4 > domain > hash. A host inside a URL is

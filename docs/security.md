@@ -23,7 +23,7 @@ noted.
 | Rule from the brief | How it's enforced | Test |
 |---|---|---|
 | Treat uploads as untrusted; validate content and size | Size cap (20 MB, plus Streamlit's 25 MB hard cap); type detected from magic bytes, not the extension; DOCX ZIP-bomb guard (100 MB uncompressed, 2,000 entries); PDF page cap (500); encrypted PDFs rejected; file names stripped of directories and control characters | `test_validator.py`, `test_readers.py` |
-| | **New:** extracted text capped at 2,000,000 characters (`CYBERSLEUTH_MAX_TEXT_CHARS`). Compressed PDF streams can expand far beyond the file size; the PDF reader stops at the first page over the cap | `test_security.py` |
+| | **New:** extracted text capped at 1,000,000 characters (2,000,000 at first; lowered after the performance measurements in [performance.md](performance.md)) (`CYBERSLEUTH_MAX_TEXT_CHARS`). Compressed PDF streams can expand far beyond the file size; the PDF reader stops at the first page over the cap | `test_security.py` |
 | Never execute uploaded content | PyMuPDF only extracts text: no PDF JavaScript, embedded files or links are acted on. DOCX XML is parsed without entity resolution (no XXE). STIX 1.x XML in the evaluation refuses any DTD or entity declaration. No `eval`, `exec` or `subprocess` in the app | `test_security.py` (XXE payload; static check), `test_real_world.py` (DTD refusal) |
 | Do not contact extracted URLs or IPs | The app has no network client at all. A static test fails if one is ever imported in `app.py` or `src/` | `test_security.py` |
 | An extracted indicator is not automatically malicious | Every indicator and technique starts `unverified`; only an analyst changes that, with an audit trail. Reserved and documentation ranges are flagged | `test_ioc.py`, `test_database.py` |
@@ -37,7 +37,7 @@ noted.
 
 | # | Finding | Severity | Fix |
 |---|---|---|---|
-| 1 | **No cap on extracted text.** A PDF under 20 MB could expand into very large text and keep the NLP stages busy for a long time (denial of service) | Medium | `max_text_chars` (default 2,000,000), checked page by page while reading a PDF and after every reader |
+| 1 | **No cap on extracted text.** A PDF under 20 MB could expand into very large text and keep the NLP stages busy for a long time (denial of service) | Medium | `max_text_chars` (default 1,000,000), checked page by page while reading a PDF and after every reader |
 | 2 | **Link injection in charts.** Document names were passed to Plotly unescaped | Low (Plotly blocks `javascript:` links, so this allowed a misleading link, not script execution) | `dashboard.plain()` escapes `& < >` in chart labels |
 | 3 | **Unbounded URL length.** Indicator values longer than the 2,048-character database column would fail on databases that enforce lengths (SQLite doesn't) | Low | URLs over 2,048 characters aren't extracted (`MAX_URL_LENGTH`) |
 | 4 | **Manifest IDs used as file names.** An ID like `../x` could name a path outside the raw-data folder | Low (manifests are project files) | IDs must be lower-case slugs |
@@ -62,8 +62,12 @@ audited because it isn't on PyPI; it is a model package from spaCy's GitHub rele
 * **Parser vulnerabilities.** PyMuPDF (MuPDF, written in C) parses hostile PDFs in the app's
   own process. Keep it updated, and for a shared deployment run the app in a container with
   limited memory and no outbound network.
-* **ReDoS.** The IOC patterns were written to avoid nested quantifiers. Their run time on
-  large documents is measured in the performance step, not here.
+* **ReDoS.** Checked in the performance step ([performance.md](performance.md)) on 21
+  hostile inputs.
+  * **One quadratic pattern was found and fixed:** the hyphen rejoin in the text cleaner.
+    100,000 characters without spaces stalled the analysis.
+  * **All regex stages are now linear,** under 0.25 s per 100,000 hostile characters.
+  * **Severity:** medium (denial of service). Pinned by a timing test.
 * **No authentication or per-user separation.** Anyone who can reach the app can see every
   stored analysis and change verdicts. Streamlit's XSRF protection is on by default and is
   left enabled.

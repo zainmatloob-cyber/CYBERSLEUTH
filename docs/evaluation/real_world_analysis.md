@@ -141,7 +141,7 @@ are also ATT&CK names. The most frequent are "Remote Services", "Password Manage
 | Hashes: every printed hash found | Recall against all STIX hashes is low (0.15–0.34) because STIX lists many unprinted hashes |
 | Vice Society Tor address "missed" as a domain | **The `.onion` fix works:** it was extracted as a URL flagged `tor_onion_service`. STIX types it as a domain, and the overlap rule reports the URL only (the known design choice) |
 | `cloudfronts.net` "missed" | We extracted `main.cloudfronts.net` as printed; STIX lists the parent domain |
-| `sam.hiv`, `system.hiv`, `security.hiv` extracted as domains | **New false-positive class:** registry hive file names whose extension is also a real TLD (`.hiv`). Like `.zip` or `.py`, this needs a file-extension rule chosen and tested on other data |
+| `sam.hiv`, `system.hiv`, `security.hiv` extracted as domains | **New false-positive class:** registry hive file names whose extension is also a real TLD (`.hiv`). Like `.zip` or `.py`, this needs a file-extension rule chosen and tested on other data. **Addressed afterwards** (hardening): a general extension-vs-TLD check added `hiv`, `java` and `pf` to the file-extension TLDs, tested on synthetic examples only. This test split was not re-scored |
 | Reference links, contact addresses, `victimname_…@protonmail.com` | Correct extraction, not IOCs; they stay unverified, as in the first set |
 
 **Risk:** 5 of 8 test advisories still score Critical, so the score still saturates on
