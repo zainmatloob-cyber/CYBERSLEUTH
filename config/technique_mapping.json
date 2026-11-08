@@ -5,5 +5,5 @@
   "rule": "Lowest of the candidates 0.25 / 0.5 / 0.75 at which at least 50% of model-only suggestions match a technique CISA cites (parent level); rule fixed before the run.",
   "result": "docs/evaluation/real_world_threshold.md: 17 of 358 suggestions kept, 10 agree (0.59, Wilson 95% interval 0.36-0.78).",
   "applies_to": "Document-level mappings with no explicit evidence. A suggestion is kept when its best sentence score reaches the cut-off. Explicit mappings are never removed, and the trained model's own threshold is unchanged.",
-  "status": "Not yet tested on the test split."
+  "status": "Tested once on the 8-advisory test split at d88d86a: 12 of 15 kept suggestions agree with CISA (0.80, Wilson 0.55-0.93), against 27 of 281 without the cut-off; docs/evaluation/real_world_batch2_test.md."
 }

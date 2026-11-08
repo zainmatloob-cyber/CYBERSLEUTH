@@ -99,9 +99,29 @@ bundle ([results](docs/evaluation/real_world.md), [error analysis](docs/evaluati
 
 The technique model doesn't transfer from ATT&CK procedure text to real reports at its current
 threshold. Model suggestions are therefore treated as unverified leads (hidden by default and
-excluded from the risk score until confirmed). A stricter cut-off for model-only suggestions
-(decision score 0.75) was then chosen on a separate development set of real advisories
-([selection](docs/evaluation/real_world_threshold.md)). Its test result is pending.
+excluded from the risk score until confirmed).
+
+### Real-world follow-up: a cut-off for model suggestions, tested on 8 new advisories
+A second set of 17 CISA advisories (2022–2025) was split once into development (9) and test
+(8).
+* **Choosing the cut-off:** a rule fixed in advance chose a decision-score cut-off of **0.75**
+  for model-only suggestions on the development split
+  ([selection](docs/evaluation/real_world_threshold.md)).
+* **Testing it:** the test split was then scored once with the code frozen
+  ([results](docs/evaluation/real_world_batch2_test.md)).
+
+| Model-only suggestions (test split) | Suggestions | Agree with CISA (parent) |
+|---|---|---|
+| Without the cut-off | 281 | 0.10 |
+| **With the 0.75 cut-off** | **15** | **0.80** (95% interval 0.55–0.93) |
+
+* **What changed:** the cut-off turns model suggestions from noise into usable leads.
+* **The cost is coverage:** about 2 suggestions per advisory remain. With IDs masked, the
+  model alone recovers 12% of CISA's techniques (parent level). The name/term matcher still
+  does most of the work.
+* **Uncertainty:** 15 suggestions is a small sample, and the interval treats them as
+  independent.
+* **Unchanged:** suggestions stay unverified leads until an analyst confirms them.
 
 ### Synthetic extraction test set
 8 synthetic, author-annotated documents, split dev/test. The test split was scored once,

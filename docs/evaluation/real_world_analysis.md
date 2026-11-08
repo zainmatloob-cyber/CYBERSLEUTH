@@ -100,9 +100,51 @@ Fixing these by looking at this test set and re-scoring would be tuning on test.
 * **Done:** item 3. Line-wrapped URL rejoining, `&nbsp;` removal, placeholder rejection and
   `.onion` support, each covered by synthetic unit tests. The development-split extraction
   report is unchanged. These 14 advisories were **not** re-scored to claim an improvement.
-* **In progress:** item 2. A second set of 17 advisories was split once into development (9)
-  and test (8). On the development split, the pre-declared rule chose a cut-off of 0.75
-  for model-only suggestions ([selection](real_world_threshold.md)). The test split has not
-  been scored yet.
+* **Done:** item 2. A second set of 17 advisories was split once into development (9) and
+  test (8). On the development split, the pre-declared rule chose a cut-off of 0.75 for
+  model-only suggestions ([selection](real_world_threshold.md)). The test split was then
+  scored once at `d88d86a` ([results](real_world_batch2_test.md)); see below.
 
 The scores in [real_world.md](real_world.md) remain the record for code version `0f1e6e9`.
+
+## 5. Second set: test split (8 advisories, scored once at `d88d86a`)
+
+Reproduce the analysis with `python scripts/analyse_real_world_errors.py --manifest
+data/real_world/batch2/manifest.json --split test --after-final`. As with the first set,
+nothing below has been used to change the system.
+
+**Model-only suggestions with the 0.75 cut-off**
+
+| | Suggestions | Agree with CISA (parent) |
+|---|---|---|
+| Without the cut-off (same run) | 281 | 0.10 |
+| With the cut-off | 15 | 0.80 (Wilson 0.55–0.93) |
+
+* **Agreement held up on unseen advisories.** It was higher than on the development split
+  (0.59 from 17 suggestions). Both samples are small, so the gap may be chance.
+* **Wrong suggestions that passed** (3 of 15): Masquerading, System Network Configuration
+  Discovery and Obtain Capabilities, each in a different advisory.
+* **Coverage is the cost:** about 2 suggestions per advisory. With IDs masked, the model
+  alone recovers 12% of CISA's techniques, and the name/term matcher 66%.
+* **By period:** before 2023, 3 of 5 agree; from 2023 on, 9 of 10. That's too few
+  suggestions to conclude anything about age.
+
+**Name/term-only matches** show the same pattern as in the first set: everyday phrases that
+are also ATT&CK names. The most frequent are "Remote Services", "Password Managers",
+"IP addresses", "network devices" and "multi-factor authentication".
+
+**Indicators** (first real-document check of the step-2 robustness fixes):
+
+| Observation | Explanation |
+|---|---|
+| IPv4: 36 of 36 STIX values found, and every extracted IP is in STIX | — |
+| Hashes: every printed hash found | Recall against all STIX hashes is low (0.15–0.34) because STIX lists many unprinted hashes |
+| Vice Society Tor address "missed" as a domain | **The `.onion` fix works:** it was extracted as a URL flagged `tor_onion_service`. STIX types it as a domain, and the overlap rule reports the URL only (the known design choice) |
+| `cloudfronts.net` "missed" | We extracted `main.cloudfronts.net` as printed; STIX lists the parent domain |
+| `sam.hiv`, `system.hiv`, `security.hiv` extracted as domains | **New false-positive class:** registry hive file names whose extension is also a real TLD (`.hiv`). Like `.zip` or `.py`, this needs a file-extension rule chosen and tested on other data |
+| Reference links, contact addresses, `victimname_…@protonmail.com` | Correct extraction, not IOCs; they stay unverified, as in the first set |
+
+**Risk:** 5 of 8 test advisories still score Critical, so the score still saturates on
+#StopRansomware-style advisories. Leads no longer contribute, so this comes from explicit
+techniques, indicators and vulnerabilities. It is left for a later revision of the risk
+model, to be chosen on development data.

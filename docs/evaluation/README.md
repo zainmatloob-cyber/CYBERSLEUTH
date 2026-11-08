@@ -121,3 +121,7 @@ python scripts/choose_real_world_threshold.py --manifest data/real_world/batch2/
 
 **Cut-off selection (development split):** [real_world_threshold.md](real_world_threshold.md).
 The rule chose 0.75, set in `config/technique_mapping.json`.
+
+**Test split (scored once at `d88d86a`):** [real_world_batch2_test.md](real_world_batch2_test.md).
+At the 0.75 cut-off, 12 of 15 model-only suggestions agree with CISA (0.80), against 27 of 281
+(0.10) without it. The error analysis is in [real_world_analysis.md](real_world_analysis.md), §5.

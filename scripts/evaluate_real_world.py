@@ -299,8 +299,9 @@ def render_markdown(results: dict, gold: dict) -> str:
                      f"{mo['predicted']} | {_pct(mo['agreement_parent'])} | "
                      f"{_pct(d['masked']['all']['parent']['recall'])} | "
                      f"{d['analysis_seconds']} | {d['risk'][0]} {d['risk'][1]} |")
-    unresolved = {k: v["unresolved"] for k, v in gold["documents"].items() if v["unresolved"]}
-    translated = {k: v["translated"] for k, v in gold["documents"].items() if v["translated"]}
+    scored = {k: v for k, v in gold["documents"].items() if k in results["documents"]}
+    unresolved = {k: v["unresolved"] for k, v in scored.items() if v["unresolved"]}
+    translated = {k: v["translated"] for k, v in scored.items() if v["translated"]}
     lines += [
         "",
         *_period_section(results),
@@ -312,7 +313,8 @@ def render_markdown(results: dict, gold: dict) -> str:
         "## 6. Limitations",
         "",
         f"* {len(results['documents'])} advisories is a small sample; per-document numbers "
-        "vary widely. No confidence intervals are claimed.",
+        "vary widely. The only interval given (model-only agreement) treats suggestions as "
+        "independent, so it understates the uncertainty.",
         "* The set was chosen by the project owner. Advisory types: "
         + ", ".join(f"{g} {n}" for g, n in sorted(_group_counts(results).items())) + ".",
         "* CISA's technique list is incomplete by design, so agreement understates precision "
