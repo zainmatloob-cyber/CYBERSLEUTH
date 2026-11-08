@@ -1,0 +1,2273 @@
+{
+  "documents": {
+    "aa24-242a": {
+      "title": "#StopRansomware: RansomHub Ransomware",
+      "group": "ransomware",
+      "pages": 24,
+      "gold_techniques": 23,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.73,
+      "risk": [
+        93.8,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 23,
+          "cited_exact": 23,
+          "cited_parent": 23,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 9,
+          "cited_exact": 0,
+          "cited_parent": 4,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.4444
+        },
+        "model_only": {
+          "predicted": 42,
+          "cited_exact": 0,
+          "cited_parent": 1,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0238
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 23,
+          "fp": 51,
+          "fn": 0,
+          "support": 23,
+          "precision": 0.3108108108108108,
+          "recall": 1.0,
+          "f1": 0.4742268041237113
+        },
+        "parent": {
+          "tp": 22,
+          "fp": 44,
+          "fn": 0,
+          "support": 22,
+          "precision": 0.3333333333333333,
+          "recall": 1.0,
+          "f1": 0.5
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 18,
+            "fp": 51,
+            "fn": 5,
+            "support": 23,
+            "precision": 0.2608695652173913,
+            "recall": 0.782608695652174,
+            "f1": 0.391304347826087
+          },
+          "parent": {
+            "tp": 20,
+            "fp": 44,
+            "fn": 2,
+            "support": 22,
+            "precision": 0.3125,
+            "recall": 0.9090909090909091,
+            "f1": 0.4651162790697674
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 9,
+            "fp": 9,
+            "fn": 14,
+            "support": 23,
+            "precision": 0.5,
+            "recall": 0.391304347826087,
+            "f1": 0.4390243902439025
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 5,
+            "fn": 12,
+            "support": 22,
+            "precision": 0.6666666666666666,
+            "recall": 0.45454545454545453,
+            "f1": 0.5405405405405405
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 9,
+            "fp": 42,
+            "fn": 14,
+            "support": 23,
+            "precision": 0.17647058823529413,
+            "recall": 0.391304347826087,
+            "f1": 0.24324324324324328
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 41,
+            "fn": 12,
+            "support": 22,
+            "precision": 0.19607843137254902,
+            "recall": 0.45454545454545453,
+            "f1": 0.273972602739726
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 9,
+          "stix": 9,
+          "stix_in_text": 9,
+          "matched": 9,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "domain": {
+          "extracted": 6,
+          "stix": 1,
+          "stix_in_text": 1,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "url": {
+          "extracted": 110,
+          "stix": 108,
+          "stix_in_text": 106,
+          "matched": 106,
+          "extracted_in_stix": 0.9636,
+          "stix_found": 0.9815,
+          "printed_stix_found": 1.0
+        },
+        "email": {
+          "extracted": 3,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        }
+      }
+    },
+    "aa25-050a": {
+      "title": "#StopRansomware: Ghost (Cring) Ransomware",
+      "group": "ransomware",
+      "pages": 13,
+      "gold_techniques": 28,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.11,
+      "risk": [
+        96.2,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 28,
+          "cited_exact": 28,
+          "cited_parent": 28,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 6,
+          "cited_exact": 0,
+          "cited_parent": 1,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1667
+        },
+        "model_only": {
+          "predicted": 41,
+          "cited_exact": 0,
+          "cited_parent": 8,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1951
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 28,
+          "fp": 47,
+          "fn": 0,
+          "support": 28,
+          "precision": 0.37333333333333335,
+          "recall": 1.0,
+          "f1": 0.5436893203883496
+        },
+        "parent": {
+          "tp": 24,
+          "fp": 38,
+          "fn": 0,
+          "support": 24,
+          "precision": 0.3870967741935484,
+          "recall": 1.0,
+          "f1": 0.5581395348837209
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 24,
+            "fp": 47,
+            "fn": 4,
+            "support": 28,
+            "precision": 0.3380281690140845,
+            "recall": 0.8571428571428571,
+            "f1": 0.48484848484848475
+          },
+          "parent": {
+            "tp": 24,
+            "fp": 38,
+            "fn": 0,
+            "support": 24,
+            "precision": 0.3870967741935484,
+            "recall": 1.0,
+            "f1": 0.5581395348837209
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 16,
+            "fp": 6,
+            "fn": 12,
+            "support": 28,
+            "precision": 0.7272727272727273,
+            "recall": 0.5714285714285714,
+            "f1": 0.64
+          },
+          "parent": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 9,
+            "support": 24,
+            "precision": 0.75,
+            "recall": 0.625,
+            "f1": 0.6818181818181818
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 8,
+            "fp": 41,
+            "fn": 20,
+            "support": 28,
+            "precision": 0.16326530612244897,
+            "recall": 0.2857142857142857,
+            "f1": 0.20779220779220778
+          },
+          "parent": {
+            "tp": 16,
+            "fp": 33,
+            "fn": 8,
+            "support": 24,
+            "precision": 0.32653061224489793,
+            "recall": 0.6666666666666666,
+            "f1": 0.43835616438356156
+          }
+        }
+      },
+      "ioc": {
+        "domain": {
+          "extracted": 6,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "url": {
+          "extracted": 1,
+          "stix": 1,
+          "stix_in_text": 1,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "email": {
+          "extracted": 34,
+          "stix": 33,
+          "stix_in_text": 33,
+          "matched": 33,
+          "extracted_in_stix": 0.9706,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "md5": {
+          "extracted": 14,
+          "stix": 14,
+          "stix_in_text": 14,
+          "matched": 14,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 6,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 0,
+          "stix": 6,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        }
+      }
+    },
+    "aa25-071a": {
+      "title": "#StopRansomware: Medusa Ransomware (updated August 18, 2026)",
+      "group": "ransomware",
+      "pages": 29,
+      "gold_techniques": 38,
+      "techniques_evaluated": true,
+      "analysis_seconds": 2.25,
+      "risk": [
+        96.8,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 38,
+          "cited_exact": 38,
+          "cited_parent": 38,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 8,
+          "cited_exact": 0,
+          "cited_parent": 5,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.625
+        },
+        "model_only": {
+          "predicted": 47,
+          "cited_exact": 0,
+          "cited_parent": 6,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1277
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 38,
+          "fp": 55,
+          "fn": 0,
+          "support": 38,
+          "precision": 0.40860215053763443,
+          "recall": 1.0,
+          "f1": 0.5801526717557252
+        },
+        "parent": {
+          "tp": 35,
+          "fp": 42,
+          "fn": 0,
+          "support": 35,
+          "precision": 0.45454545454545453,
+          "recall": 1.0,
+          "f1": 0.625
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 26,
+            "fp": 56,
+            "fn": 12,
+            "support": 38,
+            "precision": 0.3170731707317073,
+            "recall": 0.6842105263157895,
+            "f1": 0.43333333333333335
+          },
+          "parent": {
+            "tp": 33,
+            "fp": 43,
+            "fn": 2,
+            "support": 35,
+            "precision": 0.4342105263157895,
+            "recall": 0.9428571428571428,
+            "f1": 0.5945945945945946
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 14,
+            "fp": 8,
+            "fn": 24,
+            "support": 38,
+            "precision": 0.6363636363636364,
+            "recall": 0.3684210526315789,
+            "f1": 0.4666666666666667
+          },
+          "parent": {
+            "tp": 15,
+            "fp": 3,
+            "fn": 20,
+            "support": 35,
+            "precision": 0.8333333333333334,
+            "recall": 0.42857142857142855,
+            "f1": 0.5660377358490566
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 12,
+            "fp": 48,
+            "fn": 26,
+            "support": 38,
+            "precision": 0.2,
+            "recall": 0.3157894736842105,
+            "f1": 0.24489795918367346
+          },
+          "parent": {
+            "tp": 18,
+            "fp": 42,
+            "fn": 17,
+            "support": 35,
+            "precision": 0.3,
+            "recall": 0.5142857142857142,
+            "f1": 0.3789473684210526
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 21,
+          "stix": 21,
+          "stix_in_text": 21,
+          "matched": 20,
+          "extracted_in_stix": 0.9524,
+          "stix_found": 0.9524,
+          "printed_stix_found": 0.9524
+        },
+        "domain": {
+          "extracted": 9,
+          "stix": 1,
+          "stix_in_text": 1,
+          "matched": 1,
+          "extracted_in_stix": 0.1111,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "url": {
+          "extracted": 5,
+          "stix": 2,
+          "stix_in_text": 2,
+          "matched": 2,
+          "extracted_in_stix": 0.4,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "email": {
+          "extracted": 2,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 6,
+          "stix": 6,
+          "stix_in_text": 6,
+          "matched": 6,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 5,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 0,
+          "stix": 6,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        }
+      }
+    },
+    "aa25-203a": {
+      "title": "#StopRansomware: Interlock",
+      "group": "ransomware",
+      "pages": 19,
+      "gold_techniques": 25,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.62,
+      "risk": [
+        66.5,
+        "High"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 25,
+          "cited_exact": 25,
+          "cited_parent": 25,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 7,
+          "cited_exact": 0,
+          "cited_parent": 3,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.4286
+        },
+        "model_only": {
+          "predicted": 41,
+          "cited_exact": 0,
+          "cited_parent": 7,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1707
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 25,
+          "fp": 48,
+          "fn": 0,
+          "support": 25,
+          "precision": 0.3424657534246575,
+          "recall": 1.0,
+          "f1": 0.5102040816326531
+        },
+        "parent": {
+          "tp": 23,
+          "fp": 38,
+          "fn": 0,
+          "support": 23,
+          "precision": 0.3770491803278688,
+          "recall": 1.0,
+          "f1": 0.5476190476190476
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 17,
+            "fp": 49,
+            "fn": 8,
+            "support": 25,
+            "precision": 0.25757575757575757,
+            "recall": 0.68,
+            "f1": 0.37362637362637363
+          },
+          "parent": {
+            "tp": 22,
+            "fp": 39,
+            "fn": 1,
+            "support": 23,
+            "precision": 0.36065573770491804,
+            "recall": 0.9565217391304348,
+            "f1": 0.5238095238095238
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 11,
+            "fp": 7,
+            "fn": 14,
+            "support": 25,
+            "precision": 0.6111111111111112,
+            "recall": 0.44,
+            "f1": 0.5116279069767442
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 4,
+            "fn": 13,
+            "support": 23,
+            "precision": 0.7142857142857143,
+            "recall": 0.43478260869565216,
+            "f1": 0.5405405405405405
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 6,
+            "fp": 42,
+            "fn": 19,
+            "support": 25,
+            "precision": 0.125,
+            "recall": 0.24,
+            "f1": 0.1643835616438356
+          },
+          "parent": {
+            "tp": 13,
+            "fp": 35,
+            "fn": 10,
+            "support": 23,
+            "precision": 0.2708333333333333,
+            "recall": 0.5652173913043478,
+            "f1": 0.3661971830985915
+          }
+        }
+      },
+      "ioc": {
+        "domain": {
+          "extracted": 1,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "url": {
+          "extracted": 9,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "email": {
+          "extracted": 4,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 9,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 3,
+          "stix": 12,
+          "stix_in_text": 3,
+          "matched": 3,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.25,
+          "printed_stix_found": 1.0
+        },
+        "sha256": {
+          "extracted": 34,
+          "stix": 30,
+          "stix_in_text": 29,
+          "matched": 29,
+          "extracted_in_stix": 0.8529,
+          "stix_found": 0.9667,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa26-222a": {
+      "title": "#StopRansomware: Gunra Ransomware",
+      "group": "ransomware",
+      "pages": 21,
+      "gold_techniques": 36,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.88,
+      "risk": [
+        96.8,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 36,
+          "cited_exact": 36,
+          "cited_parent": 36,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 7,
+          "cited_exact": 0,
+          "cited_parent": 4,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.5714
+        },
+        "model_only": {
+          "predicted": 43,
+          "cited_exact": 0,
+          "cited_parent": 3,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0698
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 36,
+          "fp": 50,
+          "fn": 0,
+          "support": 36,
+          "precision": 0.4186046511627907,
+          "recall": 1.0,
+          "f1": 0.5901639344262295
+        },
+        "parent": {
+          "tp": 32,
+          "fp": 42,
+          "fn": 0,
+          "support": 32,
+          "precision": 0.43243243243243246,
+          "recall": 1.0,
+          "f1": 0.6037735849056604
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 32,
+            "fp": 50,
+            "fn": 4,
+            "support": 36,
+            "precision": 0.3902439024390244,
+            "recall": 0.8888888888888888,
+            "f1": 0.5423728813559323
+          },
+          "parent": {
+            "tp": 32,
+            "fp": 42,
+            "fn": 0,
+            "support": 32,
+            "precision": 0.43243243243243246,
+            "recall": 1.0,
+            "f1": 0.6037735849056604
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 21,
+            "fp": 7,
+            "fn": 15,
+            "support": 36,
+            "precision": 0.75,
+            "recall": 0.5833333333333334,
+            "f1": 0.6562499999999999
+          },
+          "parent": {
+            "tp": 20,
+            "fp": 3,
+            "fn": 12,
+            "support": 32,
+            "precision": 0.8695652173913043,
+            "recall": 0.625,
+            "f1": 0.7272727272727273
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 11,
+            "fp": 43,
+            "fn": 25,
+            "support": 36,
+            "precision": 0.2037037037037037,
+            "recall": 0.3055555555555556,
+            "f1": 0.24444444444444444
+          },
+          "parent": {
+            "tp": 14,
+            "fp": 40,
+            "fn": 18,
+            "support": 32,
+            "precision": 0.25925925925925924,
+            "recall": 0.4375,
+            "f1": 0.3255813953488372
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 17,
+          "stix": 17,
+          "stix_in_text": 17,
+          "matched": 17,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "domain": {
+          "extracted": 2,
+          "stix": 4,
+          "stix_in_text": 4,
+          "matched": 1,
+          "extracted_in_stix": 0.5,
+          "stix_found": 0.25,
+          "printed_stix_found": 0.25
+        },
+        "url": {
+          "extracted": 5,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "email": {
+          "extracted": 6,
+          "stix": 4,
+          "stix_in_text": 4,
+          "matched": 4,
+          "extracted_in_stix": 0.6667,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 1,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 1,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 1,
+          "stix": 4,
+          "stix_in_text": 1,
+          "matched": 1,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.25,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa26-293a": {
+      "title": "#StopRansomware: SafePay Ransomware",
+      "group": "ransomware",
+      "pages": 19,
+      "gold_techniques": 26,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.69,
+      "risk": [
+        96.4,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 26,
+          "cited_exact": 26,
+          "cited_parent": 26,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 9,
+          "cited_exact": 0,
+          "cited_parent": 2,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.2222
+        },
+        "model_only": {
+          "predicted": 61,
+          "cited_exact": 0,
+          "cited_parent": 4,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0656
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 26,
+          "fp": 70,
+          "fn": 0,
+          "support": 26,
+          "precision": 0.2708333333333333,
+          "recall": 1.0,
+          "f1": 0.4262295081967213
+        },
+        "parent": {
+          "tp": 20,
+          "fp": 59,
+          "fn": 0,
+          "support": 20,
+          "precision": 0.25316455696202533,
+          "recall": 1.0,
+          "f1": 0.4040404040404041
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 17,
+            "fp": 71,
+            "fn": 9,
+            "support": 26,
+            "precision": 0.19318181818181818,
+            "recall": 0.6538461538461539,
+            "f1": 0.2982456140350877
+          },
+          "parent": {
+            "tp": 17,
+            "fp": 60,
+            "fn": 3,
+            "support": 20,
+            "precision": 0.22077922077922077,
+            "recall": 0.85,
+            "f1": 0.3505154639175257
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 11,
+            "fp": 9,
+            "fn": 15,
+            "support": 26,
+            "precision": 0.55,
+            "recall": 0.4230769230769231,
+            "f1": 0.47826086956521735
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 7,
+            "fn": 10,
+            "support": 20,
+            "precision": 0.5882352941176471,
+            "recall": 0.5,
+            "f1": 0.5405405405405405
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 6,
+            "fp": 62,
+            "fn": 20,
+            "support": 26,
+            "precision": 0.08823529411764706,
+            "recall": 0.23076923076923078,
+            "f1": 0.12765957446808512
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 58,
+            "fn": 10,
+            "support": 20,
+            "precision": 0.14705882352941177,
+            "recall": 0.5,
+            "f1": 0.22727272727272727
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 9,
+          "stix": 9,
+          "stix_in_text": 9,
+          "matched": 9,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "domain": {
+          "extracted": 1,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "email": {
+          "extracted": 1,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 1,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 4,
+          "stix": 5,
+          "stix_in_text": 4,
+          "matched": 4,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.8,
+          "printed_stix_found": 1.0
+        },
+        "sha256": {
+          "extracted": 6,
+          "stix": 6,
+          "stix_in_text": 6,
+          "matched": 6,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa26-281a": {
+      "title": "Chinese Government-linked Cyber Threat Actors Combine Automated and Hands-on Hacking Tools to Steal Sensitive Data",
+      "group": "state-sponsored",
+      "pages": 58,
+      "gold_techniques": 15,
+      "techniques_evaluated": true,
+      "analysis_seconds": 3.26,
+      "risk": [
+        95.2,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 15,
+          "cited_exact": 15,
+          "cited_parent": 15,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 17,
+          "cited_exact": 0,
+          "cited_parent": 4,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.2353
+        },
+        "model_only": {
+          "predicted": 65,
+          "cited_exact": 0,
+          "cited_parent": 4,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0615
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 15,
+          "fp": 82,
+          "fn": 0,
+          "support": 15,
+          "precision": 0.15463917525773196,
+          "recall": 1.0,
+          "f1": 0.2678571428571429
+        },
+        "parent": {
+          "tp": 11,
+          "fp": 67,
+          "fn": 0,
+          "support": 11,
+          "precision": 0.14102564102564102,
+          "recall": 1.0,
+          "f1": 0.24719101123595508
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 8,
+            "fp": 83,
+            "fn": 7,
+            "support": 15,
+            "precision": 0.08791208791208792,
+            "recall": 0.5333333333333333,
+            "f1": 0.1509433962264151
+          },
+          "parent": {
+            "tp": 11,
+            "fp": 68,
+            "fn": 0,
+            "support": 11,
+            "precision": 0.13924050632911392,
+            "recall": 1.0,
+            "f1": 0.2444444444444444
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 7,
+            "fp": 17,
+            "fn": 8,
+            "support": 15,
+            "precision": 0.2916666666666667,
+            "recall": 0.4666666666666667,
+            "f1": 0.35897435897435903
+          },
+          "parent": {
+            "tp": 8,
+            "fp": 11,
+            "fn": 3,
+            "support": 11,
+            "precision": 0.42105263157894735,
+            "recall": 0.7272727272727273,
+            "f1": 0.5333333333333333
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 1,
+            "fp": 66,
+            "fn": 14,
+            "support": 15,
+            "precision": 0.014925373134328358,
+            "recall": 0.06666666666666667,
+            "f1": 0.024390243902439022
+          },
+          "parent": {
+            "tp": 5,
+            "fp": 62,
+            "fn": 6,
+            "support": 11,
+            "precision": 0.07462686567164178,
+            "recall": 0.45454545454545453,
+            "f1": 0.1282051282051282
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 517,
+          "stix": 514,
+          "stix_in_text": 514,
+          "matched": 514,
+          "extracted_in_stix": 0.9942,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "domain": {
+          "extracted": 223,
+          "stix": 203,
+          "stix_in_text": 202,
+          "matched": 194,
+          "extracted_in_stix": 0.87,
+          "stix_found": 0.9557,
+          "printed_stix_found": 0.9604
+        },
+        "url": {
+          "extracted": 4,
+          "stix": 24,
+          "stix_in_text": 24,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "email": {
+          "extracted": 4,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 32,
+          "stix": 32,
+          "stix_in_text": 32,
+          "matched": 32,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 6,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 26,
+          "stix": 32,
+          "stix_in_text": 26,
+          "matched": 26,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.8125,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa26-237a": {
+      "title": "A Tale of Two SOCs: Insights from Two Red Team Assessments",
+      "group": "red-team",
+      "pages": 23,
+      "gold_techniques": 25,
+      "techniques_evaluated": true,
+      "analysis_seconds": 2.32,
+      "risk": [
+        38.1,
+        "Moderate"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 25,
+          "cited_exact": 25,
+          "cited_parent": 25,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 12,
+          "cited_exact": 0,
+          "cited_parent": 7,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.5833
+        },
+        "model_only": {
+          "predicted": 56,
+          "cited_exact": 0,
+          "cited_parent": 5,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0893
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 25,
+          "fp": 68,
+          "fn": 0,
+          "support": 25,
+          "precision": 0.26881720430107525,
+          "recall": 1.0,
+          "f1": 0.423728813559322
+        },
+        "parent": {
+          "tp": 22,
+          "fp": 54,
+          "fn": 0,
+          "support": 22,
+          "precision": 0.2894736842105263,
+          "recall": 1.0,
+          "f1": 0.4489795918367347
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 19,
+            "fp": 69,
+            "fn": 6,
+            "support": 25,
+            "precision": 0.2159090909090909,
+            "recall": 0.76,
+            "f1": 0.33628318584070793
+          },
+          "parent": {
+            "tp": 21,
+            "fp": 55,
+            "fn": 1,
+            "support": 22,
+            "precision": 0.27631578947368424,
+            "recall": 0.9545454545454546,
+            "f1": 0.4285714285714286
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 14,
+            "fp": 12,
+            "fn": 11,
+            "support": 25,
+            "precision": 0.5384615384615384,
+            "recall": 0.56,
+            "f1": 0.5490196078431373
+          },
+          "parent": {
+            "tp": 15,
+            "fp": 5,
+            "fn": 7,
+            "support": 22,
+            "precision": 0.75,
+            "recall": 0.6818181818181818,
+            "f1": 0.7142857142857143
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 5,
+            "fp": 57,
+            "fn": 20,
+            "support": 25,
+            "precision": 0.08064516129032258,
+            "recall": 0.2,
+            "f1": 0.11494252873563218
+          },
+          "parent": {
+            "tp": 10,
+            "fp": 52,
+            "fn": 12,
+            "support": 22,
+            "precision": 0.16129032258064516,
+            "recall": 0.45454545454545453,
+            "f1": 0.23809523809523805
+          }
+        }
+      }
+    },
+    "aa23-129a": {
+      "title": "Hunting Russian Intelligence \"Snake\" Malware",
+      "group": "state-sponsored",
+      "pages": 48,
+      "gold_techniques": 48,
+      "techniques_evaluated": true,
+      "analysis_seconds": 4.28,
+      "risk": [
+        63.0,
+        "High"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 48,
+          "cited_exact": 48,
+          "cited_parent": 48,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 12,
+          "cited_exact": 0,
+          "cited_parent": 3,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.25
+        },
+        "model_only": {
+          "predicted": 55,
+          "cited_exact": 0,
+          "cited_parent": 9,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1636
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 48,
+          "fp": 67,
+          "fn": 0,
+          "support": 48,
+          "precision": 0.41739130434782606,
+          "recall": 1.0,
+          "f1": 0.5889570552147239
+        },
+        "parent": {
+          "tp": 40,
+          "fp": 53,
+          "fn": 0,
+          "support": 40,
+          "precision": 0.43010752688172044,
+          "recall": 1.0,
+          "f1": 0.6015037593984962
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 41,
+            "fp": 67,
+            "fn": 7,
+            "support": 48,
+            "precision": 0.37962962962962965,
+            "recall": 0.8541666666666666,
+            "f1": 0.5256410256410257
+          },
+          "parent": {
+            "tp": 40,
+            "fp": 53,
+            "fn": 0,
+            "support": 40,
+            "precision": 0.43010752688172044,
+            "recall": 1.0,
+            "f1": 0.6015037593984962
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 36,
+            "fp": 12,
+            "fn": 12,
+            "support": 48,
+            "precision": 0.75,
+            "recall": 0.75,
+            "f1": 0.75
+          },
+          "parent": {
+            "tp": 31,
+            "fp": 8,
+            "fn": 9,
+            "support": 40,
+            "precision": 0.7948717948717948,
+            "recall": 0.775,
+            "f1": 0.7848101265822786
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 5,
+            "fp": 55,
+            "fn": 43,
+            "support": 48,
+            "precision": 0.08333333333333333,
+            "recall": 0.10416666666666667,
+            "f1": 0.0925925925925926
+          },
+          "parent": {
+            "tp": 14,
+            "fp": 46,
+            "fn": 26,
+            "support": 40,
+            "precision": 0.23333333333333334,
+            "recall": 0.35,
+            "f1": 0.28
+          }
+        }
+      }
+    },
+    "aa24-016a": {
+      "title": "Known Indicators of Compromise Associated with Androxgh0st Malware",
+      "group": "malware",
+      "pages": 13,
+      "gold_techniques": 15,
+      "techniques_evaluated": true,
+      "analysis_seconds": 0.95,
+      "risk": [
+        70.8,
+        "High"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 15,
+          "cited_exact": 15,
+          "cited_parent": 15,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 1,
+          "cited_exact": 0,
+          "cited_parent": 0,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0
+        },
+        "model_only": {
+          "predicted": 28,
+          "cited_exact": 0,
+          "cited_parent": 5,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1786
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 15,
+          "fp": 29,
+          "fn": 0,
+          "support": 15,
+          "precision": 0.3409090909090909,
+          "recall": 1.0,
+          "f1": 0.5084745762711864
+        },
+        "parent": {
+          "tp": 13,
+          "fp": 24,
+          "fn": 0,
+          "support": 13,
+          "precision": 0.35135135135135137,
+          "recall": 1.0,
+          "f1": 0.52
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 11,
+            "fp": 29,
+            "fn": 4,
+            "support": 15,
+            "precision": 0.275,
+            "recall": 0.7333333333333333,
+            "f1": 0.4
+          },
+          "parent": {
+            "tp": 13,
+            "fp": 24,
+            "fn": 0,
+            "support": 13,
+            "precision": 0.35135135135135137,
+            "recall": 1.0,
+            "f1": 0.52
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 7,
+            "fp": 1,
+            "fn": 8,
+            "support": 15,
+            "precision": 0.875,
+            "recall": 0.4666666666666667,
+            "f1": 0.608695652173913
+          },
+          "parent": {
+            "tp": 7,
+            "fp": 1,
+            "fn": 6,
+            "support": 13,
+            "precision": 0.875,
+            "recall": 0.5384615384615384,
+            "f1": 0.6666666666666667
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 4,
+            "fp": 28,
+            "fn": 11,
+            "support": 15,
+            "precision": 0.125,
+            "recall": 0.26666666666666666,
+            "f1": 0.1702127659574468
+          },
+          "parent": {
+            "tp": 9,
+            "fp": 23,
+            "fn": 4,
+            "support": 13,
+            "precision": 0.28125,
+            "recall": 0.6923076923076923,
+            "f1": 0.4
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 2,
+          "stix": 1,
+          "stix_in_text": 1,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "domain": {
+          "extracted": 3,
+          "stix": 2,
+          "stix_in_text": 2,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "url": {
+          "extracted": 12,
+          "stix": 8,
+          "stix_in_text": 8,
+          "matched": 8,
+          "extracted_in_stix": 0.6667,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "email": {
+          "extracted": 2,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 8,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 8,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 8,
+          "stix": 8,
+          "stix_in_text": 8,
+          "matched": 8,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa24-207a": {
+      "title": "North Korea Cyber Group Conducts Global Espionage Campaign to Advance Regime's Military and Nuclear Programs",
+      "group": "state-sponsored",
+      "pages": 30,
+      "gold_techniques": 23,
+      "techniques_evaluated": true,
+      "analysis_seconds": 2.48,
+      "risk": [
+        96.2,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 22,
+          "cited_exact": 22,
+          "cited_parent": 22,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 13,
+          "cited_exact": 1,
+          "cited_parent": 2,
+          "agreement_exact": 0.0769,
+          "agreement_parent": 0.1538
+        },
+        "model_only": {
+          "predicted": 38,
+          "cited_exact": 0,
+          "cited_parent": 0,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.0
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 23,
+          "fp": 50,
+          "fn": 0,
+          "support": 23,
+          "precision": 0.3150684931506849,
+          "recall": 1.0,
+          "f1": 0.4791666666666667
+        },
+        "parent": {
+          "tp": 20,
+          "fp": 47,
+          "fn": 0,
+          "support": 20,
+          "precision": 0.29850746268656714,
+          "recall": 1.0,
+          "f1": 0.45977011494252873
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 16,
+            "fp": 50,
+            "fn": 7,
+            "support": 23,
+            "precision": 0.24242424242424243,
+            "recall": 0.6956521739130435,
+            "f1": 0.35955056179775285
+          },
+          "parent": {
+            "tp": 16,
+            "fp": 47,
+            "fn": 4,
+            "support": 20,
+            "precision": 0.25396825396825395,
+            "recall": 0.8,
+            "f1": 0.38554216867469876
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 7,
+            "fp": 12,
+            "fn": 16,
+            "support": 23,
+            "precision": 0.3684210526315789,
+            "recall": 0.30434782608695654,
+            "f1": 0.3333333333333333
+          },
+          "parent": {
+            "tp": 7,
+            "fp": 11,
+            "fn": 13,
+            "support": 20,
+            "precision": 0.3888888888888889,
+            "recall": 0.35,
+            "f1": 0.36842105263157887
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 9,
+            "fp": 38,
+            "fn": 14,
+            "support": 23,
+            "precision": 0.19148936170212766,
+            "recall": 0.391304347826087,
+            "f1": 0.2571428571428572
+          },
+          "parent": {
+            "tp": 9,
+            "fp": 38,
+            "fn": 11,
+            "support": 20,
+            "precision": 0.19148936170212766,
+            "recall": 0.45,
+            "f1": 0.26865671641791045
+          }
+        }
+      },
+      "ioc": {
+        "domain": {
+          "extracted": 3,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "url": {
+          "extracted": 24,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "email": {
+          "extracted": 7,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 121,
+          "stix": 123,
+          "stix_in_text": 121,
+          "matched": 121,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.9837,
+          "printed_stix_found": 1.0
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 89,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 31,
+          "stix": 90,
+          "stix_in_text": 31,
+          "matched": 31,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.3444,
+          "printed_stix_found": 1.0
+        }
+      }
+    },
+    "aa24-290a": {
+      "title": "Iranian Cyber Actors' Brute Force and Credential Access Activity Compromises Critical Infrastructure Organizations",
+      "group": "state-sponsored",
+      "pages": 15,
+      "gold_techniques": 28,
+      "techniques_evaluated": true,
+      "analysis_seconds": 1.07,
+      "risk": [
+        88.8,
+        "Critical"
+      ],
+      "published_groups": {
+        "id": {
+          "predicted": 28,
+          "cited_exact": 28,
+          "cited_parent": 28,
+          "agreement_exact": 1.0,
+          "agreement_parent": 1.0
+        },
+        "name_or_term": {
+          "predicted": 10,
+          "cited_exact": 0,
+          "cited_parent": 5,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.5
+        },
+        "model_only": {
+          "predicted": 33,
+          "cited_exact": 0,
+          "cited_parent": 5,
+          "agreement_exact": 0.0,
+          "agreement_parent": 0.1515
+        }
+      },
+      "published": {
+        "exact": {
+          "tp": 28,
+          "fp": 43,
+          "fn": 0,
+          "support": 28,
+          "precision": 0.39436619718309857,
+          "recall": 1.0,
+          "f1": 0.5656565656565656
+        },
+        "parent": {
+          "tp": 24,
+          "fp": 32,
+          "fn": 0,
+          "support": 24,
+          "precision": 0.42857142857142855,
+          "recall": 1.0,
+          "f1": 0.6
+        }
+      },
+      "masked": {
+        "all": {
+          "exact": {
+            "tp": 19,
+            "fp": 44,
+            "fn": 9,
+            "support": 28,
+            "precision": 0.30158730158730157,
+            "recall": 0.6785714285714286,
+            "f1": 0.41758241758241754
+          },
+          "parent": {
+            "tp": 22,
+            "fp": 33,
+            "fn": 2,
+            "support": 24,
+            "precision": 0.4,
+            "recall": 0.9166666666666666,
+            "f1": 0.5569620253164558
+          }
+        },
+        "name_or_term": {
+          "exact": {
+            "tp": 12,
+            "fp": 10,
+            "fn": 16,
+            "support": 28,
+            "precision": 0.5454545454545454,
+            "recall": 0.42857142857142855,
+            "f1": 0.4799999999999999
+          },
+          "parent": {
+            "tp": 12,
+            "fp": 5,
+            "fn": 12,
+            "support": 24,
+            "precision": 0.7058823529411765,
+            "recall": 0.5,
+            "f1": 0.5853658536585366
+          }
+        },
+        "model_only": {
+          "exact": {
+            "tp": 7,
+            "fp": 34,
+            "fn": 21,
+            "support": 28,
+            "precision": 0.17073170731707318,
+            "recall": 0.25,
+            "f1": 0.20289855072463767
+          },
+          "parent": {
+            "tp": 12,
+            "fp": 29,
+            "fn": 12,
+            "support": 24,
+            "precision": 0.2926829268292683,
+            "recall": 0.5,
+            "f1": 0.3692307692307692
+          }
+        }
+      },
+      "ioc": {
+        "ipv4": {
+          "extracted": 69,
+          "stix": 69,
+          "stix_in_text": 69,
+          "matched": 69,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "url": {
+          "extracted": 1,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "email": {
+          "extracted": 3,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 2,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 2,
+          "stix": 2,
+          "stix_in_text": 2,
+          "matched": 2,
+          "extracted_in_stix": 1.0,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "sha256": {
+          "extracted": 0,
+          "stix": 2,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        }
+      }
+    },
+    "aa23-025a": {
+      "title": "Protecting Against Malicious Use of Remote Monitoring and Management Software",
+      "group": "tooling-abuse",
+      "pages": 7,
+      "gold_techniques": 0,
+      "techniques_evaluated": false,
+      "analysis_seconds": 0.54,
+      "risk": [
+        53.5,
+        "High"
+      ],
+      "ioc": {
+        "domain": {
+          "extracted": 11,
+          "stix": 10,
+          "stix_in_text": 10,
+          "matched": 10,
+          "extracted_in_stix": 0.9091,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "email": {
+          "extracted": 4,
+          "stix": 0,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": null,
+          "printed_stix_found": null
+        }
+      }
+    },
+    "aa23-131a": {
+      "title": "Malicious Actors Exploit CVE-2023-27350 in PaperCut MF and NG",
+      "group": "exploitation",
+      "pages": 13,
+      "gold_techniques": 0,
+      "techniques_evaluated": false,
+      "analysis_seconds": 0.88,
+      "risk": [
+        91.8,
+        "Critical"
+      ],
+      "ioc": {
+        "ipv4": {
+          "extracted": 16,
+          "stix": 17,
+          "stix_in_text": 17,
+          "matched": 16,
+          "extracted_in_stix": 1.0,
+          "stix_found": 0.9412,
+          "printed_stix_found": 0.9412
+        },
+        "domain": {
+          "extracted": 16,
+          "stix": 13,
+          "stix_in_text": 13,
+          "matched": 13,
+          "extracted_in_stix": 0.8125,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "url": {
+          "extracted": 2,
+          "stix": 2,
+          "stix_in_text": 1,
+          "matched": 0,
+          "extracted_in_stix": 0.0,
+          "stix_found": 0.0,
+          "printed_stix_found": 0.0
+        },
+        "email": {
+          "extracted": 6,
+          "stix": 5,
+          "stix_in_text": 5,
+          "matched": 5,
+          "extracted_in_stix": 0.8333,
+          "stix_found": 1.0,
+          "printed_stix_found": 1.0
+        },
+        "md5": {
+          "extracted": 0,
+          "stix": 3,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha1": {
+          "extracted": 0,
+          "stix": 3,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        },
+        "sha256": {
+          "extracted": 0,
+          "stix": 3,
+          "stix_in_text": 0,
+          "matched": 0,
+          "extracted_in_stix": null,
+          "stix_found": 0.0,
+          "printed_stix_found": null
+        }
+      }
+    }
+  },
+  "attack_version": "20.1",
+  "overall": {
+    "published_groups": {
+      "id": {
+        "predicted": 329,
+        "cited_exact": 329,
+        "cited_parent": 329,
+        "agreement_exact": 1.0,
+        "agreement_parent": 1.0
+      },
+      "name_or_term": {
+        "predicted": 111,
+        "cited_exact": 1,
+        "cited_parent": 40,
+        "agreement_exact": 0.009,
+        "agreement_parent": 0.3604
+      },
+      "model_only": {
+        "predicted": 550,
+        "cited_exact": 0,
+        "cited_parent": 57,
+        "agreement_exact": 0.0,
+        "agreement_parent": 0.1036
+      }
+    },
+    "published": {
+      "exact": {
+        "tp": 330,
+        "fp": 660,
+        "fn": 0,
+        "support": 330,
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "f1": 0.5
+      },
+      "parent": {
+        "tp": 286,
+        "fp": 540,
+        "fn": 0,
+        "support": 286,
+        "precision": 0.34624697336561744,
+        "recall": 1.0,
+        "f1": 0.5143884892086331
+      }
+    },
+    "masked": {
+      "all": {
+        "exact": {
+          "tp": 248,
+          "fp": 666,
+          "fn": 82,
+          "support": 330,
+          "precision": 0.2713347921225383,
+          "recall": 0.7515151515151515,
+          "f1": 0.3987138263665595
+        },
+        "parent": {
+          "tp": 271,
+          "fp": 546,
+          "fn": 15,
+          "support": 286,
+          "precision": 0.3317013463892289,
+          "recall": 0.9475524475524476,
+          "f1": 0.49138712601994555
+        }
+      },
+      "name_or_term": {
+        "exact": {
+          "tp": 165,
+          "fp": 110,
+          "fn": 165,
+          "support": 330,
+          "precision": 0.6,
+          "recall": 0.5,
+          "f1": 0.5454545454545454
+        },
+        "parent": {
+          "tp": 160,
+          "fp": 68,
+          "fn": 126,
+          "support": 286,
+          "precision": 0.7017543859649122,
+          "recall": 0.5594405594405595,
+          "f1": 0.622568093385214
+        }
+      },
+      "model_only": {
+        "exact": {
+          "tp": 83,
+          "fp": 556,
+          "fn": 247,
+          "support": 330,
+          "precision": 0.1298904538341158,
+          "recall": 0.2515151515151515,
+          "f1": 0.17131062951496387
+        },
+        "parent": {
+          "tp": 140,
+          "fp": 499,
+          "fn": 146,
+          "support": 286,
+          "precision": 0.2190923317683881,
+          "recall": 0.48951048951048953,
+          "f1": 0.30270270270270266
+        }
+      }
+    },
+    "ioc": {
+      "ipv4": {
+        "extracted": 660,
+        "stix": 657,
+        "stix_in_text": 657,
+        "matched": 654,
+        "extracted_in_stix": 0.9909,
+        "stix_found": 0.9954,
+        "printed_stix_found": 0.9954
+      },
+      "domain": {
+        "extracted": 281,
+        "stix": 234,
+        "stix_in_text": 233,
+        "matched": 219,
+        "extracted_in_stix": 0.7794,
+        "stix_found": 0.9359,
+        "printed_stix_found": 0.9399
+      },
+      "url": {
+        "extracted": 173,
+        "stix": 145,
+        "stix_in_text": 142,
+        "matched": 116,
+        "extracted_in_stix": 0.6705,
+        "stix_found": 0.8,
+        "printed_stix_found": 0.8169
+      },
+      "email": {
+        "extracted": 76,
+        "stix": 42,
+        "stix_in_text": 42,
+        "matched": 42,
+        "extracted_in_stix": 0.5526,
+        "stix_found": 1.0,
+        "printed_stix_found": 1.0
+      },
+      "md5": {
+        "extracted": 173,
+        "stix": 199,
+        "stix_in_text": 173,
+        "matched": 173,
+        "extracted_in_stix": 1.0,
+        "stix_found": 0.8693,
+        "printed_stix_found": 1.0
+      },
+      "sha1": {
+        "extracted": 9,
+        "stix": 137,
+        "stix_in_text": 9,
+        "matched": 9,
+        "extracted_in_stix": 1.0,
+        "stix_found": 0.0657,
+        "printed_stix_found": 1.0
+      },
+      "sha256": {
+        "extracted": 106,
+        "stix": 187,
+        "stix_in_text": 101,
+        "matched": 101,
+        "extracted_in_stix": 0.9528,
+        "stix_found": 0.5401,
+        "printed_stix_found": 1.0
+      }
+    }
+  },
+  "components": {
+    "entities": "en_core_web_sm",
+    "threat_classification": "model+rules",
+    "technique_mapping": "explicit+model"
+  }
+}

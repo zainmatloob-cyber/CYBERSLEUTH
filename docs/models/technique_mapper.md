@@ -46,6 +46,10 @@ coverage 0.97.
   *not* be modified"). Not fixed here, because the examples come from the test split.
 
 ## Limitations
+* **It doesn't transfer to real reports at the current threshold.** On 14 CISA advisories,
+  only 10% of model-only suggestions (55 of 550) match a technique CISA cites. Below a decision
+  score of 0.25 (85% of suggestions), agreement is 3%; at 0.75 or above it is 65%. See
+  [real-world analysis](../evaluation/real_world_analysis.md).
 * Trained on ATT&CK procedure prose. Real reports differ in style and length.
 * Parent-technique level only for the model. Sub-techniques come only from explicit matches.
 * Assertion detection is a cue heuristic without an annotated evaluation set.

@@ -83,6 +83,22 @@ an evidence trail for every finding: document, page and character position.
 
 ## Evaluation
 
+### Real-world test: 14 CISA advisories (scored once)
+Gold labels come from CISA itself: the ATT&CK IDs each advisory cites, and its STIX indicator
+bundle ([results](docs/evaluation/real_world.md), [error analysis](docs/evaluation/real_world_analysis.md)):
+
+| Component | Result on real advisories |
+|---|---|
+| IPv4 extraction | 654 of 657 STIX IPs found; 99% of extracted IPs are in STIX |
+| Hash extraction | 100% of the hashes printed in the PDFs found |
+| Technique matching (IDs masked, name/term matcher) | precision 0.70, recall 0.56 (parent technique) |
+| **Model-only technique suggestions** | **only 10% agree with CISA** (85% of suggestions have a low score; those agree 3% of the time) |
+
+The technique model doesn't transfer from ATT&CK procedure text to real reports at its current
+threshold. Model suggestions should be treated as low-confidence leads; the fix is planned
+and will be validated on separate data.
+
+### Synthetic extraction test set
 8 synthetic, author-annotated documents, split dev/test. The test split was scored once,
 with the code frozen ([details and every error](docs/evaluation/README.md)):
 

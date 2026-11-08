@@ -76,6 +76,10 @@ python scripts/evaluate_real_world.py           # write gold labels only (inspec
 python scripts/evaluate_real_world.py --final   # score once -> real_world.md / .json
 ```
 
+**Results:** [real_world.md](real_world.md) (scored once at `0f1e6e9`) and
+[real_world_analysis.md](real_world_analysis.md) (error analysis). Model-only technique
+suggestions agree with CISA only 10% of the time; IP and hash extraction are near-perfect.
+
 Method and caveats are in `src/evaluation/real_world.py`. The main question is how often
 model-only technique suggestions agree with what CISA cites. A suggestion CISA doesn't cite
 isn't necessarily wrong, so this is reported as agreement, not precision.
