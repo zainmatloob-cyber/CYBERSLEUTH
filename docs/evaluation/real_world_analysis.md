@@ -94,4 +94,12 @@ Fixing these by looking at this test set and re-scoring would be tuning on test.
    robustness problems. They'll be fixed with unit tests built from synthetic examples, and
    the effect measured on new documents.
 
+### Status (2026-11-08)
+* **Done:** item 1 (`ee278a8`). Leads are hidden by default, flagged in reports, and score
+  only once confirmed. Confirming or rejecting a technique re-scores the analysis.
+* **Done:** item 3. Line-wrapped URL rejoining, `&nbsp;` removal, placeholder rejection and
+  `.onion` support, each covered by synthetic unit tests. The development-split extraction
+  report is unchanged. These 14 advisories were **not** re-scored to claim an improvement.
+* **Open:** item 2 needs a new batch of advisories.
+
 The scores in [real_world.md](real_world.md) remain the record for code version `0f1e6e9`.

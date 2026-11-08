@@ -86,8 +86,19 @@ Implemented in `src/nlp/ioc_extractor.py`. It never resolves or contacts any val
    * Title-case dotted names (`System.Management`) are rejected because `.management`,
      `.exchange` and `.security` are real TLDs.
 4. **Overlap priority:** URL > email > CVE > IPv4 > domain > hash. A host inside a URL is
-   not counted twice.
-5. **De-duplication** by `(type, value)`. Every occurrence keeps its page, position,
+   not counted twice. This is a deliberate choice, and it costs recall when a reference list
+   such as STIX also lists the host on its own.
+5. **Robustness for PDF text** (added 2026-11-08 after the real-world error analysis, using
+   synthetic unit tests only):
+   * **Line-wrapped URLs** are rejoined when the URL stops at a line break and the next
+     token continues it with URL structure (`/ . ? = & % # _ ~`). They are flagged
+     `rejoined_line_break`, and the occurrence keeps the exact source slice.
+   * **A trailing `&nbsp`/`&nbsp;`** (HTML conversion residue) is removed from URLs.
+   * **Placeholders** whose labels are all `x` (`xxx.xxx.xxx.xxx`) are rejected; `.xxx` is a
+     real TLD, so real `.xxx` domains still match.
+   * **Tor `.onion` names** (RFC 7686) are accepted with a valid 16- or 56-character base32
+     label and flagged `tor_onion_service`.
+6. **De-duplication** by `(type, value)`. Every occurrence keeps its page, position,
    sentence index and sentence text.
 
 Flags (`documentation_range`, `private`, `reserved_domain`, …) describe what a value is.

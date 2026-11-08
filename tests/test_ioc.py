@@ -302,3 +302,58 @@ def test_sample_advisory_exact_extraction(extractor, name):
         (IOCType.MD5, MD5),
         (IOCType.SHA256, SHA256),
     }
+
+
+# --- robustness on PDF-extracted text (synthetic examples only) ------------------------
+
+ONION_V3 = "abcdefghijklmnopqrstuvwxyz234567abcdefghijklmnopqrstuvwx"  # 56 base32 chars
+
+
+def _found(text: str) -> list[tuple[str, str, list[str]]]:
+    return [(m.ioc_type.value, m.value, sorted(f.value for f in m.flags))
+            for m in IOCExtractor().find(text)]
+
+
+def test_url_wrapped_at_line_break_is_rejoined_and_flagged():
+    text = "Fetched https://cdn.bad-host.com/stage/loader.reques\nts.php?id=7 at noon."
+    matches = IOCExtractor().find(text)
+    assert [(m.value, sorted(f.value for f in m.flags)) for m in matches] == [
+        ("https://cdn.bad-host.com/stage/loader.requests.php?id=7", ["rejoined_line_break"])]
+    assert text[matches[0].char_start:matches[0].char_end] == matches[0].raw  # exact slice
+
+
+@pytest.mark.parametrize(("text", "expected"), [
+    ("See https://bad-host.com/a/b\nThe actor then left.", ["https://bad-host.com/a/b"]),
+    ("See https://bad-host.com/a/b\nand then left.", ["https://bad-host.com/a/b"]),
+    ("Two https://a-host.com/x\nhttps://b-host.com/y here.",
+     ["https://a-host.com/x", "https://b-host.com/y"]),
+], ids=["sentence", "plain-word", "new-url"])
+def test_url_not_joined_with_unrelated_next_line(text, expected):
+    found = _found(text)
+    assert [v for _, v, _ in found] == expected
+    assert all(not flags for _, _, flags in found)
+
+
+def test_trailing_nbsp_residue_is_removed_but_query_entities_kept():
+    found = {v for _, v, _ in _found("Get https://bad-host.com/js/app.js&nbsp; and "
+                                     "https://bad-host.com/q?a=1&copy=2 too.")}
+    assert found == {"https://bad-host.com/js/app.js", "https://bad-host.com/q?a=1&copy=2"}
+
+
+@pytest.mark.parametrize("text", [
+    "C2 at xxx.xxx.xxx.xxx was redacted.",
+    "Request to http://XXX.XXX.XXX.XXX:80/index.html was redacted.",
+], ids=["domain", "url-host"])
+def test_placeholders_are_rejected(text):
+    assert _found(text) == []
+
+
+def test_real_xxx_domains_are_still_accepted():
+    assert _found("Traffic to bad-site.xxx was seen.") == [("domain", "bad-site.xxx", [])]
+
+
+def test_onion_names_need_a_valid_tor_label():
+    found = _found(f"Leak site {ONION_V3}.onion and http://abcdefghijklmnop.onion/x "
+                   "but not shop.onion or http://bad-1.onion/")
+    assert found == [("domain", f"{ONION_V3}.onion", ["tor_onion_service"]),
+                     ("url", "http://abcdefghijklmnop.onion/x", ["tor_onion_service"])]

@@ -9,6 +9,16 @@ Pipeline per page:
 4. **Overlap resolution** by priority: URL > email > CVE > IPv4 > domain > hashes.
    A domain inside a URL is therefore not counted twice.
 
+Robustness rules for text extracted from PDFs:
+* **Line-wrapped URLs** are rejoined when the URL stops exactly at a line break and the next
+  token continues it with URL structure (``/ . ? = & % # _ ~``). The occurrence keeps the
+  exact source slice (including the break), and the indicator is flagged ``REJOINED``.
+* **HTML residue** (a trailing ``&nbsp`` / ``&nbsp;``) is removed from URLs. There is no
+  general HTML unescaping, because that would corrupt query strings such as ``&copy=2``.
+* **Placeholders** such as ``xxx.xxx.xxx.xxx`` (``.xxx`` is a real TLD) are rejected.
+* **Tor ``.onion`` names** (RFC 7686, not in the IANA root zone) are accepted only with a
+  valid base32 label (16 or 56 characters) and flagged ``TOR_ONION``.
+
 Then, per document: **de-duplication** by ``(type, value)`` and **evidence
 linking** of every occurrence to its sentence.
 
@@ -49,6 +59,12 @@ _PRIVATE_NETS = tuple(
     ipaddress.ip_network(n) for n in ("10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16")
 )
 _SHARED_NET = ipaddress.ip_network("100.64.0.0/10")
+_ONION_LABEL = re.compile(r"^(?:[a-z2-7]{16}|[a-z2-7]{56})$")
+_PLACEHOLDER_LABEL = re.compile(r"^x+$", re.IGNORECASE)
+_NBSP_TAIL = re.compile(r"(?:&nbsp;?)+$", re.IGNORECASE)
+# A continuation token on the next line: URL characters up to whitespace.
+_CONTINUATION = re.compile(r"[A-Za-z0-9/._~%?=&#:+\-]+")
+_URL_STRUCTURE = frozenset("/.?=&%#_~")
 _FIRST_CVE_YEAR = 1999
 
 # --- regex building blocks ----------------------------------------------------
@@ -129,10 +145,35 @@ def _trim_url(raw: str) -> str:
 
 def _domain_flags(domain: str) -> frozenset[IOCFlag]:
     tld = domain.rsplit(".", 1)[-1]
+    if tld == "onion":
+        return frozenset({IOCFlag.TOR_ONION})
     reserved = tld in _RESERVED_TLDS or any(
         domain == d or domain.endswith("." + d) for d in _RESERVED_DOMAINS
     )
     return frozenset({IOCFlag.RESERVED_DOMAIN}) if reserved else frozenset()
+
+
+def _is_placeholder(host: str) -> bool:
+    """``xxx.xxx.xxx.xxx`` / ``x.x.x.x``: a redaction pattern, not a real host."""
+    return all(_PLACEHOLDER_LABEL.match(label) for label in host.split("."))
+
+
+def _valid_onion(domain: str) -> bool:
+    labels = domain.split(".")
+    return len(labels) >= 2 and bool(_ONION_LABEL.match(labels[-2]))
+
+
+def _rejoin_wrapped(text: str, end: int) -> int | None:
+    """End offset of a URL continued on the next line, or ``None`` if it isn't."""
+    if end >= len(text) or text[end] != "\n":
+        return None
+    match = _CONTINUATION.match(text, end + 1)
+    if not match or _URL_RE.match(text, end + 1):
+        return None  # nothing to join, or the next line starts a new URL
+    token = match.group().rstrip(_URL_TRAILING)
+    if not token or not (_URL_STRUCTURE & set(token)):
+        return None  # a plain word ("See", "and") is the next sentence, not the URL
+    return end + 1 + len(token)
 
 
 def _ip_flags(ip: ipaddress.IPv4Address) -> frozenset[IOCFlag]:
@@ -177,12 +218,17 @@ class IOCExtractor:
 
     def _valid_domain(self, domain: str) -> bool:
         # RFC 6761 special-use names are not delegated (absent from the IANA list) but
-        # are unambiguous; they are accepted and always carry RESERVED_DOMAIN.
+        # are unambiguous; they are accepted and always carry RESERVED_DOMAIN. RFC 7686
+        # .onion names are accepted only with a valid Tor base32 label.
+        if len(domain) > 253 or _is_placeholder(domain):
+            return False
         tld = domain.rsplit(".", 1)[-1]
-        return len(domain) <= 253 and (tld in self.tlds or tld in _RESERVED_TLDS)
+        if tld == "onion":
+            return _valid_onion(domain)
+        return tld in self.tlds or tld in _RESERVED_TLDS
 
     def _url(self, raw: str) -> tuple[str, frozenset[IOCFlag]] | None:
-        literal = refang(raw)
+        literal = _NBSP_TAIL.sub("", refang(raw).replace("\n", ""))
         scheme, _, rest = literal.partition("://")
         host_end = len(rest)
         for sep in "/?#":
@@ -192,7 +238,9 @@ class IOCExtractor:
         host_port, path = rest[:host_end], rest[host_end:]
         host = host_port.rsplit(":", 1)[0] if ":" in host_port else host_port
         host = host.lower().rstrip(".")
-        if not host:
+        if not host or _is_placeholder(host):
+            return None
+        if host.endswith(".onion") and not _valid_onion(host):
             return None
         value = f"{scheme.lower()}://{host_port.lower()}{path}"
         try:
@@ -249,19 +297,26 @@ class IOCExtractor:
         covered = bytearray(len(text))
         accepted: list[IOCMatch] = []
 
-        def accept(ioc_type: IOCType, start: int, raw: str, result) -> None:
+        def accept(ioc_type: IOCType, start: int, raw: str, result,
+                   extra: frozenset[IOCFlag] = frozenset()) -> None:
             end = start + len(raw)
             if result is None or any(covered[start:end]):
                 return
             covered[start:end] = b"\x01" * (end - start)
             value, flags = result
             accepted.append(
-                IOCMatch(ioc_type, raw, value, start, end, _is_defanged(raw), flags)
+                IOCMatch(ioc_type, raw, value, start, end, _is_defanged(raw), flags | extra)
             )
 
         for m in _URL_RE.finditer(text):
             raw = _trim_url(m.group())
-            accept(IOCType.URL, m.start(), raw, self._url(raw))
+            extra: frozenset[IOCFlag] = frozenset()
+            if m.start() + len(raw) == m.end():  # nothing trimmed: may continue on next line
+                wrapped_end = _rejoin_wrapped(text, m.end())
+                if wrapped_end is not None:
+                    raw = _trim_url(text[m.start():wrapped_end])
+                    extra = frozenset({IOCFlag.REJOINED})
+            accept(IOCType.URL, m.start(), raw, self._url(raw), extra)
         for m in _EMAIL_RE.finditer(text):
             accept(IOCType.EMAIL, m.start(), m.group(), self._email(m.group()))
         for m in _CVE_RE.finditer(text):

@@ -42,6 +42,8 @@ class IOCFlag(StrEnum):
     SHARED = "shared_address_space"  # RFC 6598 carrier-grade NAT
     RESERVED = "reserved"
     RESERVED_DOMAIN = "reserved_domain"  # RFC 2606 / 6761 example & test names
+    TOR_ONION = "tor_onion_service"  # RFC 7686 .onion name (reachable only over Tor)
+    REJOINED = "rejoined_line_break"  # URL reconstructed across a line break in the source
 
 
 @dataclass(frozen=True)
