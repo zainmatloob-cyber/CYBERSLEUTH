@@ -258,9 +258,18 @@ pytest --cov=src --cov=app --cov-report=term-missing
 ruff check .
 ```
 
+570 tests; line coverage of `src/` is 98% (2026-11-08). The uncovered lines are mostly
+minor UI branches and defensive checks a test can't reach, such as a zero-page PDF, which
+PyMuPDF can't create.
+
 The suite covers:
 * validation and attack cases (disguised executables, zip bombs, path traversal,
   Markdown injection);
+* model and knowledge-base files: wrong object type, wrong format version, other
+  scikit-learn version, corrupt JSON;
+* the upload flow: a rerun doesn't re-analyse, a duplicate document reopens the stored
+  analysis, a failed save still shows the result, errors are escaped, and unexpected
+  failures show a generic message with the details only in the log;
 * every reader's edge cases;
 * cleaning that leaves IOCs intact, and the sentence-position invariant;
 * IOC false-positive traps and defanging variants;

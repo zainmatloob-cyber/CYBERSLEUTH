@@ -198,6 +198,9 @@ class TechniqueModel:
             raise TechniqueModelError(f"{path.name} is not a TechniqueModel.")
         if model.metadata.get("format_version") != str(MODEL_FORMAT_VERSION):
             raise TechniqueModelError(f"{path.name} has an incompatible format version.")
+        if model.metadata.get("sklearn_version") != sklearn.__version__:
+            logger.warning("Technique model trained with scikit-learn %s, running %s.",
+                           model.metadata.get("sklearn_version"), sklearn.__version__)
         return model
 
 

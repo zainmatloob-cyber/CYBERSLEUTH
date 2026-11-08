@@ -229,3 +229,115 @@ def test_md_escape_neutralises_markup(raw, escaped):
 
 def test_md_escape_keeps_plain_text_readable():
     assert md_escape("report 2026") == "report 2026"
+
+
+# --- the upload flow of the analysis page --------------------------------------------
+
+
+def _upload_script(db_url: str, data: bytes, name: str, file_id: str,
+                   fail_save: bool = False) -> None:
+    import streamlit as st
+
+    from src.database.db_manager import AnalysisRepository, DatabaseError, make_engine
+    from src.intelligence.analyzer import Analyzer
+    from src.ui import pages
+
+    class Upload:  # stands in for Streamlit's UploadedFile
+        def __init__(self):
+            self.name, self.file_id = name, file_id
+
+        def getvalue(self) -> bytes:
+            return data
+
+    st.session_state.setdefault("analyses_run", 0)
+
+    class CountingAnalyzer(Analyzer):
+        def analyze(self, *args, **kwargs):
+            st.session_state["analyses_run"] += 1
+            return super().analyze(*args, **kwargs)
+
+    repo = AnalysisRepository(make_engine(db_url))
+    if fail_save:
+        def refuse(_result):
+            raise DatabaseError("disk full")
+        repo.save = refuse
+    st.file_uploader = lambda *args, **kwargs: Upload()
+    pages.analysis_page(CountingAnalyzer(use_models=False), repo)
+    st.caption(f"analyses_run={st.session_state['analyses_run']}")
+
+
+REPORT = b"APT28 used Mimikatz against 198.51.100.7 before deploying LockBit."
+
+
+def _upload_app(db_url, **kwargs) -> AppTest:
+    at = AppTest.from_function(_upload_script, kwargs={"db_url": db_url, **kwargs},
+                               default_timeout=60).run()
+    assert not at.exception
+    return at
+
+
+def _runs(at) -> str:
+    return next(c.value for c in at.caption if c.value.startswith("analyses_run="))
+
+
+def test_upload_is_analysed_saved_and_not_reanalysed_on_rerun(db_url):
+    at = _upload_app(db_url, data=REPORT, name="r.txt", file_id="f1")
+    assert any("Saved as analysis #1" in i.value for i in at.info)
+    assert _runs(at) == "analyses_run=1"
+    at.run()  # any widget interaction reruns the script with the same upload
+    assert not at.exception and _runs(at) == "analyses_run=1"
+
+
+def test_same_document_uploaded_again_reopens_the_stored_analysis(db_url):
+    _upload_app(db_url, data=REPORT, name="r.txt", file_id="f1")
+    at = _upload_app(db_url, data=REPORT, name="copy.txt", file_id="f2")
+    assert any("already analysed" in i.value and "#1" in i.value for i in at.info)
+
+
+def test_bad_upload_shows_an_escaped_error(db_url):
+    at = _upload_app(db_url, data=b"MZ\x90\x00" * 64, name="[x](http://evil).pdf",
+                     file_id="f3")
+    message = at.error[0].value
+    assert "Could not process" in message and r"\[x\]\(http\://evil\)" in message
+    assert not at.tabs  # nothing else is rendered for a rejected file
+
+
+def test_save_failure_still_shows_the_analysis(db_url):
+    at = _upload_app(db_url, data=REPORT, name="r.txt", file_id="f4", fail_save=True)
+    assert any("Not saved: disk full" in i.value for i in at.info)
+    assert at.tabs  # the in-memory analysis is still displayed
+
+
+def _crash_script() -> None:
+    import streamlit as st
+
+    from src.ui.common import run_analysis
+
+    class Broken:
+        def analyze(self, *args, **kwargs):
+            raise RuntimeError("secret internal detail /etc/app.conf")
+
+    result, error = run_analysis(Broken(), b"x", "r.txt")
+    st.write(f"result={result is None} error={error}")
+
+
+def test_unexpected_failure_shows_a_generic_message_only():
+    at = AppTest.from_function(_crash_script, default_timeout=60).run()
+    assert not at.exception
+    text = at.markdown[0].value
+    assert "result=True" in text and "unexpected error" in text
+    assert "secret" not in text and "/etc/app.conf" not in text  # details go to the log only
+
+
+def test_repository_failure_gives_none(monkeypatch):
+    import src.ui.common as common
+
+    def broken():
+        raise OSError("cannot open database")
+
+    monkeypatch.setattr(common, "AnalysisRepository", broken)
+    common.get_repository.clear()
+    try:
+        assert common.get_repository() is None
+    finally:
+        common.get_repository.clear()
