@@ -60,3 +60,20 @@ test is the expected effect of tuning on dev.
 ## Reports
 `dev_full`, `dev_rules_only`, `test_full`, `test_rules_only` (`.md` and `.json`) in this
 folder. Reproduce with `python scripts/evaluate_extraction.py --split test [--rules-only]`.
+
+## Real-world evaluation (CISA advisories, Phase 5)
+Six public CISA joint advisories (three ransomware, two state-sponsored, one social
+engineering). **The gold labels come from CISA, not the author:** technique labels are the
+ATT&CK IDs each advisory cites, and indicator labels are CISA's STIX bundle. The documents
+aren't redistributed. `data/real_world/manifest.json` pins every file by URL and SHA-256.
+
+```text
+python scripts/fetch_real_world.py              # fetch + verify (or download manually, see output)
+python scripts/fetch_real_world.py --record     # first time only: record hashes
+python scripts/evaluate_real_world.py           # write gold labels only (inspect first)
+python scripts/evaluate_real_world.py --final   # score once -> real_world.md / .json
+```
+
+Method and caveats are in `src/evaluation/real_world.py`. The main question is how often
+model-only technique suggestions agree with what CISA cites. A suggestion CISA doesn't cite
+isn't necessarily wrong, so this is reported as agreement, not precision.

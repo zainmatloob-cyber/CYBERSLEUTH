@@ -1,0 +1,30 @@
+{
+  "description": "Public CISA joint cybersecurity advisories (TLP:CLEAR) used as a real-world evaluation set. Documents are not redistributed here: run scripts/fetch_real_world.py, which verifies each file against the SHA-256 recorded below.",
+  "retrieved": "2026-11-08",
+  "documents": [
+    {"id": "aa23-158a", "group": "ransomware", "title": "#StopRansomware: CL0P Ransomware Gang Exploits CVE-2023-34362 MOVEit Vulnerability",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-158a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2023-07/aa23-158a-stopransomware-cl0p-ransomware-gang-exploits-moveit-vulnerability_8.pdf",
+     "stix": "https://www.cisa.gov/sites/default/files/2023-06/AA23-158A%20StopRansomware%20CL0P%20Ransomware%20Gang%20Exploits%20CVE-2023-34362%20MOVEit%20Vulnerability.stix_.json"},
+    {"id": "aa24-109a", "group": "ransomware", "title": "#StopRansomware: Akira Ransomware",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-109a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2025-12/aa24-109a-stopransomware-akira-ransomware.pdf",
+     "stix": "https://www.cisa.gov/sites/default/files/2025-11/AA24-109A-%23StopRansomware-Akira-Ransomware.stix_.json"},
+    {"id": "aa23-352a", "group": "ransomware", "title": "#StopRansomware: Play Ransomware",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-352a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2025-06/aa23-352a-stopransomware-play-ransomware_2_revised.pdf",
+     "stix": "https://www.cisa.gov/sites/default/files/2025-06/AA23-352A_StopRansomware-Play-Ransomware.stix_JSON.json"},
+    {"id": "aa23-320a", "group": "social-engineering", "title": "Scattered Spider",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-320a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2025-08/aa23-320a-scattered-spider-508c.pdf",
+     "stix": null},
+    {"id": "aa23-144a", "group": "state-sponsored", "title": "People's Republic of China State-Sponsored Cyber Actor Living off the Land to Evade Detection",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-144a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2023-11/CSA_PRC_State_Sponsored_Cyber_Living_off_the_Land_v1.1_ES-US.pdf",
+     "stix": "https://www.cisa.gov/sites/default/files/STIX/AA23-144A_PRC_State-Sponsored_Cyber_Actor_Living_Off_the_Land_to_Evade_Detection.stix.json"},
+    {"id": "aa23-347a", "group": "state-sponsored", "title": "Russian Foreign Intelligence Service (SVR) Exploiting JetBrains TeamCity CVE Globally",
+     "page": "https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-347a",
+     "pdf": "https://www.cisa.gov/sites/default/files/2023-12/aa23-347a-russian-foreign-intelligence-service-svr-exploiting-jetbrains-teamcity-cve-globally_0.pdf",
+     "stix": "https://www.cisa.gov/sites/default/files/2023-12/aa23-347a-russian-foreign-intelligence-service-svr-exploiting-jetbrains-teamcity-cve-globally.json"}
+  ]
+}
