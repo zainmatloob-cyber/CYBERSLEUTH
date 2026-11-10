@@ -16,6 +16,7 @@ from src.database.db_manager import MAX_NOTE_LENGTH, AnalysisRepository
 from src.database.views import StoredAnalysis, rescore_analysis
 from src.ingestion.models import ExtractedDocument
 from src.intelligence.analyzer import AnalysisResult
+from src.intelligence.assertion import AssertionStatus
 from src.intelligence.mitre_mapper import AnalystVerdict
 from src.nlp.entity_models import EntityType
 from src.nlp.ioc_models import IOCType, VerificationStatus
@@ -60,9 +61,14 @@ def render_summary(view: StoredAnalysis) -> None:
     cols[3].metric("Unique IOCs", len(view.indicators))
     cols[4].metric("Entities", len(view.entities))
     leads = sum(1 for m in view.mappings if m.is_unverified_lead)
-    cols[5].metric("ATT&CK techniques", len(view.mappings) - leads,
-                   help=f"Explicit or analyst-confirmed. {leads} unverified model "
-                        "suggestion(s) are listed separately in the ATT&CK tab.")
+    # Same rule as the dashboard: no leads, no rejected and no negated techniques.
+    counted = sum(1 for m in view.mappings
+                  if not m.is_unverified_lead and m.verdict != AnalystVerdict.REJECTED
+                  and m.status is not AssertionStatus.NEGATED)
+    cols[5].metric("ATT&CK techniques", counted,
+                   help=f"Explicit or analyst-confirmed, not negated and not rejected. {leads} "
+                        "unverified model suggestion(s) are listed separately in the ATT&CK "
+                        "tab.")
     cols[6].metric("Analysis time", f"{view.timings_ms.get('total', 0) / 1000:.1f} s")
     warnings = [*view.warnings, *view.document_warnings]
     for warning in warnings:
@@ -132,9 +138,10 @@ def render_attack(view: StoredAnalysis, repo: AnalysisRepository | None) -> None
     left, right = st.columns(2)
     show_leads = left.checkbox(
         f"Show {len(leads)} unverified model suggestion(s)", key="attack_show_leads",
-        help="Model-only suggestions are leads, not findings: on 14 real CISA advisories only "
-             "10% matched a technique CISA cites. They don't count toward the risk score "
-             "unless you confirm them.")
+        help="Model-only suggestions are leads, not findings. Only those above a score cut-off "
+             "chosen on real CISA advisories are kept; on unseen advisories about 4 in 5 of "
+             "them matched a technique CISA cites (a small sample). They don't count toward "
+             "the risk score unless you confirm them.")
     hide_negated = right.checkbox("Hide negated", value=True, key="attack_hide_negated")
     if show_leads and leads:
         st.warning("Model suggestions are shown. Score = SVM margin, not a probability; "

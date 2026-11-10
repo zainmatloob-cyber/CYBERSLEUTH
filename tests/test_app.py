@@ -74,12 +74,24 @@ def test_result_views_render(analysis_app):
     assert metrics["Unique IOCs"] == "2"  # IP + CVE
     # APT28, Mimikatz, Log4Shell, Kerberoasting, Phishing (the last is a negated mention)
     assert metrics["Entities"] == "5"
-    assert metrics["ATT&CK techniques"] == "2"  # T1558.003 observed, T1566 negated
+    # T1558.003 observed counts; T1566 ("No phishing was observed") is negated, so it doesn't
+    assert metrics["ATT&CK techniques"] == "1"
     assert metrics["Risk"].split(" · ")[1] in {"Low", "Moderate", "High", "Critical"}
     assert analysis_app.success  # no warnings → success banner
     assert [t.label for t in analysis_app.tabs][-2:] == ["ℹ️ Metadata",
                                                        "📤 Export"]
     assert "🔤 Sentences" in [t.label for t in analysis_app.tabs]  # session text available
+
+
+def test_technique_metric_excludes_rejected(analysis_app, db_url):
+    from src.intelligence.mitre_mapper import AnalystVerdict
+
+    repo = AnalysisRepository(make_engine(db_url))
+    stored = repo.get_analysis(repo.list_analyses()[0].id)
+    observed = next(m for m in stored.mappings if m.technique_id == "T1558.003")
+    repo.set_mapping_verdict(observed.id, AnalystVerdict.REJECTED, "test")
+    at = analysis_app.run()  # the script re-reads the stored analysis
+    assert {m.label: m.value for m in at.metric}["ATT&CK techniques"] == "0"
 
 
 def test_ioc_filters(analysis_app):

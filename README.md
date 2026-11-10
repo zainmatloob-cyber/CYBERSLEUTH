@@ -6,11 +6,25 @@ CyberSleuth turns unstructured cybersecurity reports (PDF, DOCX, TXT) into
 structured, explainable, evidence-backed threat intelligence. It runs entirely
 locally with free and open-source tools and needs no paid API.
 
-> **Status: Phase 4 complete, v0.4.0.** Ingestion, IOC extraction, entity recognition,
-> threat classification (TF-IDF + Logistic Regression), MITRE ATT&CK technique mapping,
-> explainable risk scoring, SQLite persistence with analyst verification, a dashboard with
-> cross-document explorers, and PDF/JSON/CSV reports work and are tested. Phase 5 (evaluation
-> on real reports, hardening, deployment) is next. See the [Roadmap](#roadmap).
+> **Status: Phase 5 work complete; release v1.0.0 pending.** Everything below works and is
+> tested:
+> * ingestion, IOC extraction and entity recognition;
+> * threat classification and MITRE ATT&CK mapping;
+> * explainable risk scoring;
+> * analyst verification, a dashboard with cross-document explorers, and reports;
+> * evaluation on 31 real CISA advisories, a security review, performance hardening and
+>   deployment files.
+>
+> Still to do: publishing the model release and the final tag. See the [Roadmap](#roadmap).
+
+![Analysis view: ATT&CK tab with a rejected technique](docs/screenshots/analysis_attack.png)
+
+More screenshots: [risk](docs/screenshots/analysis_risk.png) ·
+[indicators](docs/screenshots/analysis_iocs.png) · [dashboard](docs/screenshots/dashboard.png) ·
+[history](docs/screenshots/history.png) · [IOC explorer](docs/screenshots/ioc_explorer.png) ·
+[ATT&CK explorer](docs/screenshots/attack_explorer.png). All of them show synthetic sample
+data only (`python scripts/take_screenshots.py`). The [demo guide](docs/demo.md) walks
+through them.
 
 ## Problem
 
@@ -195,9 +209,19 @@ pip install -r requirements-dev.txt
 On macOS/Linux, use `python3.12 -m venv .venv` and `source .venv/bin/activate`.
 `requirements.lock.txt` pins the exact versions the tests last passed with.
 
-## Train the models (once, about 2 minutes)
+## Get the trained models
 
-The trained models are not committed (they are git-ignored and rebuilt deterministically):
+The model files are git-ignored. Download the exact files every recorded result was measured
+with; each is checked against a SHA-256 pinned in `config/model_files.json`:
+
+```powershell
+python scripts/fetch_models.py            # from the GitHub release "models-v1"
+python scripts/fetch_models.py --verify   # check local files, no download
+```
+
+To retrain instead (about 2 minutes), run the commands below. The new files won't be
+byte-identical to the evaluated ones. `--final` also re-scores the held-out test splits, so
+use it only for a deliberate retrain:
 
 ```powershell
 python scripts/prepare_threat_dataset.py   # downloads the pinned Hugging Face dataset, verifies SHA-256
@@ -205,7 +229,7 @@ python scripts/train_threat_classifier.py --final
 python scripts/train_technique_model.py --final
 ```
 
-Without them the app still runs. Threat categories then come from rules only, ATT&CK mapping
+Without the models the app still runs. Threat categories then come from rules only, ATT&CK mapping
 from explicit matches only, and the analysis shows a warning and lowers its confidence.
 
 ## Usage
@@ -230,6 +254,23 @@ for entity in result.entities:
 ```
 
 Evaluate extraction quality: `python scripts/evaluate_extraction.py --split dev`.
+
+### Docker and other deployments
+
+```bash
+docker build -t cybersleuth .
+docker run --rm -p 8501:8501 --memory 1g -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
+```
+
+The image runs as a non-root user, downloads and verifies the models during the build, and
+keeps the database in a volume.
+
+> **The Dockerfile hasn't been built yet:** Docker wasn't available on the development
+> machine. Its start command, health check and structure were checked without Docker.
+
+[docs/deployment.md](docs/deployment.md) covers local, Docker and Streamlit Community Cloud
+deployment. The app has **no login**, so read the deployment limits in
+[docs/security.md](docs/security.md) before sharing it.
 
 ## Configuration
 
@@ -302,7 +343,9 @@ data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated li
 data/evaluation/        Annotation guidelines and the annotated dev/test documents
 scripts/                Sample generator, ATT&CK KB builder, evaluation runner
 tests/                  pytest suite
-docs/                   Architecture, methodology, evaluation reports
+docs/                   Architecture, methodology, evaluation, security, performance,
+                        deployment and demo guides; screenshots
+Dockerfile              Container image (see docs/deployment.md)
 ```
 
 ## Roadmap
@@ -311,7 +354,13 @@ docs/                   Architecture, methodology, evaluation reports
 - [x] **Phase 2:** IOC extraction, cybersecurity named-entity recognition, evidence views, evaluation
 - [x] **Phase 3:** Threat classification (rule baseline + TF-IDF/Logistic Regression), MITRE ATT&CK mapping, explainable risk scoring
 - [x] **Phase 4:** SQLite persistence and analyst verification, dashboard, explorers, PDF/JSON/CSV reports
-- [ ] **Phase 5:** Evaluation on a manually verified dataset, hardening, deployment
+- [x] **Phase 5:**
+  * evaluation on 31 real CISA advisories (14, then 17 split into development and test);
+  * unverified-lead policy and a model cut-off tested on unseen advisories;
+  * IOC robustness;
+  * security review, performance and ReDoS hardening;
+  * Docker and deployment guides, demo guide and screenshots.
+- [ ] **Release v1.0.0:** publish the model files as the `models-v1` release, then tag
 
 ## Known limitations
 

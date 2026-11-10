@@ -1,0 +1,28 @@
+# Keep the build context small and never copy secrets, local data or databases.
+.git
+.venv
+venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+
+# secrets and local configuration
+.env
+.env.*
+.streamlit/secrets.toml
+
+# local data: downloaded datasets, CISA advisories, databases
+data/raw
+data/processed/*.jsonl
+*.db
+*.sqlite
+
+# partial model downloads (complete, verified model files are allowed in)
+models/*.part
+
+# not needed at run time
+tests
+docs
