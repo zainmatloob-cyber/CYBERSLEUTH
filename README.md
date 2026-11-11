@@ -234,6 +234,11 @@ from explicit matches only, and the analysis shows a warning and lowers its conf
 
 ## Usage
 
+On Windows, run `start.cmd`. On first launch it creates a Python 3.12 virtual environment
+and installs the runtime dependencies.
+
+Or start the app from an activated environment with:
+
 ```powershell
 streamlit run app.py
 ```
