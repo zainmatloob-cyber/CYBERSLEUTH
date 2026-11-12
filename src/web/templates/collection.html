@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>{{ title }}</h1>
+  {% block lede %}{% endblock %}
+</section>
+{% if not db_available %}
+<p class="empty">The database is unavailable, so there are no saved analyses to show.</p>
+{% elif not ready %}
+<div class="empty">
+  <p>No analyses saved yet.</p>
+  <p><a class="btn primary" href="/">Analyze a document</a></p>
+</div>
+{% else %}
+{% block body %}{% endblock %}
+{% endif %}
+{% endblock %}

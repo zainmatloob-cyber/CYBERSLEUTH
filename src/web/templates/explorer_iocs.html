@@ -1,0 +1,28 @@
+{% extends "collection.html" %}
+{% from "macros.html" import data_table %}
+{% block lede %}<p class="lede">Indicators across all documents (latest analysis each). <strong>Documents &gt; 1</strong> means the same indicator appears in several reports: a correlation lead, not a verdict. Values are shown as text and are never contacted.</p>{% endblock %}
+{% block body %}
+{% if not data.total %}
+<p class="empty">No indicators extracted yet.</p>
+{% else %}
+<form class="filters" action="/explorer/iocs" method="get" role="search"
+      hx-get="/explorer/iocs" hx-target="#page-results" hx-select="#page-results"
+      hx-swap="outerHTML" hx-trigger="input delay:300ms, submit" hx-push-url="true">
+  <input type="hidden" name="f" value="1">
+  <fieldset class="checks">
+    <legend>Types</legend>
+    {% for t in data.types %}<label><input type="checkbox" name="type" value="{{ t }}"{% if t in data.chosen_types %} checked{% endif %}> {{ t }}</label>{% endfor %}
+  </fieldset>
+  <fieldset class="checks">
+    <legend>Verdicts</legend>
+    {% for v in data.verdicts %}<label><input type="checkbox" name="verdict" value="{{ v }}"{% if v in data.chosen_verdicts %} checked{% endif %}> {{ v }}</label>{% endfor %}
+  </fieldset>
+  <label><input type="checkbox" name="shared" value="1"{% if data.shared_only %} checked{% endif %}> In ≥ 2 documents</label>
+  <label class="search">Search value <input type="search" name="q" value="{{ data.query }}" placeholder="e.g. 198.51.100"></label>
+</form>
+<div id="page-results">
+  <p class="muted small">{{ data.shown }} of {{ data.total }} indicators · ▸ shows every occurrence</p>
+  {{ data_table(data.table, empty="No indicators match the filter.") }}
+</div>
+{% endif %}
+{% endblock %}

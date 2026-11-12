@@ -71,7 +71,9 @@ def test_templates_have_no_inline_scripts_or_handlers():
     for path in TEMPLATES.rglob("*.html"):
         source = path.read_text(encoding="utf-8")
         for tag in re.findall(r"<script\b[^>]*>", source):
-            assert "src=" in tag, f"inline script in {path.name}"
+            # JSON data blocks never execute; anything else must load from a file.
+            assert "src=" in tag or 'type="application/json"' in tag, \
+                f"inline script in {path.name}"
         assert not re.search(r"\son[a-z]+\s*=", source), f"inline handler in {path.name}"
         assert "hx-on" not in source and "|safe" not in source.replace(" ", "")
 
@@ -487,3 +489,118 @@ def test_reports_download_with_safe_names_and_current_verdicts(client, repo):
 def test_unknown_exports_are_404(client, url):
     analysed(client)
     assert client.get(url).status_code == 404
+
+
+# --- step 3: history, dashboard, explorers -------------------------------------------------
+
+COLLECTION_PAGES = ["/history", "/dashboard", "/explorer/iocs", "/explorer/entities",
+                    "/explorer/attack"]
+
+
+@pytest.mark.parametrize("url", COLLECTION_PAGES)
+def test_collection_pages_explain_when_empty(client, analyzer, url):
+    assert "No analyses saved yet" in client.get(url).text
+    no_db = TestClient(create_app(lambda: analyzer, lambda: None))
+    assert "database is unavailable, so there are no saved" in no_db.get(url).text
+
+
+@pytest.fixture
+def two_reports(client):
+    """Two documents sharing an IP, one with an explicit technique, one hostile name."""
+    analysed(client, data=ATTACK_REPORT, name="first.txt")
+    analysed(client, data=REPORT + b" Seen again later.", name="</script><img src=x>.txt")
+    return client
+
+
+@pytest.mark.parametrize("url", COLLECTION_PAGES)
+def test_collection_pages_render(two_reports, url):
+    response = two_reports.get(url)
+    assert response.status_code == 200
+    assert "<img src=x>" not in response.text
+
+
+def test_history_lists_and_links_analyses(two_reports):
+    text = two_reports.get("/history").text
+    assert 'href="/analyses/1"' in text and 'href="/analyses/2"' in text
+    # "/" in the upload name is treated as a path separator, so only the tail is kept.
+    assert "first.txt" in text and "script&gt;&lt;img src=x&gt;.txt" in text
+
+
+def test_delete_requires_confirmation_and_removes_the_document(two_reports, repo):
+    assert two_reports.post("/documents/1/delete").status_code == 400
+    assert repo.stats().documents == 2
+    response = two_reports.post("/documents/1/delete", data={"confirm": "yes"},
+                                follow_redirects=False)
+    assert response.status_code == 303 and response.headers["location"] == "/history"
+    assert repo.stats().documents == 1
+    htmx = two_reports.post("/documents/2/delete", data={"confirm": "yes"}, headers=HX)
+    assert htmx.headers["hx-redirect"] == "/history"
+    assert repo.stats().documents == 0
+
+
+def test_cross_site_delete_is_refused(two_reports, repo):
+    response = two_reports.post("/documents/1/delete", data={"confirm": "yes"},
+                                headers={"Origin": "https://evil.example"})
+    assert response.status_code == 403 and repo.stats().documents == 2
+
+
+def test_delete_without_a_database(analyzer):
+    client = TestClient(create_app(lambda: analyzer, lambda: None))
+    assert client.post("/documents/1/delete", data={"confirm": "yes"}).status_code == 503
+
+
+def test_dashboard_embeds_escaped_chart_data(two_reports):
+    import json
+
+    text = two_reports.get("/dashboard").text
+    assert '<script src="/vendor/plotly.min.js" defer></script>' in text
+    specs = re.findall(r'<script type="application/json" class="chart-spec">(.*?)</script>',
+                       text, re.S)
+    assert len(specs) == 4
+    for spec in specs:
+        assert "<" not in spec and ">" not in spec
+        assert json.loads(spec)["data"]
+    assert "Recent analyses" in text and "Table view" in text
+
+
+def test_plotly_is_served_locally(client):
+    response = client.get("/vendor/plotly.min.js")
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/javascript")
+    assert len(response.content) > 1_000_000
+
+
+def test_ioc_explorer_filters(two_reports):
+    everything = two_reports.get("/explorer/iocs").text
+    assert "198.51.100.7" in everything and "CVE-2021-44228" in everything
+    shared = two_reports.get("/explorer/iocs?f=1&type=IPV4&type=CVE&verdict=unverified"
+                             "&shared=1").text
+    assert "198.51.100.7" in shared and "first.txt" in shared
+    nothing = two_reports.get("/explorer/iocs?f=1&type=IPV4&verdict=unverified&q=10.0").text
+    assert "No indicators match the filter." in nothing
+
+
+def test_entity_explorer_filters_and_links(two_reports):
+    text = two_reports.get("/explorer/entities?f=1&type=Tool&q=mimi").text
+    assert "Mimikatz" in text
+    assert 'href="https://attack.mitre.org/software/S0002/"' in text
+    assert "No entities match" in two_reports.get("/explorer/entities?f=1&q=zzz").text
+
+
+def test_attack_explorer_filter_and_heatmap(two_reports):
+    text = two_reports.get("/explorer/attack").text
+    assert "T1558.003" in text and "chart-spec" in text
+    explicit = two_reports.get("/explorer/attack?f=1&explicit=1").text
+    assert "T1558.003" in explicit
+
+
+def test_chart_json_cannot_close_its_script_element():
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    from src.web.pages import chart
+
+    figure = go.Figure(go.Bar(x=["</script><b>&"], y=[1]))
+    c = chart(figure, pd.DataFrame({"A": [1]}), "t")
+    assert "<" not in c.spec and ">" not in c.spec and "&" not in c.spec
+    assert "\\u003c" in c.spec and "\\u0026" in c.spec

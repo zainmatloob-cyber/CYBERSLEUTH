@@ -317,3 +317,18 @@ table.data .toggle-col { width: 2.25rem; min-width: 2.25rem; padding-right: 0; }
 }
 .download-label { font-weight: 700; }
 .download-file { color: var(--muted); overflow-wrap: anywhere; }
+
+/* --- charts, history ------------------------------------------------------------------ */
+
+.chart-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr)); gap: 1rem; margin: 1rem 0; }
+.chart { margin: 0; padding: .75rem 1rem; min-width: 0; }
+.chart-plot { width: 100%; min-height: 180px; }
+.chart-empty { display: grid; place-items: center; min-height: 180px; }
+.table-view { margin-top: .5rem; }
+.table-view summary { cursor: pointer; color: var(--muted); font-size: .85rem; }
+.nowrap { white-space: nowrap; }
+.danger-zone summary { cursor: pointer; color: var(--error); font-size: .85rem; white-space: nowrap; }
+.danger-zone form { display: flex; flex-direction: column; gap: .5rem; margin-top: .5rem; min-width: 220px; font-size: .85rem; }
+.danger-zone label { display: flex; gap: .4rem; align-items: flex-start; }
+.btn.danger { background: var(--error); border-color: var(--error); color: #fff; align-self: flex-start; }
+table.data td a[target="_blank"] { white-space: nowrap; }

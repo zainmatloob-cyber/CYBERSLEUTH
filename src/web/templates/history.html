@@ -1,0 +1,39 @@
+{% extends "collection.html" %}
+{% from "macros.html" import band_badge %}
+{% block lede %}<p class="lede">Every saved analysis, newest first. Open one to see its findings and verdicts.</p>{% endblock %}
+{% block body %}
+<div class="table-wrap">
+  <table class="data">
+    <thead>
+      <tr>
+        <th scope="col" class="num">Id</th><th scope="col">Analysed (UTC)</th><th scope="col">Document</th>
+        <th scope="col" class="num">Risk</th><th scope="col">Band</th><th scope="col">Confidence</th>
+        <th scope="col">SHA-256</th><th scope="col"><span class="sr-only">Actions</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in data.analyses %}
+      <tr>
+        <td class="num">{{ a.id }}</td>
+        <td class="nowrap">{{ a.created }}</td>
+        <td><a href="/analyses/{{ a.id }}">{{ a.filename }}</a></td>
+        <td class="num">{{ a.risk }}</td>
+        <td>{{ band_badge(a.band) }}</td>
+        <td>{{ a.confidence }}</td>
+        <td class="mono small">{{ a.sha256 }}</td>
+        <td>
+          <details class="danger-zone">
+            <summary>Delete</summary>
+            <form method="post" action="/documents/{{ a.document_id }}/delete"
+                  hx-post="/documents/{{ a.document_id }}/delete">
+              <label><input type="checkbox" name="confirm" value="yes" required> Permanently delete <strong>{{ a.filename }}</strong>, all its analyses and verdicts</label>
+              <button type="submit" class="btn danger">Delete</button>
+            </form>
+          </details>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

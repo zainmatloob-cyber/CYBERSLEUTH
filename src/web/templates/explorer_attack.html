@@ -1,0 +1,30 @@
+{% extends "collection.html" %}
+{% from "macros.html" import data_table, chart_panel %}
+{% block head %}
+<script src="/vendor/plotly.min.js" defer></script>
+<script src="/static/charts.js" defer></script>
+{% endblock %}
+{% block lede %}<p class="lede">'Documents (counted)' includes explicit or analyst-confirmed techniques; negated, rejected and unverified model-only suggestions ('Model lead in') are not counted. Verdicts are set in each analysis's ATT&amp;CK tab.</p>{% endblock %}
+{% block body %}
+{% if not data.total %}
+<p class="empty">No ATT&amp;CK techniques mapped yet.</p>
+{% else %}
+<section class="metrics" aria-label="Verification">
+  <div class="metric"><span class="metric-label">Confirmed</span><span class="metric-value">{{ data.coverage.confirmed }}</span></div>
+  <div class="metric"><span class="metric-label">Rejected</span><span class="metric-value">{{ data.coverage.rejected }}</span></div>
+  <div class="metric"><span class="metric-label">Unverified</span><span class="metric-value">{{ data.coverage.unverified }}</span></div>
+</section>
+<form class="filters" action="/explorer/attack" method="get"
+      hx-get="/explorer/attack" hx-target="#page-results" hx-select="#page-results"
+      hx-swap="outerHTML" hx-trigger="change" hx-push-url="true">
+  <input type="hidden" name="f" value="1">
+  <label><input type="checkbox" name="explicit" value="1"{% if data.explicit_only %} checked{% endif %}> Techniques with explicit evidence only</label>
+  <noscript><button class="btn" type="submit">Apply</button></noscript>
+</form>
+<div id="page-results">
+  <p class="muted small">{{ data.shown }} of {{ data.total }} techniques</p>
+  {{ data_table(data.table, empty="No techniques match the filter.") }}
+</div>
+{% if data.heatmap %}{{ chart_panel(data.heatmap) }}{% endif %}
+{% endif %}
+{% endblock %}

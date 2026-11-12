@@ -247,9 +247,8 @@ Open http://localhost:8501 and upload a report. Synthetic demo documents are in
 [`data/samples/`](data/samples/); regenerate them with `python scripts/make_samples.py`.
 
 **New web interface (in progress).** A FastAPI + HTMX interface with light and dark themes is replacing
-Streamlit. Try it with `python -m src.web` and open http://127.0.0.1:8000. It currently covers
-upload, every analysis tab, analyst verdicts and report export; history, dashboard and explorers
-are next.
+Streamlit. Try it with `python -m src.web` and open http://127.0.0.1:8000. It covers
+every page: analysis tabs, verdicts, export, history, dashboard and the three explorers.
 
 Programmatic use:
 

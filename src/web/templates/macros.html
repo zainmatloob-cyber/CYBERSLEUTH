@@ -67,3 +67,16 @@
   </div>
 </form>
 {% endmacro %}
+
+{# A Plotly chart (src.web.pages.Chart) plus its table view. charts.js draws every
+   .chart-plot from the JSON next to it and re-themes it when the theme changes. #}
+{% macro chart_panel(c) %}
+<figure class="chart card">
+  <script type="application/json" class="chart-spec">{{ c.spec }}</script>
+  <div class="chart-plot" id="{{ c.id }}" role="img" aria-label="{{ c.title }} chart; the same data is in the table view below"></div>
+  <details class="table-view">
+    <summary>Table view</summary>
+    {{ data_table(c.table) }}
+  </details>
+</figure>
+{% endmacro %}

@@ -10,8 +10,9 @@ import logging
 from collections.abc import Callable
 from pathlib import Path, PurePath
 
+import plotly
 from fastapi import FastAPI, Form, Request, UploadFile
-from fastapi.responses import HTMLResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
@@ -23,7 +24,7 @@ from src.intelligence.analyzer import AnalysisResult, Analyzer
 from src.reporting import csv_report, json_report, pdf_report
 from src.reporting.common import report_stem
 from src.utils.exceptions import CyberSleuthError
-from src.web import tabs
+from src.web import pages, tabs
 from src.web.security import SecurityMiddleware
 from src.web.state import UNSAVED_PREFIX, AppState, default_repository, new_unsaved_ref
 
@@ -36,7 +37,17 @@ SAVE_NOTES = {
     "existing": "This document was already analysed with the same components: showing "
                 "stored analysis #{id} with its analyst verdicts.",
 }
-NAV = (("analyze", "Analyze", "/"),)
+NAV = (
+    ("analyze", "Analyze", "/"),
+    ("history", "History", "/history"),
+    ("dashboard", "Dashboard", "/dashboard"),
+    ("iocs", "IOC Explorer", "/explorer/iocs"),
+    ("entities", "Entity Explorer", "/explorer/entities"),
+    ("attack", "ATT&CK Explorer", "/explorer/attack"),
+)
+# Plotly's browser bundle ships inside the plotly Python package; serve that copy so the
+# app never loads scripts from a CDN and the version always matches the figures.
+PLOTLY_JS = Path(plotly.__file__).resolve().parent / "package_data" / "plotly.min.js"
 EXPORTS = {
     "pdf": ("application/pdf", pdf_report.to_pdf),
     "json": ("application/json", json_report.to_json),
@@ -212,6 +223,61 @@ def create_app(analyzer_factory: Callable[[], Analyzer] = Analyzer,
         filename = f"{report_stem(view)}.{fmt}"  # report_stem allows only [A-Za-z0-9_-]
         return Response(build(view, events), media_type=media_type, headers={
             "Content-Disposition": f'attachment; filename="{filename}"'})
+
+    # --- cross-document pages ------------------------------------------------------------
+
+    def collection_page(request: Request, name: str, active: str, title: str,
+                        build) -> HTMLResponse:
+        """A page over all saved analyses; explains itself when there is nothing to show."""
+        context = {"title": title, "ready": False}
+        if state.repo is not None and state.repo.stats().documents:
+            context.update(ready=True, data=build())
+        return page(request, name, context, active=active)
+
+    @app.get("/history", response_class=HTMLResponse)
+    def history(request: Request) -> HTMLResponse:
+        return collection_page(request, "history.html", "history", "Analysis history",
+                               lambda: pages.history(state.repo))
+
+    @app.post("/documents/{document_id}/delete")
+    def delete_document(request: Request, document_id: int,
+                        confirm: str = Form("")) -> Response:
+        if state.repo is None:
+            return Response("The database is unavailable.", status_code=503,
+                            media_type="text/plain")
+        if confirm != "yes":
+            return Response("Tick the confirmation box to delete.", status_code=400,
+                            media_type="text/plain")
+        state.repo.delete_document(document_id)
+        if request.headers.get("hx-request") == "true":
+            return Response(status_code=204, headers={"HX-Redirect": "/history"})
+        return RedirectResponse("/history", status_code=303)
+
+    @app.get("/dashboard", response_class=HTMLResponse)
+    def dashboard(request: Request) -> HTMLResponse:
+        return collection_page(request, "dashboard.html", "dashboard", "Dashboard",
+                               lambda: pages.dashboard(state.repo))
+
+    @app.get("/explorer/iocs", response_class=HTMLResponse)
+    def ioc_explorer(request: Request) -> HTMLResponse:
+        return collection_page(request, "explorer_iocs.html", "iocs", "IOC Explorer",
+                               lambda: pages.ioc_explorer(state.repo, request.query_params))
+
+    @app.get("/explorer/entities", response_class=HTMLResponse)
+    def entity_explorer(request: Request) -> HTMLResponse:
+        return collection_page(request, "explorer_entities.html", "entities",
+                               "Entity Explorer",
+                               lambda: pages.entity_explorer(state.repo, request.query_params))
+
+    @app.get("/explorer/attack", response_class=HTMLResponse)
+    def attack_explorer(request: Request) -> HTMLResponse:
+        return collection_page(request, "explorer_attack.html", "attack", "ATT&CK Explorer",
+                               lambda: pages.attack_explorer(state.repo, request.query_params))
+
+    @app.get("/vendor/plotly.min.js")
+    def plotly_js() -> FileResponse:
+        return FileResponse(PLOTLY_JS, media_type="text/javascript",
+                            headers={"Cache-Control": "public, max-age=86400"})
 
     @app.get("/healthz")
     def health() -> dict:

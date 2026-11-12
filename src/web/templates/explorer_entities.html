@@ -1,0 +1,23 @@
+{% extends "collection.html" %}
+{% from "macros.html" import data_table %}
+{% block lede %}<p class="lede">Malware, threat actors, tools, vulnerabilities and other entities across documents. <strong>model:spacy</strong> entities are statistical predictions.</p>{% endblock %}
+{% block body %}
+{% if not data.total %}
+<p class="empty">No entities recognised yet.</p>
+{% else %}
+<form class="filters" action="/explorer/entities" method="get" role="search"
+      hx-get="/explorer/entities" hx-target="#page-results" hx-select="#page-results"
+      hx-swap="outerHTML" hx-trigger="input delay:300ms, submit" hx-push-url="true">
+  <input type="hidden" name="f" value="1">
+  <fieldset class="checks">
+    <legend>Types</legend>
+    {% for t in data.types %}<label><input type="checkbox" name="type" value="{{ t }}"{% if t in data.chosen %} checked{% endif %}> {{ t }}</label>{% endfor %}
+  </fieldset>
+  <label class="search">Search name <input type="search" name="q" value="{{ data.query }}"></label>
+</form>
+<div id="page-results">
+  <p class="muted small">{{ data.shown }} of {{ data.total }} entities</p>
+  {{ data_table(data.table, empty="No entities match the filter.") }}
+</div>
+{% endif %}
+{% endblock %}

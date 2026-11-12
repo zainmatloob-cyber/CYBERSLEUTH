@@ -1,0 +1,21 @@
+{% extends "collection.html" %}
+{% from "macros.html" import data_table, chart_panel %}
+{% block head %}
+<script src="/vendor/plotly.min.js" defer></script>
+<script src="/static/charts.js" defer></script>
+{% endblock %}
+{% block lede %}<p class="lede">All figures use the latest analysis of each document and count documents, not mentions. Negated findings are excluded from the charts.</p>{% endblock %}
+{% block body %}
+<section class="metrics" aria-label="Totals">
+  {% for label, value in data.metrics %}
+  <div class="metric"><span class="metric-label">{{ label }}</span><span class="metric-value">{{ value }}</span></div>
+  {% endfor %}
+</section>
+<div class="chart-grid">
+  {% for key, c, empty in data.panels %}
+  {% if c %}{{ chart_panel(c) }}{% else %}<div class="chart card chart-empty"><p class="muted">{{ empty }}</p></div>{% endif %}
+  {% endfor %}
+</div>
+<h2 class="section">Recent analyses</h2>
+{{ data_table(data.recent) }}
+{% endblock %}
