@@ -1,0 +1,17 @@
+{% if data.numbers | length > 1 %}
+<form class="filters" action="/analyses/{{ ref }}" method="get"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="change" hx-push-url="true">
+  <input type="hidden" name="tab" value="text">
+  <label>Page
+    <select name="page">
+      {% for n in data.numbers %}<option value="{{ n }}"{% if n == data.page.page_number %} selected{% endif %}>{{ n }}</option>{% endfor %}
+    </select>
+  </label>
+  <noscript><button class="btn" type="submit">Show</button></noscript>
+</form>
+{% endif %}
+<div id="tab-results">
+  <h3>Cleaned text, page {{ data.page.page_number }}</h3>
+  <pre class="doc-text">{{ data.page.text or "(no extractable text on this page)" }}</pre>
+</div>

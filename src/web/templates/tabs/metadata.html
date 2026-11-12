@@ -1,0 +1,9 @@
+{% from "macros.html" import data_table %}
+<h3>File</h3>
+{{ data_table(data.file) }}
+<h3>Embedded document metadata <span class="muted small">(untrusted, author-supplied)</span></h3>
+{{ data_table(data.embedded, empty="No embedded metadata.") }}
+<h3>Analysis provenance</h3>
+{{ data_table(data.provenance) }}
+<h3>Verification history</h3>
+{{ data_table(data.history, empty="No analyst verdicts recorded yet.") }}

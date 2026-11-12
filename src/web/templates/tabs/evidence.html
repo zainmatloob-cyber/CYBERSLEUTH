@@ -1,0 +1,12 @@
+{% from "macros.html" import data_table %}
+<form class="filters" action="/analyses/{{ ref }}" method="get"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="change" hx-push-url="true">
+  <input type="hidden" name="tab" value="evidence">
+  <label><input type="checkbox" name="all" value="1"{% if data.show_all %} checked{% endif %}> Include sentences without findings</label>
+  <noscript><button class="btn" type="submit">Apply</button></noscript>
+</form>
+<div id="tab-results">
+  <p class="muted small">{{ "{:,}".format(data.table.total_rows) }} sentences</p>
+  {{ data_table(data.table, empty="No sentences with findings.") }}
+</div>

@@ -1,0 +1,39 @@
+{% from "macros.html" import data_table %}
+{% if not data.total %}
+<p class="empty">No cybersecurity entities were recognised in this document.</p>
+{% else %}
+<p class="muted">Sources: <strong>kb:mitre-attack</strong> / <strong>kb:curated</strong> are deterministic knowledge-base matches; <strong>rule:actor-pattern</strong> uses vendor naming conventions; <strong>model:spacy</strong> is a statistical prediction and may be wrong. No confidence scores are shown because none of these components produces calibrated probabilities.</p>
+
+<div class="chips">
+  {% for label, _, count in data.counts %}<span class="chip"><span class="chip-count">{{ count }}</span> {{ label }}</span>{% endfor %}
+</div>
+
+<form class="filters" action="/analyses/{{ ref }}" method="get" role="search"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="input delay:300ms, submit" hx-push-url="true">
+  <input type="hidden" name="tab" value="entities">
+  <input type="hidden" name="f" value="1">
+  <fieldset class="checks">
+    <legend>Types</legend>
+    {% for label, value, _ in data.counts %}
+    <label><input type="checkbox" name="type" value="{{ value }}"{% if value in data.chosen %} checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+  </fieldset>
+  <label class="search">Search <input type="search" name="q" value="{{ data.query }}" placeholder="name or alias"></label>
+</form>
+{% endif %}
+
+<div id="tab-results">
+  {% if data.total %}
+  <p class="muted small">{{ data.shown }} of {{ data.total }} entities · ▸ shows the mentions</p>
+  {{ data_table(data.table, empty="No entities match the filter.") }}
+  {% endif %}
+</div>
+
+<h2 class="section">Vulnerabilities</h2>
+{% if data.vulnerabilities %}
+<p class="muted">CVE identifiers and named vulnerabilities (e.g. Log4Shell) merged per CVE.</p>
+{{ data_table(data.vulnerabilities) }}
+{% else %}
+<p class="muted">No vulnerabilities mentioned.</p>
+{% endif %}

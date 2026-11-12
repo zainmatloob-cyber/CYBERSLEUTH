@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "macros.html" import band_badge %}
+{% block title %}{{ view.filename }} · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="page-head analysis-head">
+  <p class="eyebrow">{% if unsaved %}Unsaved analysis{% else %}Analysis #{{ view.analysis_id }}{% endif %} · {{ view.created_at.strftime("%Y-%m-%d %H:%M") }} UTC</p>
+  <h1 class="filename">{{ view.filename }}</h1>
+</section>
+
+{% if save_note %}<div class="alert info" role="status">{{ save_note }}</div>{% endif %}
+{% if unsaved %}<div class="alert warn" role="status">This analysis is not saved: it is kept in memory only and analyst verification is disabled.</div>{% endif %}
+
+<section class="metrics" aria-label="Summary">
+  {% for label, value, sub in summary.metrics %}
+  <div class="metric{% if loop.first %} metric-risk band-{{ band_class.get(summary.band, 'low') }}{% endif %}">
+    <span class="metric-label">{{ label }}</span>
+    <span class="metric-value">{{ value }}</span>
+    {% if loop.first %}{{ band_badge(sub) }}{% elif sub %}<span class="metric-sub">{{ sub }}</span>{% endif %}
+  </div>
+  {% endfor %}
+</section>
+
+{% for warning in summary.warnings %}
+<div class="alert warn" role="status">{{ warning }}</div>
+{% else %}
+<div class="alert ok" role="status">Document analysed without warnings.</div>
+{% endfor %}
+
+{% include "_tab_area.html" %}
+{% endblock %}

@@ -1,0 +1,12 @@
+<div id="tab-area" class="tab-area">
+  <nav class="tabs" aria-label="Analysis sections">
+    {% for t in tabs %}
+    <a href="/analyses/{{ ref }}?tab={{ t.key }}" hx-get="/analyses/{{ ref }}?tab={{ t.key }}"
+       hx-target="#tab-area" hx-swap="outerHTML" hx-push-url="true"
+       {% if t.key == tab %}aria-current="page"{% endif %}>{{ t.label }}</a>
+    {% endfor %}
+  </nav>
+  <section class="tab-panel" aria-label="{{ (tabs | selectattr('key', 'equalto', tab) | first).label }}">
+    {% include "tabs/" ~ tab ~ ".html" %}
+  </section>
+</div>

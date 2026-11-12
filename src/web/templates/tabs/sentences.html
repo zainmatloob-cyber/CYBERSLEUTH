@@ -1,0 +1,11 @@
+{% from "macros.html" import data_table %}
+<form class="filters" action="/analyses/{{ ref }}" method="get" role="search"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="input delay:300ms, submit" hx-push-url="true">
+  <input type="hidden" name="tab" value="sentences">
+  <label class="search">Filter sentences <input type="search" name="q" value="{{ data.query }}" placeholder="e.g. phishing, 198.51.100, CVE-"></label>
+</form>
+<div id="tab-results">
+  <p class="muted small">{{ "{:,}".format(data.table.total_rows) }} of {{ "{:,}".format(data.total) }} sentences</p>
+  {{ data_table(data.table, empty="No sentences match.") }}
+</div>

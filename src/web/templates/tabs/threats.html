@@ -1,0 +1,7 @@
+{% from "macros.html" import data_table %}
+{% if data.table is none %}
+<p class="empty">No threat categories were detected.</p>
+{% else %}
+<p class="muted">Categories are aggregated from sentences. <strong>model</strong> = TF-IDF classifier (score, not a probability); <strong>rules</strong> = keyword evidence, which also fires on mere mentions. A category whose only evidence is negated is shown as <code>negated</code>. Report-level aggregation is not validated against labelled reports. Use ▸ to see the evidence sentences.</p>
+{{ data_table(data.table) }}
+{% endif %}

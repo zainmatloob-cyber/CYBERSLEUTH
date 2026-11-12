@@ -1,0 +1,356 @@
+"""Web interface tests (src/web/) using FastAPI's TestClient.
+
+Every test uses a temporary database and a rules-only analyzer, so tests never touch the
+real database or load the (slow, optional) trained models.
+"""
+
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+import pytest
+from fastapi.testclient import TestClient
+
+from src.database.db_manager import AnalysisRepository, make_engine
+from src.intelligence.analyzer import Analyzer
+from src.web.app import _safe_filename, create_app
+from src.web.render import Cell, format_value, table
+from src.web.security import CONTENT_SECURITY_POLICY
+from src.web.state import ResultCache
+
+REPORT = (b"APT28 used Mimikatz against the target. Then 198.51.100.7 contacted "
+          b"http://evil.example/payload. Log4Shell (CVE-2021-44228) was exploited. "
+          b"No phishing was observed.")
+TEMPLATES = Path(__file__).resolve().parent.parent / "src" / "web" / "templates"
+HX = {"HX-Request": "true"}
+
+
+@pytest.fixture(scope="module")
+def analyzer() -> Analyzer:
+    return Analyzer(use_models=False)
+
+
+@pytest.fixture
+def repo(tmp_path) -> AnalysisRepository:
+    return AnalysisRepository(make_engine(f"sqlite:///{(tmp_path / 'web.db').as_posix()}"))
+
+
+@pytest.fixture
+def client(analyzer, repo) -> TestClient:
+    return TestClient(create_app(lambda: analyzer, lambda: repo))
+
+
+def upload(client: TestClient, data: bytes = REPORT, name: str = "report.txt", **kwargs):
+    return client.post("/analyze", files={"file": (name, data, "text/plain")},
+                       follow_redirects=False, **kwargs)
+
+
+def analysed(client: TestClient, **kwargs) -> str:
+    response = upload(client, **kwargs)
+    assert response.status_code == 303, response.text
+    return response.headers["location"]
+
+
+# --- pages and headers ---------------------------------------------------------------
+
+
+def test_home_page_renders_with_security_headers(client):
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Document analysis" in response.text
+    assert response.headers["content-security-policy"] == CONTENT_SECURITY_POLICY
+    assert "script-src 'self'" in CONTENT_SECURITY_POLICY
+    assert response.headers["x-frame-options"] == "DENY"
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert response.headers["cache-control"] == "no-store"
+
+
+def test_templates_have_no_inline_scripts_or_handlers():
+    """The CSP forbids inline scripts; keep templates compatible with it."""
+    for path in TEMPLATES.rglob("*.html"):
+        source = path.read_text(encoding="utf-8")
+        for tag in re.findall(r"<script\b[^>]*>", source):
+            assert "src=" in tag, f"inline script in {path.name}"
+        assert not re.search(r"\son[a-z]+\s*=", source), f"inline handler in {path.name}"
+        assert "hx-on" not in source and "|safe" not in source.replace(" ", "")
+
+
+def test_static_assets_are_served(client):
+    for path in ("/static/app.css", "/static/app.js", "/static/theme.js",
+                 "/static/vendor/htmx.min.js", "/static/favicon.svg"):
+        assert client.get(path).status_code == 200, path
+
+
+def test_health(client):
+    assert client.get("/healthz").json() == {"status": "ok"}
+
+
+# --- analysing ---------------------------------------------------------------------
+
+
+def test_upload_saves_and_redirects_to_the_analysis(client):
+    location = analysed(client)
+    assert location == "/analyses/1?saved=new"
+    page = client.get(location)
+    assert page.status_code == 200
+    assert "Saved as analysis #1." in page.text
+    assert "report.txt" in page.text
+    for label in ("Risk", "Threats", "Entities", "Evidence", "Text", "Sentences", "Metadata"):
+        assert f">{label}</a>" in page.text
+
+
+def test_same_document_again_shows_the_stored_analysis(client):
+    analysed(client)
+    location = analysed(client)
+    assert location == "/analyses/1?saved=existing"
+    assert "already analysed" in client.get(location).text
+
+
+def test_htmx_upload_redirects_with_a_header(client):
+    response = upload(client, headers=HX)
+    assert response.status_code == 204
+    assert response.headers["hx-redirect"] == "/analyses/1?saved=new"
+
+
+@pytest.mark.parametrize(("name", "data", "message"), [
+    ("report.exe", b"MZ data", "not allowed"),
+    ("empty.txt", b"", "empty"),
+])
+def test_rejected_uploads_show_an_error(client, name, data, message):
+    response = upload(client, data=data, name=name)
+    assert response.status_code == 422
+    assert "Could not process" in response.text
+    assert message in response.text.lower()
+    fragment = upload(client, data=data, name=name, headers=HX)
+    assert fragment.status_code == 200
+    assert "<html" not in fragment.text and "Could not process" in fragment.text
+
+
+def test_oversized_upload_is_refused_before_analysis(client, monkeypatch):
+    import src.web.app as web_app
+    from config.settings import IngestionSettings, Settings
+
+    monkeypatch.setattr(web_app, "settings",
+                        Settings(ingestion=IngestionSettings(max_file_size_bytes=50)))
+    response = upload(client)
+    assert response.status_code == 422
+    assert "larger than" in response.text
+
+
+def test_hostile_filename_is_escaped(client):
+    name = '<img src=x onerror=alert(1)>.txt'
+    page = client.get(analysed(client, name=name))
+    assert "<img src=x" not in page.text
+    assert "&lt;img src=x onerror=alert(1)&gt;.txt" in page.text
+
+
+def test_safe_filename_strips_paths():
+    assert _safe_filename("C:\\Users\\a\\report.pdf") == "report.pdf"
+    assert _safe_filename("../../etc/passwd.txt") == "passwd.txt"
+    assert _safe_filename(None) == "upload"
+
+
+# --- tabs ----------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("tab", ["risk", "threats", "entities", "evidence", "text",
+                                 "sentences", "metadata"])
+def test_every_tab_renders_as_page_and_fragment(client, tab):
+    analysed(client)
+    page = client.get(f"/analyses/1?tab={tab}")
+    assert page.status_code == 200 and "<html" in page.text
+    fragment = client.get(f"/analyses/1?tab={tab}", headers={**HX, "HX-Target": "tab-area"})
+    assert fragment.status_code == 200
+    assert "<html" not in fragment.text and 'id="tab-area"' in fragment.text
+
+
+def test_unknown_tab_falls_back_to_risk(client):
+    analysed(client)
+    assert "risk model" in client.get("/analyses/1?tab=nope").text
+
+
+def test_only_validated_reference_links_are_clickable(client):
+    analysed(client)
+    text = client.get("/analyses/1?tab=entities").text
+    hrefs = set(re.findall(r'href="(https?://[^"]+)"', text))
+    assert "https://nvd.nist.gov/vuln/detail/CVE-2021-44228" in hrefs
+    assert all(h.startswith(("https://attack.mitre.org/", "https://nvd.nist.gov/"))
+               for h in hrefs)
+    evidence = client.get("/analyses/1?tab=evidence").text
+    assert "evil.example" in evidence and 'href="http://evil' not in evidence
+
+
+def test_entity_filters(client):
+    analysed(client)
+    found = client.get("/analyses/1?tab=entities&f=1&type=malware&type=tool&q=mimikatz").text
+    assert "Mimikatz" in found
+    none = client.get("/analyses/1?tab=entities&f=1&q=zzzz-not-there").text
+    assert "No entities match the filter." in none
+
+
+def test_sentence_filter_and_evidence_toggle(client):
+    analysed(client)
+    assert "1 of" in client.get("/analyses/1?tab=sentences&q=Log4Shell").text
+    findings_only = client.get("/analyses/1?tab=evidence").text
+    everything = client.get("/analyses/1?tab=evidence&all=1").text
+    assert "No phishing was observed" in everything
+    assert findings_only.count("<tr") <= everything.count("<tr")
+
+
+def test_text_tab_handles_a_bad_page_number(client):
+    analysed(client)
+    assert "Cleaned text, page 1" in client.get("/analyses/1?tab=text&page=x").text
+
+
+def test_reopened_analysis_without_cached_text_hides_session_tabs(analyzer, repo):
+    first = TestClient(create_app(lambda: analyzer, lambda: repo))
+    analysed(first)
+    restarted = TestClient(create_app(lambda: analyzer, lambda: repo))
+    page = restarted.get("/analyses/1")
+    assert page.status_code == 200
+    assert ">Evidence</a>" not in page.text and ">Metadata</a>" in page.text
+    assert "risk model" in restarted.get("/analyses/1?tab=evidence").text
+
+
+@pytest.mark.parametrize("ref", ["999", "abc", "u-unknown"])
+def test_missing_analyses_are_404(client, ref):
+    response = client.get(f"/analyses/{ref}")
+    assert response.status_code == 404
+
+
+# --- without a database ------------------------------------------------------------------
+
+
+def test_analysis_works_without_a_database(analyzer):
+    client = TestClient(create_app(lambda: analyzer, lambda: None))
+    assert "database is unavailable" in client.get("/").text
+    location = analysed(client)
+    assert location.startswith("/analyses/u-")
+    page = client.get(location)
+    assert page.status_code == 200 and "not saved" in page.text
+    assert ">Evidence</a>" in page.text
+
+
+# --- CSRF ------------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("headers", [
+    {"Sec-Fetch-Site": "cross-site"},
+    {"Sec-Fetch-Site": "same-site"},
+    {"Origin": "https://evil.example"},
+])
+def test_cross_site_posts_are_refused(client, repo, headers):
+    response = upload(client, headers=headers)
+    assert response.status_code == 403
+    assert repo.stats().documents == 0
+
+
+def test_same_origin_posts_are_allowed(client):
+    response = upload(client, headers={"Sec-Fetch-Site": "same-origin",
+                                       "Origin": "http://testserver"})
+    assert response.status_code == 303
+
+
+# --- units -----------------------------------------------------------------------------
+
+
+def test_result_cache_evicts_least_recently_used():
+    cache = ResultCache(max_items=2)
+    cache.put("a", "A")
+    cache.put("b", "B")
+    assert cache.get("a") == "A"  # a is now most recent
+    cache.put("c", "C")
+    assert cache.get("b") is None and cache.get("a") == "A" and len(cache) == 2
+    cache.discard("a")
+    assert cache.get("a") is None
+
+
+@pytest.mark.parametrize(("value", "text"), [
+    (None, ""), (float("nan"), ""), (True, "Yes"), (3.0, "3"), (0.876, "0.88"),
+    (12345, "12,345"), (42, "42"), (["a", "b"], "a, b"), ("x", "x"),
+])
+def test_format_value(value, text):
+    assert format_value(value) == text
+
+
+def test_table_links_only_reference_sites():
+    import pandas as pd
+
+    frame = pd.DataFrame({"NVD": ["https://nvd.nist.gov/vuln/detail/CVE-2021-1",
+                                  "http://evil.example"], "Score": [1.5, 2.0]})
+    t = table(frame, max_rows=1)
+    assert t.rows == [[Cell("NVD ↗", "https://nvd.nist.gov/vuln/detail/CVE-2021-1"),
+                       Cell("1.50")]]
+    assert t.truncated and t.numeric == {1}
+    assert table(frame).rows[1][0] == Cell("")
+
+
+# --- failure paths ---------------------------------------------------------------------
+
+
+def test_unexpected_analyzer_failure_shows_a_generic_message(repo):
+    class Broken:
+        def analyze(self, data, filename):
+            raise RuntimeError("secret internal detail")
+
+    client = TestClient(create_app(lambda: Broken(), lambda: repo))
+    response = upload(client)
+    assert response.status_code == 422
+    assert "unexpected error" in response.text
+    assert "secret internal detail" not in response.text
+
+
+def test_failed_save_falls_back_to_an_unsaved_analysis(analyzer, repo, monkeypatch):
+    from src.database.db_manager import DatabaseError
+
+    def fail(*_args, **_kwargs):
+        raise DatabaseError("disk full")
+
+    monkeypatch.setattr(repo, "save", fail)
+    client = TestClient(create_app(lambda: analyzer, lambda: repo))
+    location = analysed(client)
+    assert location.startswith("/analyses/u-")
+    assert client.get(location).status_code == 200
+
+
+def test_default_repository_returns_none_when_the_database_cannot_open(monkeypatch):
+    import src.web.state as state
+
+    def fail():
+        raise OSError("cannot open")
+
+    monkeypatch.setattr(state, "AnalysisRepository", fail)
+    assert state.default_repository() is None
+
+
+def test_document_without_categories_shows_the_empty_state(client):
+    analysed(client, data=b"The quarterly meeting was held on Tuesday in the main office.")
+    assert "No threat categories were detected." in client.get("/analyses/1?tab=threats").text
+
+
+def test_table_details_are_truncated_with_rows_and_empty_ones_dropped():
+    import pandas as pd
+
+    frame = pd.DataFrame({"A": [1, 2, 3]})
+    details = [pd.DataFrame({"B": [1]}), pd.DataFrame(), None]
+    t = table(frame, details=details, max_rows=2)
+    assert len(t.details) == 2 and t.details[1] is None
+    assert format_value(pd.NaT) == "" and format_value(pd.Timestamp("2026-01-02")).startswith(
+        "2026-01-02")
+
+
+def test_server_entry_point_binds_to_localhost(monkeypatch):
+    import sys
+
+    import src.web.__main__ as entry
+
+    calls = {}
+    monkeypatch.setattr(entry.uvicorn, "run", lambda *a, **k: calls.update(args=a, kwargs=k))
+    monkeypatch.setattr(sys, "argv", ["cybersleuth"])
+    monkeypatch.delenv("CYBERSLEUTH_HOST", raising=False)
+    monkeypatch.delenv("CYBERSLEUTH_PORT", raising=False)
+    entry.main()
+    assert calls["args"] == ("src.web.app:create_app",)
+    assert calls["kwargs"]["host"] == "127.0.0.1" and calls["kwargs"]["port"] == 8000
+    assert calls["kwargs"]["factory"] is True

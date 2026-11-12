@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Analyze · {{ app_name }}{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Document analysis</h1>
+  <p class="lede">Ingestion, IOC and entity extraction, threat classification, ATT&amp;CK mapping and explainable risk scoring.</p>
+</section>
+
+<form class="upload card" action="/analyze" method="post" enctype="multipart/form-data"
+      hx-post="/analyze" hx-encoding="multipart/form-data" hx-target="#upload-status"
+      hx-indicator="#analyzing" hx-disabled-elt="find button[type=submit]">
+  <label class="dropzone" id="dropzone">
+    <input type="file" name="file" id="file" accept="{{ accept }}" required>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+    <span class="dz-title" id="dz-title">Drop a threat report here, or click to choose</span>
+    <span class="dz-hint">PDF, DOCX or TXT · max {{ max_mb }} MB · max {{ max_pages }} PDF pages</span>
+  </label>
+  <div class="upload-actions">
+    <button type="submit" class="btn primary">Analyze report</button>
+    <span class="indicator" id="analyzing" role="status">
+      <span class="spinner" aria-hidden="true"></span> Analysing… large reports can take a minute
+    </span>
+  </div>
+  <div id="upload-status" aria-live="polite">
+    {% if error %}{% include "_upload_error.html" %}{% endif %}
+  </div>
+</form>
+
+<section class="notes">
+  <div class="note"><h2>Private by default</h2><p>Uploads are processed in memory. Only findings and their evidence sentences are saved, never the full text.</p></div>
+  <div class="note"><h2>Indicators stay inert</h2><p>Extracted IPs, domains and URLs are shown as text and are never contacted or made clickable.</p></div>
+  <div class="note"><h2>Evidence for everything</h2><p>Every finding links back to the sentence it came from, and analysts can confirm or reject it.</p></div>
+</section>
+<p class="muted small">Sample reports are in <code>data/samples/</code>.</p>
+{% endblock %}

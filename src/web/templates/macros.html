@@ -1,0 +1,46 @@
+{# Render a src.web.render.Table. Every value is autoescaped text; only validated
+   reference links (Cell.href) become anchors. #}
+{% macro data_table(t, caption=None, empty="No rows.") %}
+{% if t is none or not t.rows %}
+<p class="muted">{{ empty }}</p>
+{% else %}
+<div class="table-wrap">
+  <table class="data">
+    {% if caption %}<caption>{{ caption }}</caption>{% endif %}
+    <thead>
+      <tr>
+        {% if t.details %}<th class="toggle-col"><span class="sr-only">Evidence</span></th>{% endif %}
+        {% for c in t.columns %}<th scope="col"{% if loop.index0 in t.numeric %} class="num"{% endif %}>{{ c }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in t.rows %}
+      {% set sub = t.details[loop.index0] if t.details else none %}
+      <tr{% if sub %} class="has-detail"{% endif %}>
+        {% if t.details %}
+        <td class="toggle-col">
+          {% if sub %}<button type="button" class="row-toggle" aria-expanded="false" aria-label="Show evidence"><span aria-hidden="true">▸</span></button>{% endif %}
+        </td>
+        {% endif %}
+        {% for cell in row %}
+        <td{% if loop.index0 in t.numeric %} class="num"{% endif %}>
+          {%- if cell.href %}<a href="{{ cell.href }}" target="_blank" rel="noopener noreferrer">{{ cell.text }}</a>{% else %}{{ cell.text }}{% endif -%}
+        </td>
+        {% endfor %}
+      </tr>
+      {% if sub %}
+      <tr class="detail-row" hidden>
+        <td colspan="{{ t.columns | length + 1 }}">
+          {{ data_table(sub) }}
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% if t.truncated %}<p class="muted small">Showing the first {{ t.rows | length }} of {{ "{:,}".format(t.total_rows) }} rows. Narrow the filter to see the rest.</p>{% endif %}
+{% endif %}
+{% endmacro %}
+
+{% macro band_badge(band) %}<span class="badge band-{{ band_class.get(band, 'low') }}">{{ band }}</span>{% endmacro %}
