@@ -289,3 +289,31 @@ table.data .toggle-col { width: 2.25rem; min-width: 2.25rem; padding-right: 0; }
   .metric-value { font-size: 1.2rem; }
   .detail-row > td { padding-left: .75rem; }
 }
+
+/* --- verdicts and downloads --------------------------------------------------------- */
+
+.verdict {
+  margin-top: .75rem; padding: .75rem .9rem; border: 1px solid var(--border);
+  border-left: 3px solid var(--accent); border-radius: 8px; background: var(--surface);
+}
+.verdict-title { margin: 0 0 .5rem; font-weight: 600; font-size: .88rem; overflow-wrap: anywhere; }
+.verdict-fields { display: flex; flex-wrap: wrap; align-items: flex-end; gap: .6rem 1rem; }
+.verdict-fields label { display: flex; flex-direction: column; gap: .2rem; color: var(--muted); font-size: .8rem; }
+.verdict-fields .grow { flex: 1 1 260px; }
+.verdict input[type="text"] {
+  font: inherit; color: var(--text); background: var(--surface);
+  border: 1px solid var(--border-strong); border-radius: 7px; padding: .4rem .6rem; width: 100%;
+}
+
+.downloads { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: .9rem; margin: 1rem 0; }
+.download {
+  display: flex; flex-direction: column; gap: .3rem; padding: 1rem 1.1rem;
+  color: var(--text); text-decoration: none; transition: border-color .15s;
+}
+.download:hover { border-color: var(--accent); }
+.download-ext {
+  align-self: flex-start; padding: .1rem .5rem; border-radius: 6px; font-weight: 800;
+  font-size: .75rem; letter-spacing: .05em; background: var(--accent-soft); color: var(--accent);
+}
+.download-label { font-weight: 700; }
+.download-file { color: var(--muted); overflow-wrap: anywhere; }

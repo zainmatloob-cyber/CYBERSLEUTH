@@ -10,3 +10,4 @@
     {% include "tabs/" ~ tab ~ ".html" %}
   </section>
 </div>
+{% if data.flash %}{% set oob = true %}{% include "_summary.html" %}{% endif %}

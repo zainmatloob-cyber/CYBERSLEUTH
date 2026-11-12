@@ -354,3 +354,136 @@ def test_server_entry_point_binds_to_localhost(monkeypatch):
     assert calls["args"] == ("src.web.app:create_app",)
     assert calls["kwargs"]["host"] == "127.0.0.1" and calls["kwargs"]["port"] == 8000
     assert calls["kwargs"]["factory"] is True
+
+
+# --- step 2: ATT&CK, IOCs, verdicts, export ----------------------------------------------
+
+ATTACK_REPORT = REPORT + b" They used Kerberoasting to steal tickets."
+
+
+def stored(repo, analysis_id: int = 1):
+    from src.database.views import hydrate
+
+    return hydrate(repo.get_analysis(analysis_id))
+
+
+def test_attack_tab_lists_techniques_and_hides_negated_by_default(client):
+    analysed(client, data=ATTACK_REPORT)
+    default = client.get("/analyses/1?tab=attack").text
+    assert "T1558.003" in default and "T1566" not in default
+    assert "Analyst verdict for" in default
+    with_negated = client.get("/analyses/1?tab=attack&f=1").text
+    assert "T1566" in with_negated
+
+
+def test_mapping_verdict_rescores_and_refreshes_the_summary(client, repo):
+    analysed(client, data=ATTACK_REPORT)
+    view = stored(repo)
+    mapping_id = view.mapping_ids["T1558.003"]
+    before = view.risk.score
+    response = client.post(f"/analyses/1/mappings/{mapping_id}/verdict?tab=attack",
+                           data={"verdict": "rejected", "note": "  false positive "},
+                           headers={**HX, "HX-Target": "tab-area"})
+    assert response.status_code == 200
+    assert "Saved verdict &#39;rejected&#39;" in response.text
+    assert 'id="summary"' in response.text and 'hx-swap-oob="true"' in response.text
+    after = stored(repo)
+    assert after.mapping_notes[mapping_id] == "false positive"
+    assert after.risk.score < before
+    history = client.get("/analyses/1?tab=metadata").text
+    assert "false positive" in history and "rejected" in history
+
+
+def test_indicator_verdict_without_htmx_redirects_back_with_filters(client, repo):
+    analysed(client)
+    view = stored(repo)
+    indicator_id = next(iter(view.indicator_ids.values()))
+    response = client.post(f"/analyses/1/indicators/{indicator_id}/verdict?tab=iocs&f=1&q=198",
+                           data={"verdict": "malicious"}, follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/analyses/1?tab=iocs&f=1&q=198"
+    assert "malicious" in {i.verification.value for i in stored(repo).indicators}
+
+
+def test_verdict_on_a_finding_of_another_analysis_is_refused(client, repo):
+    analysed(client, data=ATTACK_REPORT)
+    analysed(client, data=REPORT + b" Second document.", name="second.txt")
+    other_mapping = stored(repo, 1).mapping_ids["T1558.003"]
+    other_indicator = next(iter(stored(repo, 1).indicator_ids.values()))
+    assert client.post(f"/analyses/2/mappings/{other_mapping}/verdict",
+                       data={"verdict": "confirmed"}).status_code == 404
+    assert client.post(f"/analyses/2/indicators/{other_indicator}/verdict",
+                       data={"verdict": "malicious"}).status_code == 404
+    assert client.post("/analyses/99/mappings/1/verdict",
+                       data={"verdict": "confirmed"}).status_code == 404
+
+
+def test_invalid_verdict_values_are_rejected(client, repo):
+    analysed(client, data=ATTACK_REPORT)
+    view = stored(repo)
+    mapping_id = view.mapping_ids["T1558.003"]
+    indicator_id = next(iter(view.indicator_ids.values()))
+    assert client.post(f"/analyses/1/mappings/{mapping_id}/verdict",
+                       data={"verdict": "pwned"}).status_code == 400
+    assert client.post(f"/analyses/1/indicators/{indicator_id}/verdict",
+                       data={"verdict": "pwned"}).status_code == 400
+
+
+def test_cross_site_verdicts_are_refused(client, repo):
+    analysed(client, data=ATTACK_REPORT)
+    mapping_id = stored(repo).mapping_ids["T1558.003"]
+    response = client.post(f"/analyses/1/mappings/{mapping_id}/verdict",
+                           data={"verdict": "rejected"}, headers={"Sec-Fetch-Site": "cross-site"})
+    assert response.status_code == 403
+    assert stored(repo).mappings[0].verdict.value == "unverified"
+
+
+def test_ioc_filters(client):
+    analysed(client)
+    everything = client.get("/analyses/1?tab=iocs").text
+    assert "198.51.100.7" in everything and "CVE-2021-44228" in everything
+    only_cves = client.get("/analyses/1?tab=iocs&f=1&type=cve").text
+    assert "CVE-2021-44228" in only_cves and "198.51.100.7" not in only_cves
+    unflagged = client.get("/analyses/1?tab=iocs&f=1&type=cve&type=ipv4&hide_flagged=1").text
+    assert "198.51.100.7" not in unflagged
+    by_context = client.get("/analyses/1?tab=iocs&f=1&type=ipv4&q=contacted").text
+    assert "198.51.100.7" in by_context
+
+
+def test_unsaved_analysis_has_no_verdict_forms(analyzer):
+    client = TestClient(create_app(lambda: analyzer, lambda: None))
+    location = analysed(client, data=ATTACK_REPORT)
+    ref = location.split("/")[-1]
+    page = client.get(f"/analyses/{ref}?tab=attack").text
+    assert "requires a saved analysis" in page and "Analyst verdict for" not in page
+    assert "not saved, so reports carry no analyst verdicts" in client.get(
+        f"/analyses/{ref}?tab=export").text
+    assert client.get(f"/analyses/{ref}/export/json").status_code == 200
+
+
+def test_reports_download_with_safe_names_and_current_verdicts(client, repo):
+    import io
+    import json
+    import zipfile
+
+    analysed(client, data=ATTACK_REPORT, name='weird "name"; x.txt')
+    mapping_id = stored(repo).mapping_ids["T1558.003"]
+    client.post(f"/analyses/1/mappings/{mapping_id}/verdict", data={"verdict": "confirmed"})
+    export_tab = client.get("/analyses/1?tab=export").text
+    assert "/analyses/1/export/pdf" in export_tab
+
+    pdf = client.get("/analyses/1/export/pdf")
+    assert pdf.headers["content-type"] == "application/pdf" and pdf.content.startswith(b"%PDF")
+    # The upload name contained quotes and a semicolon; only [A-Za-z0-9_-] survive.
+    assert re.fullmatch(r'attachment; filename="cybersleuth_[A-Za-z0-9_-]+_1\.pdf"',
+                        pdf.headers["content-disposition"])
+    data = json.loads(client.get("/analyses/1/export/json").content)
+    assert "confirmed" in json.dumps(data)
+    archive = zipfile.ZipFile(io.BytesIO(client.get("/analyses/1/export/zip").content))
+    assert archive.namelist()
+
+
+@pytest.mark.parametrize("url", ["/analyses/1/export/exe", "/analyses/9/export/pdf"])
+def test_unknown_exports_are_404(client, url):
+    analysed(client)
+    assert client.get(url).status_code == 404

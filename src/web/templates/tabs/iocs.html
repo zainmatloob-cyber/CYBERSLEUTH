@@ -1,0 +1,38 @@
+{% from "macros.html" import data_table, verdict_form %}
+{% if not data.total %}
+<p class="empty">No indicators of compromise were found in this document.</p>
+{% else %}
+<p class="muted">Extracted indicators are <strong>unverified</strong>: appearing in a report does not make a value malicious. Flags describe what a value is (e.g. a documentation IP range), not a verdict. Values are shown as text and are never contacted.</p>
+
+<div class="chips">
+  {% for label, _, count in data.counts %}<span class="chip"><span class="chip-count">{{ count }}</span> {{ label }}</span>{% endfor %}
+</div>
+
+<form class="filters" action="/analyses/{{ ref }}" method="get" role="search"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="input delay:300ms, submit" hx-push-url="true">
+  <input type="hidden" name="tab" value="iocs">
+  <input type="hidden" name="f" value="1">
+  <fieldset class="checks">
+    <legend>Types</legend>
+    {% for label, value, _ in data.counts %}
+    <label><input type="checkbox" name="type" value="{{ value }}"{% if value in data.chosen %} checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+  </fieldset>
+  <label class="search">Search <input type="search" name="q" value="{{ data.query }}" placeholder="value or context"></label>
+  <label title="Hide private, documentation and reserved values"><input type="checkbox" name="hide_flagged" value="1"{% if data.hide_flagged %} checked{% endif %}> Hide flagged</label>
+</form>
+{% endif %}
+
+<div id="tab-results">
+  {% if data.flash %}<div class="alert ok" role="status">{{ data.flash }}</div>{% endif %}
+  {% if data.total %}
+  <p class="muted small">{{ data.shown }} of {{ data.total }} indicators · ▸ shows every occurrence{% if data.can_verify %} and the verdict form{% endif %}</p>
+  {% if data.forms is not none %}
+  {% call(i) data_table(data.table, empty="No indicators match the filter.") %}{% if data.forms[i] %}{{ verdict_form(data.forms[i], query) }}{% endif %}{% endcall %}
+  {% else %}
+  {{ data_table(data.table, empty="No indicators match the filter.") }}
+  <p class="muted small">Analyst verification requires a saved analysis.</p>
+  {% endif %}
+  {% endif %}
+</div>

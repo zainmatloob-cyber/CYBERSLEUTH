@@ -10,15 +10,7 @@
 {% if save_note %}<div class="alert info" role="status">{{ save_note }}</div>{% endif %}
 {% if unsaved %}<div class="alert warn" role="status">This analysis is not saved: it is kept in memory only and analyst verification is disabled.</div>{% endif %}
 
-<section class="metrics" aria-label="Summary">
-  {% for label, value, sub in summary.metrics %}
-  <div class="metric{% if loop.first %} metric-risk band-{{ band_class.get(summary.band, 'low') }}{% endif %}">
-    <span class="metric-label">{{ label }}</span>
-    <span class="metric-value">{{ value }}</span>
-    {% if loop.first %}{{ band_badge(sub) }}{% elif sub %}<span class="metric-sub">{{ sub }}</span>{% endif %}
-  </div>
-  {% endfor %}
-</section>
+{% include "_summary.html" %}
 
 {% for warning in summary.warnings %}
 <div class="alert warn" role="status">{{ warning }}</div>

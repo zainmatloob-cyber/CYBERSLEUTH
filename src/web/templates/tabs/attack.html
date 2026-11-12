@@ -1,0 +1,34 @@
+{% from "macros.html" import data_table, verdict_form %}
+{% if not data.total %}
+<p class="empty">No ATT&amp;CK techniques were mapped.</p>
+{% else %}
+<p class="muted"><strong>explicit-*</strong> mappings come from the text naming the technique. Status: observed / capability / possible / negated. Every mapping is <strong>unverified</strong> until an analyst reviews it; confirming or rejecting one updates the risk score.</p>
+
+<form class="filters" id="attack-filters" action="/analyses/{{ ref }}" method="get"
+      hx-get="/analyses/{{ ref }}" hx-target="#tab-results" hx-select="#tab-results"
+      hx-swap="outerHTML" hx-trigger="change" hx-push-url="true">
+  <input type="hidden" name="tab" value="attack">
+  <input type="hidden" name="f" value="1">
+  <label title="Model-only suggestions are leads, not findings. Only those above a score cut-off chosen on real CISA advisories are kept; on unseen advisories about 4 in 5 of them matched a technique CISA cites (a small sample). They don't count toward the risk score unless you confirm them.">
+    <input type="checkbox" name="leads" value="1"{% if data.show_leads %} checked{% endif %}> Show {{ data.leads }} unverified model suggestion(s)
+  </label>
+  <label><input type="checkbox" name="hide_negated" value="1"{% if data.hide_negated %} checked{% endif %}> Hide negated</label>
+  <noscript><button class="btn" type="submit">Apply</button></noscript>
+</form>
+{% endif %}
+
+<div id="tab-results">
+  {% if data.flash %}<div class="alert ok" role="status">{{ data.flash }}</div>{% endif %}
+  {% if data.total %}
+  {% if data.show_leads and data.leads %}
+  <div class="alert warn" role="status">Model suggestions are shown. Score = SVM margin, not a probability; low scores are usually wrong on real reports. Confirm only what the evidence sentence supports.</div>
+  {% endif %}
+  <p class="muted small">{{ data.shown }} of {{ data.total }} techniques{% if data.leads and not data.show_leads %} · {{ data.leads }} model suggestion(s) hidden{% endif %} · ▸ shows the evidence{% if data.can_verify %} and the verdict form{% endif %}</p>
+  {% if data.forms is not none %}
+  {% call(i) data_table(data.table, empty="No techniques match the filter.") %}{% if data.forms[i] %}{{ verdict_form(data.forms[i], query) }}{% endif %}{% endcall %}
+  {% else %}
+  {{ data_table(data.table, empty="No techniques match the filter.") }}
+  <p class="muted small">Analyst verification requires a saved analysis.</p>
+  {% endif %}
+  {% endif %}
+</div>

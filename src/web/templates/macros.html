@@ -1,5 +1,6 @@
 {# Render a src.web.render.Table. Every value is autoescaped text; only validated
-   reference links (Cell.href) become anchors. #}
+   reference links (Cell.href) become anchors. Called with {% call(i) data_table(t) %},
+   the block is rendered in row i's expandable detail, under its evidence. #}
 {% macro data_table(t, caption=None, empty="No rows.") %}
 {% if t is none or not t.rows %}
 <p class="muted">{{ empty }}</p>
@@ -16,6 +17,7 @@
     <tbody>
       {% for row in t.rows %}
       {% set sub = t.details[loop.index0] if t.details else none %}
+      {% set row_index = loop.index0 %}
       <tr{% if sub %} class="has-detail"{% endif %}>
         {% if t.details %}
         <td class="toggle-col">
@@ -32,6 +34,7 @@
       <tr class="detail-row" hidden>
         <td colspan="{{ t.columns | length + 1 }}">
           {{ data_table(sub) }}
+          {% if caller is defined %}{{ caller(row_index) }}{% endif %}
         </td>
       </tr>
       {% endif %}
@@ -44,3 +47,23 @@
 {% endmacro %}
 
 {% macro band_badge(band) %}<span class="badge band-{{ band_class.get(band, 'low') }}">{{ band }}</span>{% endmacro %}
+
+{# Analyst verdict form (src.web.tabs.VerdictForm). Posting keeps the current filters via
+   the query string; HTMX swaps the refreshed tab area. #}
+{% macro verdict_form(form, query) %}
+<form class="verdict" method="post" action="{{ form.action }}?{{ query }}"
+      hx-post="{{ form.action }}?{{ query }}" hx-target="#tab-area" hx-swap="outerHTML">
+  <p class="verdict-title">Analyst verdict for <span class="mono">{{ form.label }}</span></p>
+  <div class="verdict-fields">
+    <label>Verdict
+      <select name="verdict">
+        {% for option in form.options %}<option value="{{ option }}"{% if option == form.current %} selected{% endif %}>{{ option }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="grow">Note (optional)
+      <input type="text" name="note" value="{{ form.note }}" maxlength="{{ form.max_note }}" placeholder="Why? e.g. confirmed in vendor report">
+    </label>
+    <button type="submit" class="btn primary">Save verdict</button>
+  </div>
+</form>
+{% endmacro %}

@@ -1,0 +1,12 @@
+<p class="muted">Reports contain findings and their evidence sentences, never the full document text. Network indicators are defanged in the PDF and CSV; verdicts are exported as currently recorded.</p>
+{% if not data.saved %}<div class="alert info" role="status">This analysis is not saved, so reports carry no analyst verdicts.</div>{% endif %}
+<div class="downloads">
+  {% for ext, label, help_text, filename in data.reports %}
+  <a class="download card" href="/analyses/{{ ref }}/export/{{ ext }}" download="{{ filename }}">
+    <span class="download-ext">{{ ext | upper }}</span>
+    <span class="download-label">{{ label }}</span>
+    <span class="muted small">{{ help_text }}</span>
+    <span class="download-file mono small">{{ filename }}</span>
+  </a>
+  {% endfor %}
+</div>

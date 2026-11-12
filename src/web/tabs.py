@@ -13,11 +13,14 @@ from dataclasses import dataclass
 import pandas as pd
 from starlette.datastructures import QueryParams
 
+from src.database.db_manager import MAX_NOTE_LENGTH
 from src.database.views import StoredAnalysis
 from src.intelligence.analyzer import AnalysisResult
 from src.intelligence.assertion import AssertionStatus
 from src.intelligence.mitre_mapper import AnalystVerdict
 from src.nlp.entity_models import EntityType
+from src.nlp.ioc_models import IOCType, VerificationStatus
+from src.reporting.common import report_stem
 from src.visualization import tables
 from src.web.render import key_values, table
 
@@ -34,11 +37,14 @@ class Tab:
 TABS = (
     Tab("risk", "Risk"),
     Tab("threats", "Threats"),
+    Tab("attack", "ATT&CK"),
+    Tab("iocs", "IOCs"),
     Tab("entities", "Entities"),
     Tab("evidence", "Evidence", session_only=True),
     Tab("text", "Text", session_only=True),
     Tab("sentences", "Sentences", session_only=True),
     Tab("metadata", "Metadata"),
+    Tab("export", "Export"),
 )
 TAB_KEYS = {t.key for t in TABS}
 
@@ -53,6 +59,23 @@ class TabContext:
     result: AnalysisResult | None
     params: QueryParams
     repo: object | None  # AnalysisRepository; typed loosely to keep tests light
+    flash: str | None = None  # confirmation after saving a verdict
+
+    @property
+    def can_verify(self) -> bool:
+        return self.repo is not None and bool(self.view.analysis_id)
+
+
+@dataclass(frozen=True)
+class VerdictForm:
+    """An analyst verdict form for one finding. ``label`` is untrusted (extracted text)."""
+
+    action: str
+    label: str
+    options: list[str]
+    current: str
+    note: str
+    max_note: int = MAX_NOTE_LENGTH
 
 
 # --- summary (always shown above the tabs) ---------------------------------------
@@ -98,6 +121,90 @@ def threats_tab(ctx: TabContext) -> dict:
         return {"table": None}
     return {"table": table(tables.categories_frame(findings),
                            details=[tables.category_evidence_frame(f) for f in findings])}
+
+
+def _checked(params: QueryParams, name: str, default: bool) -> bool:
+    """Checkbox state: its default until the filter form is submitted (marker ``f``)."""
+    return params.get(name) == "1" if "f" in params else default
+
+
+def attack_tab(ctx: TabContext) -> dict:
+    view = ctx.view
+    mappings = view.mappings
+    leads = [m for m in mappings if m.is_unverified_lead]
+    show_leads = _checked(ctx.params, "leads", False)
+    hide_negated = _checked(ctx.params, "hide_negated", True)
+    visible = [m for m in mappings if (show_leads or not m.is_unverified_lead)
+               and (not hide_negated or m.status is not AssertionStatus.NEGATED)]
+    forms = None
+    if ctx.can_verify:
+        forms = []
+        for m in visible:
+            mapping_id = view.mapping_ids.get(m.technique_id)
+            forms.append(None if mapping_id is None else VerdictForm(
+                f"/analyses/{view.analysis_id}/mappings/{mapping_id}/verdict",
+                f"{m.technique_id} · {m.name}", [v.value for v in AnalystVerdict],
+                m.verdict.value, view.mapping_notes.get(mapping_id) or ""))
+    return {
+        "total": len(mappings), "leads": len(leads), "show_leads": show_leads,
+        "hide_negated": hide_negated, "shown": len(visible), "forms": forms,
+        "flash": ctx.flash, "can_verify": ctx.can_verify,
+        "table": table(tables.mappings_frame(visible),
+                       details=[tables.mapping_evidence_frame(m) for m in visible])
+        if visible else None,
+    }
+
+
+def iocs_tab(ctx: TabContext) -> dict:
+    view = ctx.view
+    indicators = view.indicators
+    present = [t for t in IOCType if any(i.ioc_type is t for i in indicators)]
+    counts = [(t.value.upper(), t.value, sum(1 for i in indicators if i.ioc_type is t))
+              for t in present]
+    filtered = "f" in ctx.params
+    chosen = set(ctx.params.getlist("type")) if filtered else {t.value for t in present}
+    hide_flagged = _checked(ctx.params, "hide_flagged", False)
+    query = ctx.params.get("q", "").strip()
+    needle = query.lower()
+    visible = [i for i in indicators
+               if i.ioc_type.value in chosen and (not hide_flagged or not i.flags)
+               and (not needle or needle in i.value.lower()
+                    or any(needle in o.context.lower() for o in i.occurrences))]
+    forms = None
+    if ctx.can_verify:
+        forms = []
+        for i in visible:
+            indicator_id = view.indicator_ids.get((i.ioc_type, i.value))
+            forms.append(None if indicator_id is None else VerdictForm(
+                f"/analyses/{view.analysis_id}/indicators/{indicator_id}/verdict",
+                f"{i.ioc_type.value.upper()} · {i.value}",
+                [v.value for v in VerificationStatus], i.verification.value,
+                view.indicator_notes.get(indicator_id) or ""))
+    return {
+        "total": len(indicators), "counts": counts, "chosen": chosen, "query": query,
+        "hide_flagged": hide_flagged, "shown": len(visible), "forms": forms,
+        "flash": ctx.flash, "can_verify": ctx.can_verify,
+        "table": table(tables.indicators_frame(visible),
+                       details=[tables.occurrences_frame(i) for i in visible])
+        if visible else None,
+    }
+
+
+REPORTS = (
+    ("pdf", "PDF report",
+     "Analyst-facing report: summary, risk, findings with evidence, verification, limitations."),
+    ("json", "JSON (complete)",
+     "Every finding and evidence sentence, versioned schema. Includes canonical IOC values."),
+    ("zip", "CSV tables (ZIP)",
+     "One CSV per finding type, defanged, safe to open in a spreadsheet."),
+)
+
+
+def export_tab(ctx: TabContext) -> dict:
+    stem = report_stem(ctx.view)
+    return {"reports": [(ext, label, help_text, f"{stem}.{ext}")
+                        for ext, label, help_text in REPORTS],
+            "saved": bool(ctx.view.analysis_id)}
 
 
 def _entity_label(entity_type: EntityType) -> str:
@@ -187,7 +294,8 @@ def sentences_tab(ctx: TabContext) -> dict:
 
 
 BUILDERS: dict[str, Callable[[TabContext], dict]] = {
-    "risk": risk_tab, "threats": threats_tab, "entities": entities_tab,
+    "risk": risk_tab, "threats": threats_tab, "attack": attack_tab, "iocs": iocs_tab,
+    "entities": entities_tab, "export": export_tab,
     "evidence": evidence_tab, "text": text_tab, "sentences": sentences_tab,
     "metadata": metadata_tab,
 }

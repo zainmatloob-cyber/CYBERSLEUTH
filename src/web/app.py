@@ -10,7 +10,7 @@ import logging
 from collections.abc import Callable
 from pathlib import Path, PurePath
 
-from fastapi import FastAPI, Request, UploadFile
+from fastapi import FastAPI, Form, Request, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -18,8 +18,10 @@ from jinja2 import Environment, FileSystemLoader
 
 from config.settings import settings
 from src.database.db_manager import AnalysisRepository, DatabaseError
-from src.database.views import StoredAnalysis, hydrate, view_from_result
+from src.database.views import StoredAnalysis, hydrate, rescore_analysis, view_from_result
 from src.intelligence.analyzer import AnalysisResult, Analyzer
+from src.reporting import csv_report, json_report, pdf_report
+from src.reporting.common import report_stem
 from src.utils.exceptions import CyberSleuthError
 from src.web import tabs
 from src.web.security import SecurityMiddleware
@@ -35,6 +37,11 @@ SAVE_NOTES = {
                 "stored analysis #{id} with its analyst verdicts.",
 }
 NAV = (("analyze", "Analyze", "/"),)
+EXPORTS = {
+    "pdf": ("application/pdf", pdf_report.to_pdf),
+    "json": ("application/json", json_report.to_json),
+    "zip": ("application/zip", csv_report.to_csv_zip),
+}
 
 
 def _templates() -> Jinja2Templates:
@@ -116,9 +123,8 @@ def create_app(analyzer_factory: Callable[[], Analyzer] = Analyzer,
 
     # --- one analysis -----------------------------------------------------------------
 
-    @app.get("/analyses/{ref}", response_class=HTMLResponse)
-    def analysis(request: Request, ref: str, tab: str = "risk",
-                 saved: str | None = None) -> HTMLResponse:
+    def render_analysis(request: Request, ref: str, tab: str, flash: str | None = None,
+                        fragment: bool = False, saved: str | None = None) -> HTMLResponse:
         view, result = _load(state, ref)
         if view is None:
             message = ("This unsaved analysis is no longer in memory (the server keeps only "
@@ -128,16 +134,84 @@ def create_app(analyzer_factory: Callable[[], Analyzer] = Analyzer,
         available = tabs.available_tabs(result is not None)
         if tab not in {t.key for t in available}:
             tab = "risk"
-        ctx = tabs.TabContext(view, result, request.query_params, state.repo)
+        ctx = tabs.TabContext(view, result, request.query_params, state.repo, flash)
         context = {"ref": ref, "view": view, "tab": tab, "tabs": available,
-                   "data": tabs.BUILDERS[tab](ctx)}
-        if _is_fragment(request):
+                   "data": tabs.BUILDERS[tab](ctx), "query": request.url.query,
+                   "summary": tabs.summary(view)}
+        if fragment:
             return page(request, "_tab_area.html", context)
         note = SAVE_NOTES.get(saved or "")
-        context.update(summary=tabs.summary(view),
-                       save_note=note.format(id=view.analysis_id) if note else None,
+        context.update(save_note=note.format(id=view.analysis_id) if note else None,
                        unsaved=ref.startswith(UNSAVED_PREFIX))
         return page(request, "analysis.html", context)
+
+    @app.get("/analyses/{ref}", response_class=HTMLResponse)
+    def analysis(request: Request, ref: str, tab: str = "risk",
+                 saved: str | None = None) -> HTMLResponse:
+        return render_analysis(request, ref, tab, fragment=_is_fragment(request), saved=saved)
+
+    # --- analyst verdicts -----------------------------------------------------------
+
+    def verdict_response(request: Request, analysis_id: int, tab: str,
+                         message: str) -> Response:
+        if request.headers.get("hx-request") == "true":
+            response = render_analysis(request, str(analysis_id), tab, flash=message,
+                                       fragment=True)
+            response.headers["HX-Trigger"] = "cs:verdict"
+            return response
+        query = request.url.query
+        return RedirectResponse(f"/analyses/{analysis_id}?{query or f'tab={tab}'}",
+                                status_code=303)
+
+    def stored_view(analysis_id: int) -> StoredAnalysis | None:
+        if state.repo is None:
+            return None
+        try:
+            return hydrate(state.repo.get_analysis(analysis_id))
+        except DatabaseError:
+            return None
+
+    @app.post("/analyses/{analysis_id}/mappings/{mapping_id}/verdict")
+    def mapping_verdict(request: Request, analysis_id: int, mapping_id: int,
+                        verdict: str = Form(), note: str = Form("")) -> Response:
+        view = stored_view(analysis_id)
+        if view is None or mapping_id not in view.mapping_ids.values():
+            return Response("Unknown mapping.", status_code=404, media_type="text/plain")
+        try:
+            state.repo.set_mapping_verdict(mapping_id, verdict, note.strip() or None)
+        except DatabaseError as exc:
+            return Response(str(exc), status_code=400, media_type="text/plain")
+        # Confirmed suggestions now count toward the risk score; rejected ones don't.
+        rescore_analysis(state.repo, analysis_id)
+        return verdict_response(request, analysis_id, "attack",
+                                f"Saved verdict '{verdict}'. The risk score was updated.")
+
+    @app.post("/analyses/{analysis_id}/indicators/{indicator_id}/verdict")
+    def indicator_verdict(request: Request, analysis_id: int, indicator_id: int,
+                          verdict: str = Form(), note: str = Form("")) -> Response:
+        view = stored_view(analysis_id)
+        if view is None or indicator_id not in view.indicator_ids.values():
+            return Response("Unknown indicator.", status_code=404, media_type="text/plain")
+        try:
+            state.repo.set_indicator_verdict(indicator_id, verdict, note.strip() or None)
+        except DatabaseError as exc:
+            return Response(str(exc), status_code=400, media_type="text/plain")
+        return verdict_response(request, analysis_id, "iocs", f"Saved verdict '{verdict}'.")
+
+    # --- reports ------------------------------------------------------------------------
+
+    @app.get("/analyses/{ref}/export/{fmt}")
+    def export(ref: str, fmt: str) -> Response:
+        view, _ = _load(state, ref)
+        if view is None or fmt not in EXPORTS:
+            return Response("Not found.", status_code=404, media_type="text/plain")
+        media_type, build = EXPORTS[fmt]
+        # Built on request, so verdicts saved since the analysis are included.
+        events = (state.repo.verification_events(view.analysis_id)
+                  if state.repo is not None and view.analysis_id else [])
+        filename = f"{report_stem(view)}.{fmt}"  # report_stem allows only [A-Za-z0-9_-]
+        return Response(build(view, events), media_type=media_type, headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'})
 
     @app.get("/healthz")
     def health() -> dict:

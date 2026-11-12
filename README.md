@@ -248,7 +248,8 @@ Open http://localhost:8501 and upload a report. Synthetic demo documents are in
 
 **New web interface (in progress).** A FastAPI + HTMX interface with light and dark themes is replacing
 Streamlit. Try it with `python -m src.web` and open http://127.0.0.1:8000. It currently covers
-upload, the summary and the Risk, Threats, Entities, Evidence, Text, Sentences and Metadata tabs.
+upload, every analysis tab, analyst verdicts and report export; history, dashboard and explorers
+are next.
 
 Programmatic use:
 
