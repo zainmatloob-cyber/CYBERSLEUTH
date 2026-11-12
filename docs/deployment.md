@@ -1,6 +1,6 @@
 # Deployment
 
-Three ways to run CyberSleuth. All of them run the same app, and the app makes no outbound
+Ways to run CyberSleuth. All of them run the same app, and the app makes no outbound
 network requests. Before exposing it to anyone else, read
 [security.md § Deployment limits](security.md#deployment-limits): the app has **no login**.
 
@@ -11,7 +11,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt -c requirements.lock.txt
 python scripts/fetch_models.py      # trained models, SHA-256 verified (see below)
-streamlit run app.py
+python -m src.web                   # http://127.0.0.1:8000
 ```
 
 * **Without the models,** the app still runs. Threat categories come from rules only, ATT&CK
@@ -23,8 +23,8 @@ streamlit run app.py
 
 > **Status: written but not yet built or run.** Docker wasn't available on the development
 > machine. What has been checked:
-> * the start command and health-check path, by running Streamlit locally with the same
->   flags (`/_stcore/health` answered `200 ok`);
+> * the start command and health-check path, by running `python -m src.web --host 0.0.0.0
+>   --port 8000` locally (`/healthz` answered `{"status": "ok"}`);
 > * the Dockerfile's structure, by static tests (`tests/test_deployment.py`): pinned base
 >   image, non-root user, health check, ignored secrets, copied files exist.
 >
@@ -32,11 +32,12 @@ streamlit run app.py
 
 ```bash
 docker build -t cybersleuth .
-docker run --rm -p 8501:8501 --memory 1g --cpus 2 \
+docker run --rm -p 127.0.0.1:8000:8000 --memory 1g --cpus 2 \
   -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
 ```
 
-Then open <http://localhost:8501>.
+Then open <http://localhost:8000>. `127.0.0.1:` in `-p` publishes the port on this machine
+only; the server inside the container must listen on `0.0.0.0` for publishing to work.
 
 * **Image:** `python:3.12.10-slim-bookworm`. Every dependency version is constrained by
   `requirements.lock.txt`.
@@ -45,31 +46,28 @@ Then open <http://localhost:8501>.
   `--build-arg FETCH_MODELS=0` for a rules-only image.
 * **Runs as an unprivileged user** (uid 10001). The only writable path is the database volume
   `/var/lib/cybersleuth`.
-* **Health check:** `/_stcore/health`.
+* **Health check:** `/healthz`.
 * **Memory:** the models take about 354 MB and one analysis adds about 75 MB per million
   characters ([performance.md](performance.md)), so 1 GB leaves headroom.
 * **Network:** the running container needs no outbound access. Where the platform allows it,
   run it with outbound traffic blocked, for example on a Docker network without internet
   access. The build itself needs internet access for pip and the model download.
-* **Secrets:** `.dockerignore` keeps `.env`, `.streamlit/secrets.toml`, local databases and
+* **Secrets:** `.dockerignore` keeps `.env`, local databases and
   downloaded data out of the image.
 
-## 3. Streamlit Community Cloud
+## 3. Behind a reverse proxy (shared use)
 
-Point a new app at this repository, with `app.py` as the entry point and Python 3.12 under
-*Advanced settings*. `requirements.txt` installs everything, including the spaCy model from
-its pinned URL.
+The app has no login, so it binds to `127.0.0.1` by default. To share it with a team, keep it
+on localhost (or a private container network) and put a reverse proxy in front that:
 
-Caveats:
-* **The trained models aren't in the repository,** and the app never downloads anything
-  itself. A Cloud deployment therefore runs without them (rules-only categories,
-  explicit-only ATT&CK mapping) and says so. To use the models there, they would need to be
-  committed with Git LFS; that hasn't been set up.
-* **The file system is temporary.** The SQLite database is lost when the app restarts, so
-  history, verdicts and the dashboard reset.
-* **No login.** A public Cloud app can be used by anyone, and they all share one database.
-  Make the app private, restricted to invited viewers, and upload public documents only.
-* **Resources:** check the platform's current memory limit against the figures above.
+* **authenticates** every request (for example basic auth or single sign-on);
+* terminates **TLS**;
+* forwards to `http://127.0.0.1:8000` and passes the `Host` header through unchanged.
+
+The app already refuses cross-site POSTs (it checks the `Sec-Fetch-Site` and `Origin`
+headers) and request bodies larger than the upload limit plus 1 MB, so the proxy needs no
+extra configuration for those. Everyone who gets past the proxy shares one database and can
+change verdicts or delete documents.
 
 ## Publishing the model files (one-time, by the repository owner)
 

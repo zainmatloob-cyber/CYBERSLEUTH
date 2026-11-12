@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from src.database.db_manager import AnalysisRepository, make_engine
 from src.intelligence.analyzer import Analyzer
@@ -103,36 +102,43 @@ def test_figures_follow_the_colour_decisions(repo):
 # --- pages ----------------------------------------------------------------------
 
 
-def _page_script(db_url: str, page: str) -> None:
-    from src.database.db_manager import AnalysisRepository, make_engine
-    from src.ui import pages
+def _client(repo):
+    from fastapi.testclient import TestClient
 
-    repo = AnalysisRepository(make_engine(db_url))
-    getattr(pages, page)(repo)
+    from src.web.app import create_app
+
+    return TestClient(create_app(lambda: None, lambda: repo))
 
 
-@pytest.mark.parametrize("page", ["dashboard_page", "ioc_explorer_page",
-                                  "entity_explorer_page", "attack_explorer_page"])
-def test_pages_render(repo, page):
-    url = str(repo.engine.url)
-    at = AppTest.from_function(_page_script, kwargs={"db_url": url, "page": page},
-                               default_timeout=60).run()
-    assert not at.exception
+@pytest.mark.parametrize("url", ["/dashboard", "/explorer/iocs", "/explorer/entities",
+                                 "/explorer/attack"])
+def test_pages_render(repo, url):
+    response = _client(repo).get(url)
+    assert response.status_code == 200 and "No analyses saved yet" not in response.text
+
+
+def test_dashboard_shows_the_repository_totals(repo):
+    stats = repo.stats()
+    text = _client(repo).get("/dashboard").text
+    for label, value in (("Documents", stats.documents), ("Unique IOCs", stats.indicators)):
+        expected = f'<span class="metric-label">{label}</span><span class="metric-value">{value}'
+        assert expected in text
 
 
 def test_ioc_explorer_shared_filter(repo):
-    at = AppTest.from_function(_page_script, kwargs={"db_url": str(repo.engine.url),
-                                                     "page": "ioc_explorer_page"},
-                               default_timeout=60).run()
-    total = int(next(c.value for c in at.caption if " of " in c.value).split(" of ")[1].split()[0])
-    at.checkbox(key="iocx_shared").check().run()
-    assert any(f"1 of {total} indicators" in c.value for c in at.caption)
+    import re
+
+    client = _client(repo)
+    total = int(re.search(r"of (\d+) indicators", client.get("/explorer/iocs").text).group(1))
+    frame = agg.ioc_explorer(repo.latest_indicators())
+    shared = int((frame["Documents"] >= 2).sum())
+    types = "&".join(f"type={t}" for t in frame["Type"].unique())
+    verdicts = "&".join(f"verdict={v}" for v in {"unverified", "malicious", "benign"})
+    text = client.get(f"/explorer/iocs?f=1&shared=1&{types}&{verdicts}").text
+    assert f"{shared} of {total} indicators" in text
 
 
-@pytest.mark.parametrize("page", ["dashboard_page", "attack_explorer_page"])
-def test_pages_handle_empty_database(tmp_path, page):
-    url = f"sqlite:///{(tmp_path / 'empty.db').as_posix()}"
-    at = AppTest.from_function(_page_script, kwargs={"db_url": url, "page": page},
-                               default_timeout=60).run()
-    assert not at.exception
-    assert any("No analyses saved yet" in i.value for i in at.info)
+@pytest.mark.parametrize("url", ["/dashboard", "/explorer/attack"])
+def test_pages_handle_empty_database(tmp_path, url):
+    empty = AnalysisRepository(make_engine(f"sqlite:///{(tmp_path / 'empty.db').as_posix()}"))
+    assert "No analyses saved yet" in _client(empty).get(url).text

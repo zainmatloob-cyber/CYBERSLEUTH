@@ -1,7 +1,7 @@
 """Application-wide logging setup.
 
 Modules obtain loggers with ``logging.getLogger(__name__)``; this function is
-called once at the entry point (``app.py`` or tests) to configure handlers.
+called once at the entry point (``python -m src.web`` or tests) to configure handlers.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ _configured = False
 
 
 def configure_logging(level: str | None = None) -> None:
-    """Configure the root logger exactly once (safe under Streamlit reruns)."""
+    """Configure the root logger exactly once (safe to call repeatedly)."""
     global _configured
     if _configured:
         return

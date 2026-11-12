@@ -9,7 +9,6 @@ import zipfile
 
 import pymupdf
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from src.database.db_manager import AnalysisRepository, make_engine
 from src.database.views import hydrate, view_from_result
@@ -198,22 +197,17 @@ def test_reports_for_unsaved_and_empty_analysis(analyzer):
     assert "indicators.csv" in _read_zip(csv_report.to_csv_zip(view))
 
 
-# --- UI -----------------------------------------------------------------------
-
-
-def _export_script(db_url: str, analysis_id: int) -> None:
-    from src.database.db_manager import AnalysisRepository, make_engine
-    from src.database.views import hydrate
-    from src.ui.analysis_views import render_export
-
-    repo = AnalysisRepository(make_engine(db_url))
-    render_export(hydrate(repo.get_analysis(analysis_id)), repo)
+# --- web export ---------------------------------------------------------------
 
 
 def test_export_tab_offers_three_downloads(stored):
+    from fastapi.testclient import TestClient
+
+    from src.web.app import create_app
+
     repo, view, _ = stored
-    at = AppTest.from_function(_export_script, kwargs={"db_url": str(repo.engine.url),
-                                                       "analysis_id": view.analysis_id},
-                               default_timeout=60).run()
-    assert not at.exception
-    assert len(at.get("download_button")) == 3
+    client = TestClient(create_app(lambda: None, lambda: repo))
+    text = client.get(f"/analyses/{view.analysis_id}?tab=export").text
+    for ext in ("pdf", "json", "zip"):
+        assert f'href="/analyses/{view.analysis_id}/export/{ext}"' in text
+        assert client.get(f"/analyses/{view.analysis_id}/export/{ext}").status_code == 200

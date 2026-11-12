@@ -4,7 +4,9 @@ Review of CyberSleuth against the security rules in the project brief, carried o
 2026-11-08 (Phase 5 hardening). Each control is pinned by a test; most are in
 `tests/test_security.py`.
 
-**Scope:** the Streamlit app (`app.py`, `src/`). The evaluation scripts in `scripts/` run
+**Scope:** the web app (`src/`, served by `python -m src.web`). Reviewed first for the
+Streamlit interface; the controls marked **Web** were added when it was replaced by
+FastAPI + HTMX (2026-11-12). The evaluation scripts in `scripts/` run
 only on files the project owner downloads and are outside the threat model, except where
 noted.
 
@@ -22,14 +24,16 @@ noted.
 
 | Rule from the brief | How it's enforced | Test |
 |---|---|---|
-| Treat uploads as untrusted; validate content and size | Size cap (20 MB, plus Streamlit's 25 MB hard cap); type detected from magic bytes, not the extension; DOCX ZIP-bomb guard (100 MB uncompressed, 2,000 entries); PDF page cap (500); encrypted PDFs rejected; file names stripped of directories and control characters | `test_validator.py`, `test_readers.py` |
+| Treat uploads as untrusted; validate content and size | Size cap (20 MB); request bodies over the cap plus 1 MB are refused with 413 while they
+stream in, before the upload is spooled to disk; type detected from magic bytes, not the extension; DOCX ZIP-bomb guard (100 MB uncompressed, 2,000 entries); PDF page cap (500); encrypted PDFs rejected; file names stripped of directories and control characters | `test_validator.py`, `test_readers.py` |
 | | **New:** extracted text capped at 1,000,000 characters (2,000,000 at first; lowered after the performance measurements in [performance.md](performance.md)) (`CYBERSLEUTH_MAX_TEXT_CHARS`). Compressed PDF streams can expand far beyond the file size; the PDF reader stops at the first page over the cap | `test_security.py` |
 | Never execute uploaded content | PyMuPDF only extracts text: no PDF JavaScript, embedded files or links are acted on. DOCX XML is parsed without entity resolution (no XXE). STIX 1.x XML in the evaluation refuses any DTD or entity declaration. No `eval`, `exec` or `subprocess` in the app | `test_security.py` (XXE payload; static check), `test_real_world.py` (DTD refusal) |
-| Do not contact extracted URLs or IPs | The app has no network client at all. A static test fails if one is ever imported in `app.py` or `src/` | `test_security.py` |
+| Do not contact extracted URLs or IPs | The app has no network client at all. A static test fails if one is ever imported in `src/`. Plotly's and HTMX's browser code
+is served by the app itself, never from a CDN | `test_security.py` |
 | An extracted indicator is not automatically malicious | Every indicator and technique starts `unverified`; only an analyst changes that, with an audit trail. Reserved and documentation ranges are flagged | `test_ioc.py`, `test_database.py` |
-| Never expose secrets or credentials | No secrets in the repository: `.env`, `.streamlit/secrets.toml` and `*.db` are git-ignored, and a scan of tracked files found none. Configuration comes from environment variables. Unexpected errors show a generic message; details go to the log only | `test_app.py` |
+| Never expose secrets or credentials | No secrets in the repository: `.env` and `*.db` are git-ignored, and a scan of tracked files found none. Configuration comes from environment variables. Unexpected errors show a generic message; details go to the log only | `test_web.py` |
 | Avoid storing sensitive contents unnecessarily | The database stores the evidence sentences behind each finding, not the document. Full text is stored only with `CYBERSLEUTH_STORE_FULL_TEXT=1`. Logs contain file names and counts, never document text. Reports never include the full text | `test_database.py`, `test_reports.py` |
-| (Output safety) | All untrusted text shown through Markdown is escaped (`md_escape`); no `unsafe_allow_html`. Network IOCs and evidence sentences are defanged in reports. CSV cells get a formula-injection guard. Only ATT&CK and validated NVD links are clickable | `test_app.py`, `test_reports.py`, `test_security.py` |
+| (Output safety) | **Web:** Jinja2 autoescaping is always on and no template uses `|safe`; the one pre-escaped value is chart JSON, with `<`, `>` and `&` escaped so it cannot close its script element. A Content-Security-Policy allows only the app's own scripts (no inline scripts, no eval) and forbids framing. Network IOCs and evidence sentences are defanged in reports. CSV cells get a formula-injection guard. Only ATT&CK and validated NVD links are clickable | `test_web.py`, `test_reports.py`, `test_security.py` |
 | | **New:** chart labels are escaped. Plotly renders `<a href>` and a few other tags in labels, so a file name such as `<a href="https://…">x</a>.pdf` would have become a clickable link in the dashboard heatmap | `test_security.py` |
 | Do not implement offensive operations | The app reads documents and nothing else: no scanning, enrichment lookups or exploitation | static network check |
 
@@ -69,8 +73,10 @@ audited because it isn't on PyPI; it is a model package from spaCy's GitHub rele
   * **All regex stages are now linear,** under 0.25 s per 100,000 hostile characters.
   * **Severity:** medium (denial of service). Pinned by a timing test.
 * **No authentication or per-user separation.** Anyone who can reach the app can see every
-  stored analysis and change verdicts. Streamlit's XSRF protection is on by default and is
-  left enabled.
+  stored analysis and change verdicts. **Web:** state-changing requests from another site
+  are refused (`Sec-Fetch-Site` / `Origin` checks), so a malicious page can't make the
+  analyst's browser delete documents or change verdicts. The server binds to `127.0.0.1`
+  unless told otherwise.
 
 ## Deployment limits
 

@@ -25,12 +25,13 @@ from src.reporting import csv_report, json_report, pdf_report
 from src.reporting.common import report_stem
 from src.utils.exceptions import CyberSleuthError
 from src.web import pages, tabs
-from src.web.security import SecurityMiddleware
+from src.web.security import BodySizeLimitMiddleware, SecurityMiddleware
 from src.web.state import UNSAVED_PREFIX, AppState, default_repository, new_unsaved_ref
 
 logger = logging.getLogger("cybersleuth.web")
 
 WEB_DIR = Path(__file__).resolve().parent
+MULTIPART_OVERHEAD = 1_048_576  # form boundaries and headers around the uploaded file
 BAND_CLASS = {"Low": "low", "Moderate": "moderate", "High": "high", "Critical": "critical"}
 SAVE_NOTES = {
     "new": "Saved as analysis #{id}.",
@@ -81,6 +82,9 @@ def create_app(analyzer_factory: Callable[[], Analyzer] = Analyzer,
                repository_factory: Callable[[], AnalysisRepository | None] = default_repository,
                cache_size: int = 8) -> FastAPI:
     app = FastAPI(title=settings.app_name, docs_url=None, redoc_url=None, openapi_url=None)
+    # Added first, so it runs inside SecurityMiddleware and 413s get the security headers.
+    app.add_middleware(BodySizeLimitMiddleware,
+                       max_bytes=settings.ingestion.max_file_size_bytes + MULTIPART_OVERHEAD)
     app.add_middleware(SecurityMiddleware)
     app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
     state = AppState(analyzer_factory, repository_factory, cache_size)

@@ -87,16 +87,18 @@ def summary(view: StoredAnalysis) -> dict:
     counted = sum(1 for m in view.mappings
                   if not m.is_unverified_lead and m.verdict != AnalystVerdict.REJECTED
                   and m.status is not AssertionStatus.NEGATED)
+    total_ms = view.timings_ms.get("total", 0)
     return {
         "metrics": [
-            ("Risk", f"{risk.score:.0f}", risk.band),
+            ("Risk", f"{risk.score:.1f}", risk.band),
             ("Confidence", risk.confidence.level.title(), None),
             ("Pages", str(view.page_count), None),
             ("Unique IOCs", str(len(view.indicators)), None),
             ("Entities", str(len(view.entities)), None),
             ("ATT&CK techniques", str(counted),
              f"+{leads} model lead(s)" if leads else None),
-            ("Analysis time", f"{view.timings_ms.get('total', 0) / 1000:.1f} s", None),
+            ("Analysis time",
+             f"{total_ms:,.0f} ms" if total_ms < 1000 else f"{total_ms / 1000:.1f} s", None),
         ],
         "band": risk.band,
         "warnings": [*view.warnings, *view.document_warnings],

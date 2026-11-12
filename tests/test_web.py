@@ -604,3 +604,61 @@ def test_chart_json_cannot_close_its_script_element():
     c = chart(figure, pd.DataFrame({"A": [1]}), "t")
     assert "<" not in c.spec and ">" not in c.spec and "&" not in c.spec
     assert "\\u003c" in c.spec and "\\u0026" in c.spec
+
+
+# --- step 4: request size limit and ports from the Streamlit tests --------------------------
+
+
+@pytest.fixture
+def small_limit_client(analyzer, repo, monkeypatch):
+    """An app whose request limit is 1 MiB + 1 KiB (upload cap 1 KiB + multipart overhead)."""
+    import src.web.app as web_app
+    from config.settings import IngestionSettings, Settings
+
+    monkeypatch.setattr(web_app, "settings",
+                        Settings(ingestion=IngestionSettings(max_file_size_bytes=1024)))
+    return TestClient(create_app(lambda: analyzer, lambda: repo))
+
+
+def test_oversized_request_is_refused_from_its_declared_length(small_limit_client, repo):
+    response = upload(small_limit_client, data=b"x" * 1_200_000)
+    assert response.status_code == 413
+    assert response.headers["x-content-type-options"] == "nosniff"
+    assert repo.stats().documents == 0
+
+
+def test_oversized_chunked_request_is_refused_while_streaming(small_limit_client):
+    def chunks():
+        for _ in range(20):
+            yield b"y" * 100_000
+
+    response = small_limit_client.post(
+        "/analyze", content=chunks(),
+        headers={"Content-Type": "multipart/form-data; boundary=zzz"})
+    assert "content-length" not in response.request.headers
+    assert response.status_code == 413
+
+
+def test_bad_content_length_is_refused(small_limit_client):
+    response = small_limit_client.post("/analyze", content=b"x",
+                                       headers={"Content-Length": "abc"})
+    assert response.status_code in (400, 413)
+
+
+def test_requests_within_the_limit_still_work(small_limit_client):
+    response = upload(small_limit_client, data=b"x" * 2000)
+    assert response.status_code == 422 and "larger than" in response.text
+
+
+def test_summary_technique_count_excludes_rejected(client, repo):
+    analysed(client, data=ATTACK_REPORT)
+    metric = re.compile(r"ATT&amp;CK techniques</span>\s*<span class=\"metric-value\">(\d+)")
+    assert metric.search(client.get("/analyses/1").text).group(1) == "1"
+    mapping_id = stored(repo).mapping_ids["T1558.003"]
+    client.post(f"/analyses/1/mappings/{mapping_id}/verdict", data={"verdict": "rejected"})
+    assert metric.search(client.get("/analyses/1").text).group(1) == "0"
+
+
+def test_error_messages_are_escaped(client):
+    response = upload(client, data=b"x", name="<b>bad<b>.exe")
+    assert "<b>bad" not in response.text and "&lt;b&gt;bad&lt;b&gt;.exe" in response.text

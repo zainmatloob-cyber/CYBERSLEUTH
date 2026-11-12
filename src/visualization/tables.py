@@ -1,6 +1,6 @@
 """Pure functions that turn analysis objects into display tables.
 
-Kept separate from Streamlit so they can be unit-tested and reused by the
+Kept separate from the web layer so they can be unit-tested and reused by the
 Phase 4 exports.
 """
 

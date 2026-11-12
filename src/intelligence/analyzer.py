@@ -4,7 +4,7 @@ Stages: ingestion → IOC extraction → entity recognition → threat classific
 ATT&CK mapping → risk scoring.
 
 ``Analyzer`` holds the expensive components (spaCy model, phrase matchers, trained
-classifiers), so create it once and reuse it (the Streamlit app caches it as a resource).
+classifiers), so create it once and reuse it (the web app loads it once, on first use).
 
 Graceful degradation: when a model is missing, the stage falls back to its deterministic
 part (rules / explicit matching) and the analysis records a warning, which also lowers

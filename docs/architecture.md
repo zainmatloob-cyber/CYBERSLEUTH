@@ -76,7 +76,7 @@ pipeline depending on any UI framework.
 | `src/ingestion/text_cleaner.py` | Unicode and whitespace normalisation that leaves IOCs unchanged | Changing indicators |
 | `src/nlp/preprocessing.py` | Sentence segmentation that keeps exact source positions | Linguistic analysis |
 | `src/ingestion/pipeline.py` | Runs the stages in order and reports progress | Stage logic itself |
-| `app.py` | Streamlit presentation | Processing logic |
+| `src/web/` | Web presentation: routes, templates, security middleware | Processing logic |
 
 ### Data contract
 
@@ -101,11 +101,11 @@ Uploaded documents are treated as hostile input.
 | Threat | Control |
 |---|---|
 | Executable or other content disguised as a document | Detection from magic bytes, plus a check that the extension matches the content |
-| Oversized input / resource exhaustion | File size limit (20 MB), PDF page limit (500), Streamlit's own upload limit (25 MB) |
+| Oversized input / resource exhaustion | File size limit (20 MB), PDF page limit (500), request body limit (upload limit + 1 MB) enforced while streaming |
 | DOCX decompression bomb | Total unpacked size (100 MB) and entry count (2,000) checked from the ZIP index before parsing |
 | XML external entities (XXE) in DOCX | python-docx parses with `resolve_entities=False` |
 | Path traversal in filenames | Filenames reduced to the base name with control characters removed; uploads are never written to disk |
-| Markdown/link injection in the UI | Document text shown only in plain-text widgets; filenames, warnings and errors escaped before Markdown rendering |
+| HTML/script injection in the UI | Jinja2 autoescaping on every template; strict Content-Security-Policy (own scripts only); only validated ATT&CK/NVD links are clickable |
 | Accidental contact with attacker infrastructure | Nothing ever resolves or fetches extracted URLs or IPs |
 | Information leakage | Unexpected exceptions are logged; users see a generic message |
 | Clickable attacker infrastructure in reports | Network IOCs and evidence sentences defanged in PDF/CSV; only ATT&CK links are clickable ([reports](reports.md)) |
@@ -155,8 +155,10 @@ flowchart LR
   `StoredAnalysis`, rebuilt from the database (`src/database/views.py`). A round-trip test
   proves that save → load → hydrate reproduces every finding exactly.
 * **Session-only views** (Evidence, Text, Sentences) need the full text, which is not stored
-  by default, so they appear only for the current upload.
-* **Pages** (`src/ui/pages.py`) receive the analyzer and repository as arguments. If the
+  by default. The server keeps the 8 most recent results in memory, so these tabs appear
+  for recent uploads and disappear after a restart.
+* **The app** (`src/web/app.py`, `create_app`) receives the analyzer and repository
+  factories as arguments, so tests inject their own. If the
   database cannot be opened, analysis still works without saving or verification.
 * **Integrity**:
   * foreign keys with `ON DELETE CASCADE` (SQLite pragma set on every connection);

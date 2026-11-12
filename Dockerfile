@@ -1,7 +1,10 @@
 # CyberSleuth container image. See docs/deployment.md.
 #
 #   docker build -t cybersleuth .
-#   docker run --rm -p 8501:8501 --memory 1g -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
+#   docker run --rm -p 127.0.0.1:8000:8000 --memory 1g -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
+#
+# The app has no login: publish the port on localhost only, or put an authenticating
+# reverse proxy in front of it (docs/deployment.md).
 #
 # Build without the trained models (rules-only analysis, the app says so):
 #   docker build --build-arg FETCH_MODELS=0 -t cybersleuth .
@@ -38,10 +41,10 @@ USER cybersleuth
 
 ENV CYBERSLEUTH_DB_URL=sqlite:////var/lib/cybersleuth/cybersleuth.db
 VOLUME ["/var/lib/cybersleuth"]
-EXPOSE 8501
+EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8501/_stcore/health', timeout=4)"
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=4)"
 
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501", \
-     "--server.headless=true", "--server.fileWatcherType=none"]
+# 0.0.0.0 inside the container is required for port publishing; see the docker run note.
+CMD ["python", "-m", "src.web", "--host", "0.0.0.0", "--port", "8000"]

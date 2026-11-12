@@ -94,7 +94,7 @@ limit is generous rather than flaky.
 
 ## Not optimised (deliberately)
 
-* **No parallelism.** Analyses run one at a time per Streamlit session, and spaCy's batch size
+* **No parallelism.** Each upload is analysed in one worker thread of the web server, and spaCy's batch size
   is configurable (`CYBERSLEUTH_SPACY_BATCH_SIZE`). For a shared deployment, scale by running
   more app processes behind the proxy.
 * **No caching of results across identical uploads beyond the database:** a re-upload of a

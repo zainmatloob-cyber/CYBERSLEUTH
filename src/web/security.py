@@ -17,6 +17,7 @@ from __future__ import annotations
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse, Response
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 CONTENT_SECURITY_POLICY = "; ".join([
     "default-src 'self'",
@@ -69,3 +70,65 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         if response.headers.get("content-type", "").startswith("text/html"):
             response.headers.setdefault("Cache-Control", "no-store")
         return response
+
+
+class _BodyTooLarge(Exception):
+    pass
+
+
+class BodySizeLimitMiddleware:
+    """Refuse request bodies over ``max_bytes`` while they stream in (HTTP 413).
+
+    The multipart parser spools uploads to a temporary file before the endpoint sees them,
+    so the endpoint's own size check alone would let one huge upload fill the disk. This
+    checks the declared Content-Length up front and counts the bytes actually received, so
+    a chunked upload with no Content-Length is stopped too.
+    """
+
+    def __init__(self, app: ASGIApp, max_bytes: int) -> None:
+        self.app = app
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or scope["method"] in SAFE_METHODS:
+            await self.app(scope, receive, send)
+            return
+        declared = dict(scope["headers"]).get(b"content-length")
+        if declared is not None and (not declared.isdigit() or int(declared) > self.max_bytes):
+            await self._refuse(scope, receive, send)
+            return
+        received = 0
+        exceeded = False
+        started = False
+
+        async def counting_receive() -> Message:
+            nonlocal received, exceeded
+            message = await receive()
+            if message["type"] == "http.request":
+                received += len(message.get("body", b""))
+                if received > self.max_bytes:
+                    exceeded = True
+                    raise _BodyTooLarge
+            return message
+
+        async def guarded_send(message: Message) -> None:
+            nonlocal started
+            if exceeded:  # the app turned the aborted read into its own error: replace it
+                if message["type"] == "http.response.start" and not started:
+                    started = True
+                    await self._refuse(scope, receive, send)
+                return
+            started = started or message["type"] == "http.response.start"
+            await send(message)
+
+        try:
+            await self.app(scope, counting_receive, guarded_send)
+        except _BodyTooLarge:
+            if not started:
+                await self._refuse(scope, receive, send)
+
+    async def _refuse(self, scope: Scope, receive: Receive, send: Send) -> None:
+        limit_mb = self.max_bytes // 1_048_576
+        response = PlainTextResponse(f"Request too large (limit {limit_mb} MB).",
+                                     status_code=413)
+        await response(scope, receive, send)

@@ -15,7 +15,6 @@ htmlcov/
 
 # Secrets
 .env
-.streamlit/secrets.toml
 
 # Local data
 *.db

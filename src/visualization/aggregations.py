@@ -1,7 +1,7 @@
 """Cross-document aggregations for the dashboard and explorers.
 
 Pure functions over repository records (latest analysis per document), returning
-DataFrames, so they can be unit-tested without Streamlit or a browser.
+DataFrames, so they can be unit-tested without a web server or a browser.
 
 Counting rule used everywhere: **documents, not mentions**. A technique mentioned 40 times
 in one report counts as one document. Negated findings are excluded from "seen in"

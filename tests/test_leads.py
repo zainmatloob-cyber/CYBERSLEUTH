@@ -8,7 +8,6 @@ from dataclasses import replace
 
 import pymupdf
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from src.database.db_manager import AnalysisRepository, make_engine
 from src.database.views import hydrate, rescore_analysis
@@ -101,32 +100,30 @@ def test_dashboard_excludes_leads(stored):
     assert explorer.loc["T1486", "Model lead in"] == 1
 
 
-def _attack_tab(db_url: str, analysis_id: int) -> None:
-    from src.database.db_manager import AnalysisRepository, make_engine
-    from src.database.views import hydrate
-    from src.ui.analysis_views import render_attack
+def _client(repo):
+    from fastapi.testclient import TestClient
 
-    repo = AnalysisRepository(make_engine(db_url))
-    render_attack(hydrate(repo.get_analysis(analysis_id)), repo)
+    from src.web.app import create_app
+
+    return TestClient(create_app(lambda: None, lambda: repo))
 
 
 def test_attack_tab_hides_leads_by_default(stored):
     repo, analysis_id = stored
-    at = AppTest.from_function(_attack_tab, kwargs={"db_url": str(repo.engine.url),
-                                                    "analysis_id": analysis_id},
-                               default_timeout=60).run()
-    assert not at.exception
-    assert any("1 model suggestion(s) hidden" in c.value for c in at.caption)
-    assert list(at.dataframe[0].value["Technique"]) == ["T1558.003"]
-    at.checkbox(key="attack_show_leads").check().run()
-    assert set(at.dataframe[0].value["Technique"]) == {"T1558.003", "T1486"}
-    assert at.warning  # the shown leads come with a caution
+    client = _client(repo)
+    default = client.get(f"/analyses/{analysis_id}?tab=attack").text
+    assert "1 model suggestion(s) hidden" in default
+    assert "T1558.003" in default and "T1486" not in default
+    shown = client.get(f"/analyses/{analysis_id}?tab=attack&f=1&leads=1&hide_negated=1").text
+    assert "T1558.003" in shown and "T1486" in shown
+    assert "Model suggestions are shown" in shown  # the shown leads come with a caution
 
 
 def test_verdict_form_rescores(stored):
-    from src.ui.analysis_views import _save_mapping_verdict
-
     repo, analysis_id = stored
     view = hydrate(repo.get_analysis(analysis_id))
-    _save_mapping_verdict(repo, analysis_id, _mapping_id(view, "T1486"), "confirmed", None)
+    mapping_id = _mapping_id(view, "T1486")
+    response = _client(repo).post(f"/analyses/{analysis_id}/mappings/{mapping_id}/verdict",
+                                  data={"verdict": "confirmed"}, follow_redirects=False)
+    assert response.status_code == 303
     assert hydrate(repo.get_analysis(analysis_id)).risk.score > view.risk.score

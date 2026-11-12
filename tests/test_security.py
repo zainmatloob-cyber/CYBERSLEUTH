@@ -7,6 +7,7 @@ undo it.
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -18,7 +19,7 @@ from src.ingestion.pipeline import ingest
 from src.utils.exceptions import FileTooLargeError
 
 ROOT = Path(__file__).resolve().parent.parent
-APP_FILES = [ROOT / "app.py", *sorted((ROOT / "src").rglob("*.py"))]
+APP_FILES = sorted((ROOT / "src").rglob("*.py"))
 
 # --- the application never contacts the network or renders raw HTML ----------------
 
@@ -51,6 +52,18 @@ def test_application_code_never_renders_raw_html_or_executes_code(path):
     for forbidden in ("unsafe_allow_html", "components.html", "st.html(", "eval(", "exec(",
                       "subprocess", "os.system"):
         assert forbidden not in source, f"{path.name} uses {forbidden}"
+
+
+def test_only_the_escaped_chart_json_bypasses_template_escaping():
+    """Markup() switches Jinja2 autoescaping off for a value. Its single use is the chart
+    JSON in src/web/pages.py, which escapes <, > and & itself (see test_web.py)."""
+    users = [p.relative_to(ROOT).as_posix() for p in APP_FILES
+             if "Markup(" in p.read_text(encoding="utf-8")]
+    assert users == ["src/web/pages.py"]
+    for template in (ROOT / "src" / "web" / "templates").rglob("*.html"):
+        source = template.read_text(encoding="utf-8")
+        assert not re.search(r"\|\s*safe\b", source), f"{template.name} uses |safe"
+        assert "autoescape false" not in source, f"{template.name} disables autoescaping"
 
 
 # --- untrusted text in charts ------------------------------------------------------------

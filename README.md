@@ -6,8 +6,8 @@ CyberSleuth turns unstructured cybersecurity reports (PDF, DOCX, TXT) into
 structured, explainable, evidence-backed threat intelligence. It runs entirely
 locally with free and open-source tools and needs no paid API.
 
-> **Status: Phase 5 work complete; release v1.0.0 pending.** Everything below works and is
-> tested:
+> **Status: v1.0.0 released; the interface has since moved from Streamlit to FastAPI + HTMX.**
+> Everything below works and is tested:
 > * ingestion, IOC extraction and entity recognition;
 > * threat classification and MITRE ATT&CK mapping;
 > * explainable risk scoring;
@@ -15,14 +15,16 @@ locally with free and open-source tools and needs no paid API.
 > * evaluation on 31 real CISA advisories, a security review, performance hardening and
 >   deployment files.
 >
-> Still to do: publishing the model release and the final tag. See the [Roadmap](#roadmap).
+> See the [Roadmap](#roadmap).
 
 ![Analysis view: ATT&CK tab with a rejected technique](docs/screenshots/analysis_attack.png)
 
 More screenshots: [risk](docs/screenshots/analysis_risk.png) ·
 [indicators](docs/screenshots/analysis_iocs.png) · [dashboard](docs/screenshots/dashboard.png) ·
 [history](docs/screenshots/history.png) · [IOC explorer](docs/screenshots/ioc_explorer.png) ·
-[ATT&CK explorer](docs/screenshots/attack_explorer.png). All of them show synthetic sample
+[ATT&CK explorer](docs/screenshots/attack_explorer.png) · dark theme:
+[ATT&CK tab](docs/screenshots/analysis_attack_dark.png),
+[dashboard](docs/screenshots/dashboard_dark.png). All of them show synthetic sample
 data only (`python scripts/take_screenshots.py`). The [demo guide](docs/demo.md) walks
 through them.
 
@@ -95,8 +97,11 @@ an evidence trail for every finding: document, page and character position.
     document text is never exported.
 * **Evidence views**: findings for each sentence, and CVE IDs merged with named
   vulnerabilities (Log4Shell ↔ CVE-2021-44228).
-* **Streamlit interface**: IOC, Entity and Evidence explorers with filters and search,
-  and ATT&CK/NVD reference links. Document text, sentence and metadata views.
+* **Web interface** (FastAPI + HTMX, light and dark themes): IOC, Entity and Evidence
+  explorers with filters and search, and ATT&CK/NVD reference links. Document text,
+  sentence and metadata views. Every view has its own URL and works without JavaScript;
+  templates escape all document content and a strict Content-Security-Policy allows only
+  the app's own scripts.
 
 ## Evaluation
 
@@ -188,7 +193,7 @@ limitations: [docs/methodology.md](docs/methodology.md)
 | Area | Tools |
 |---|---|
 | Language | Python 3.12 |
-| UI | Streamlit (multipage), Plotly |
+| UI | FastAPI, Jinja2, HTMX (vendored), Plotly, uvicorn |
 | Documents | PyMuPDF, python-docx |
 | Data | pandas, SQLite + SQLAlchemy 2.0 |
 | NLP / ML | spaCy 3.8 (`en_core_web_sm`), regex extraction, MITRE ATT&CK v20.1 KB, scikit-learn (TF-IDF, Logistic Regression, LinearSVC) |
@@ -237,18 +242,17 @@ from explicit matches only, and the analysis shows a warning and lowers its conf
 On Windows, run `start.cmd`. On first launch it creates a Python 3.12 virtual environment
 and installs the runtime dependencies.
 
+It then starts the server and opens http://127.0.0.1:8000 in your browser.
+
 Or start the app from an activated environment with:
 
 ```powershell
-streamlit run app.py
+python -m src.web            # --host / --port, or CYBERSLEUTH_HOST / CYBERSLEUTH_PORT
 ```
 
-Open http://localhost:8501 and upload a report. Synthetic demo documents are in
+Open http://127.0.0.1:8000 and upload a report. The theme follows your system setting;
+the button in the top bar switches it. Synthetic demo documents are in
 [`data/samples/`](data/samples/); regenerate them with `python scripts/make_samples.py`.
-
-**New web interface (in progress).** A FastAPI + HTMX interface with light and dark themes is replacing
-Streamlit. Try it with `python -m src.web` and open http://127.0.0.1:8000. It covers
-every page: analysis tabs, verdicts, export, history, dashboard and the three explorers.
 
 Programmatic use:
 
@@ -268,7 +272,7 @@ Evaluate extraction quality: `python scripts/evaluate_extraction.py --split dev`
 
 ```bash
 docker build -t cybersleuth .
-docker run --rm -p 8501:8501 --memory 1g -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
+docker run --rm -p 127.0.0.1:8000:8000 --memory 1g -v cybersleuth-db:/var/lib/cybersleuth cybersleuth
 ```
 
 The image runs as a non-root user, downloads and verifies the models during the build, and
@@ -277,8 +281,8 @@ keeps the database in a volume.
 > **The Dockerfile hasn't been built yet:** Docker wasn't available on the development
 > machine. Its start command, health check and structure were checked without Docker.
 
-[docs/deployment.md](docs/deployment.md) covers local, Docker and Streamlit Community Cloud
-deployment. The app has **no login**, so read the deployment limits in
+[docs/deployment.md](docs/deployment.md) covers local and Docker deployment, and putting the
+app behind a reverse proxy. The app has **no login**, so read the deployment limits in
 [docs/security.md](docs/security.md) before sharing it.
 
 ## Configuration
@@ -330,14 +334,14 @@ The suite covers:
 * persistence, hydration round-trips and the verification audit trail;
 * dashboard aggregations (document counting, negation, re-analysis);
 * report safety (defanging, formula injection, no full text, link restrictions);
-* end-to-end analysis, and the UI through Streamlit's `AppTest`.
+* end-to-end analysis, and the web interface through FastAPI's `TestClient` (every page and
+  tab, verdicts, exports, CSRF and upload-size limits, escaping of hostile file names).
 
 Model-dependent tests are skipped automatically if `en_core_web_sm` is not installed.
 
 ## Project structure
 
 ```text
-app.py                  Streamlit entry point
 config/settings.py      Limits and paths (environment overrides)
 src/ingestion/          Validation, readers, cleaning, pipeline, data models
 src/nlp/                Sentence segmentation, IOC extraction, entity recognition, KB loader
@@ -345,12 +349,12 @@ src/intelligence/       Analysis orchestrator, ATT&CK mapping, threat assessment
 src/evaluation/         Precision/recall/F1 and the gold-file evaluation runner
 src/ml/                 Threat-category dataset, rule baseline, classifier, evaluation
 src/visualization/      Table builders, cross-document aggregations, Plotly figures
-src/ui/                 Streamlit pages (Analysis, History, Dashboard, IOC/Entity/ATT&CK explorers)
+src/web/                Web interface: FastAPI app (python -m src.web), templates, static assets
 src/database/           SQLAlchemy schema, repository, hydration of stored analyses
 src/reporting/          PDF/JSON/CSV report exports
 data/knowledge_base/    Versioned IANA TLDs, ATT&CK-derived entities, curated lists, rules
 data/evaluation/        Annotation guidelines and the annotated dev/test documents
-scripts/                Sample generator, ATT&CK KB builder, evaluation runner
+scripts/                Sample generator, ATT&CK KB builder, evaluation runner, screenshots
 tests/                  pytest suite
 docs/                   Architecture, methodology, evaluation, security, performance,
                         deployment and demo guides; screenshots
@@ -369,7 +373,8 @@ Dockerfile              Container image (see docs/deployment.md)
   * IOC robustness;
   * security review, performance and ReDoS hardening;
   * Docker and deployment guides, demo guide and screenshots.
-- [ ] **Release v1.0.0:** publish the model files as the `models-v1` release, then tag
+- [x] **Release v1.0.0:** model files published as the `models-v1` release, tagged
+- [x] **Web interface:** Streamlit replaced by FastAPI + HTMX with light and dark themes
 
 ## Known limitations
 
